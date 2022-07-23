@@ -31,27 +31,25 @@ class Cat {
         $this.name = ig '[person]'
         $this.Color = ig '[color]'
         # Label 'parent' | Write-Verbose
-        # if ($IncludeChildren) {
-        #     if ($true) {
-        #         $This.kittens = @(
-        #             [Cat]::New()
-        #             [Cat]::New()
-        #         )
-        #     }
-
-
-        #     if ($false) {
-        #         $this.kittens = 0..(Get-Random -min 0 -max 6) | ForEach-Object {
-        #             Label 'kitten' 'new' | Write-Verbose
-        #             [Cat]::new()
-        #         }
-        #     }
-        # }
+        if ($IncludeChildren) {
+            if ($true) {
+                $This.kittens = @(
+                    [Cat]::New()
+                    [Cat]::New()
+                )
+            }
+            if ($false) {
+                $this.kittens = 0..(Get-Random -min 0 -max 6) | ForEach-Object {
+                    Label 'kitten' 'new' | Write-Verbose
+                    [Cat]::new()
+                }
+            }
+        }
     }
 
     [string] ToString () {
-        $msg = '[Cat(Name = {0}, Kittens = {1})]'
-        $msg -f @(
+        $template = '[Cat(Name = {0}, Kittens = {1})]'
+        $render = $template -f @(
             $this.Name
             if ($This.Kittens.count -gt 0) {
                 $this.kittens.Count
@@ -59,7 +57,7 @@ class Cat {
                 'none'
             }
         )
-        return $this.msg
+        return $render
 
     }
 }
