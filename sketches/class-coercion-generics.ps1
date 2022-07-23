@@ -1,5 +1,23 @@
 Import-Module NameIt -ea stop
 
+Label 'basically the problem is
+
+
+[list[Cat]]$cats = 0..5 |%{ [Cat]::new() }
+
+then breaks
+    [list[Herd]]$Herd = $cats
+evver
+works
+    [list[Herd]]$Herd = @($cats | %{ [Herd]::New($cats) })
+
+works
+    [list[Herd]]$Herd = @($cats)
+'
+Hr -fg 'magenta'
+
+H1 'meaning: class just needs an IEnumerable ?'
+
 class Cat {
     [string]$Name = 'bob'
     [string]$Color
@@ -9,9 +27,49 @@ class Cat {
         $this.name = ig '[person]'
         $this.Color = ig '[color]'
     }
+    Cat ([bool]$IncludeChildren) {
+        $this.name = ig '[person]'
+        $this.Color = ig '[color]'
+        # Label 'parent' | Write-Verbose
+        # if ($IncludeChildren) {
+        #     if ($true) {
+        #         $This.kittens = @(
+        #             [Cat]::New()
+        #             [Cat]::New()
+        #         )
+        #     }
+
+
+        #     if ($false) {
+        #         $this.kittens = 0..(Get-Random -min 0 -max 6) | ForEach-Object {
+        #             Label 'kitten' 'new' | Write-Verbose
+        #             [Cat]::new()
+        #         }
+        #     }
+        # }
+    }
+
+    [string] ToString () {
+        $msg = '[Cat(Name = {0}, Kittens = {1})]'
+        $msg -f @(
+            $this.Name
+            if ($This.Kittens.count -gt 0) {
+                $this.kittens.Count
+            } else {
+                'none'
+            }
+        )
+        return $this.msg
+
+    }
 }
 
-[Cat]::new()
+[list[Cat]]$catList = 0..4 | ForEach-Object {
+    [Cat]::New($true)
+}
+
+$catList | to->Json
+
 
 # $APIResponse = @(
 #     @{ 'Name' = 'Cat' }
