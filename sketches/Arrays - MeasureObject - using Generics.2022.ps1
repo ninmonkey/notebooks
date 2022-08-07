@@ -1,31 +1,104 @@
+using namespace System.Collections.Generic
+
 Import-Module benchpress -PassThru -ea stop
 $PSVersionTable.PSVersion | Join-String -op 'Pwsh: '
 $Config = @{ Names = 'dev.nin' }
 
+# if slow
+$TestConfigSlow = @{
+    MaxValue    = 0x10ffff
+    RepeatCount = 200
+    Delims      = ' ▸·⇢⁞ ┐⇽▂'
+    ExportPath  = (Join-Path $PSScriptRoot './.output/Summary-Slow.xlsx')
+}
+# if fast
+$TestConfigFast = @{
+    MaxValue    = 0x10ff
+    RepeatCount = 3
+    Delims      = ' ▸·⇢⁞ ┐⇽▂'
+    ExportPath  = (Join-Path $PSScriptRoot './.output/Summary-Fast.xlsx')
+}
 $measureBenchSplat = @{
     OutVariable = 'ovBenchSummary'
-    # RepeatCount = 10
-    RepeatCount = 2
+    RepeatCount = $TestConfig.RepeatCount
     GroupName   = 'Root'
 }
-
-$TestConfig = @{
-    MaxValue = 0x10ffff
-    Delims   = ' ▸·⇢⁞ ┐⇽▂'
+if ($true -or 'fastOnly') {
+    'Fast' | Label 'Config?'
+    $TestConfig = $TestConfigFast
+} else {
+    'Slow' | Label 'Config?'
+    $TestConfig = $TestCOnfigSlow
 }
+$TestConfig | Format-Table -auto
+
 Measure-Benchmark @measureBenchSplat -Technique @{
-    # 'Filtering by the Source Command' = {
-    'Implicit [] ⇢ empty with Loop' = {
+    'Generic<Object>[] ⇢  += empty with Loop' = {
+        [list[object]]$Items = @(
+            0..$MaxValue | ForEach-Object { $Items.add( $_ ) }
+        )
+    }
+    'Generic<Object>[] ⇢  += div with Loop'   = {
+        [list[object]]$Items = @(
+            0..$MaxValue | ForEach-Object { $Items.add( ($_ / 3) ) }
+        )
+    }
+    'Generic<Object>[] ⇢ empty with Loop'     = {
+        [list[object]]$Items = @(
+            0..$MaxValue | ForEach-Object { $_ }
+        )
+    }
+    'Generic<Object>[] ⇢ empty no Loop'       = {
+        [list[object]]$Items = @(
+            0..$MaxValue
+        )
+    }
+    'Generic<Object>[] ⇢ Double '             = {
+        [list[object]]$Items = @(
+            0..$MaxValue | ForEach-Object { $_ * 2 }
+        )
+    }
+    'Generic<Int>[] ⇢ empty with Loop'        = {
+        [list[int]]$Items = @(
+            0..$MaxValue | ForEach-Object { $_ }
+        )
+    }
+    'Generic<Int>[] ⇢ empty no Loop'          = {
+        [list[int]]$Items = @(
+            0..$MaxValue
+        )
+    }
+    'Generic<Int>[] ⇢ Double '                = {
+        [list[int]]$Items = @(
+            0..$MaxValue | ForEach-Object { $_ * 2 }
+        )
+    }
+    'Object[] ⇢ empty with Loop'              = {
+        [object[]]$Items = @(
+            0..$MaxValue | ForEach-Object { $_ }
+        )
+    }
+    'Object[] ⇢ empty no Loop'                = {
+        [object[]]$Items = @(
+            0..$MaxValue
+        )
+    }
+    'Object[] ⇢ Double '                      = {
+        [object[]]$Items = @(
+            0..$MaxValue | ForEach-Object { $_ * 2 }
+        )
+    }
+    'Implicit[] ⇢ empty with Loop'            = {
         $Items = @(
             0..$MaxValue | ForEach-Object { $_ }
         )
     }
-    'Implicit [] ⇢ empty no Loop'   = {
+    'Implicit[] ⇢ empty no Loop'              = {
         $Items = @(
             0..$MaxValue
         )
     }
-    'Implicit [] ⇢ Double '         = {
+    'Implicit[] ⇢ Double '                    = {
         $Items = @(
             0..$MaxValue | ForEach-Object { $_ * 2 }
         )
@@ -42,6 +115,11 @@ $ovBenchSummary | Sort-Object RelativeSpeed -Descending | Format-Table
 # [object[]]$Items = @(
 #     0..0x10ffff | ForEach-Object { $_ * 2 }
 # )
+
+
+$ovBenchSummary | Export-Excel -Path $TestConfig.ExportPath -ea 'continue'
+$TestConfig.ExportPath | Get-Item | ForEach-Object FullName | Label 'Wrote Summary...'
+
 
 return
 
