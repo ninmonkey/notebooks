@@ -116,10 +116,14 @@ $ovBenchSummary | Sort-Object RelativeSpeed -Descending | Format-Table
 #     0..0x10ffff | ForEach-Object { $_ * 2 }
 # )
 
+try {
+    $ovBenchSummary | Export-Excel -Path $TestConfig.ExportPath -ea 'continue'
+} catch {
+    Write-Warning 'Excel is still open.'
+}
+$TestConfig.ExportPath | Get-Item | ForEach-Object FullName | Label 'Wrote Summary...' -fg2 'gray30' -bg2 'gray80'
 
-$ovBenchSummary | Export-Excel -Path $TestConfig.ExportPath -ea 'continue'
-$TestConfig.ExportPath | Get-Item | ForEach-Object FullName | Label 'Wrote Summary...'
-
+$TestConfig.ExportPath | Get-Item | Invoke-Item
 
 return
 
