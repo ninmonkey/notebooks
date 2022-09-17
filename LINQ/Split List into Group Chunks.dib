@@ -1,0 +1,44 @@
+#!pwsh
+
+# delegate
+using namespace System.Collections.Generic
+
+[List[Object]]$files = ls 'c:\'
+# $items.Sort({param($x, $y) $x.LastWriteTime.CompareTo($y.LastWriteTime)})
+$files | Select -first 3
+$files.Sort({param($x, $y) $x.LastWriteTime.CompareTo($y.LastWriteTime)})
+$files | Select -first 3
+$files
+
+#!csharp
+
+int scores = 
+IEnumerable<int> highScoresQuery3 =
+    from score in scores
+    where score > 80
+    select score;
+
+int scoreCount = highScoresQuery3.Count();
+
+#!markdown
+
+## LINQ
+
+- `IEnumerable<T>` or `IQueryable<T>`
+
+- [C# LINQ concepts](https://docs.microsoft.com/en-us/dotnet/csharp/linq/)
+  - [Query Expression](https://docs.microsoft.com/en-us/dotnet/csharp/linq/query-expression-basics)
+  
+
+
+## Async
+
+- [asynchronous-programming-patterns/calling-synchronous-methods-asynchronously](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/calling-synchronous-methods-asynchronously)
+- [Async Delegates](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/asynchronous-programming-using-delegates)
+- [\[MulticastDelegate\]](https://docs.microsoft.com/en-us/dotnet/api/system.multicastdelegate?view=net-6.0#remarks) class
+- [TOC Generics](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/types/generics)
+  
+- TOC: [https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/)
+  - [TAP - Task-based Async Pattern](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap)
+  - [EAP - Event-Based Async Pattern](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/implementing-the-event-based-asynchronous-pattern)
+  - [APM Async Programming model](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/asynchronous-programming-model-apm)
