@@ -2,6 +2,15 @@ using namespace System.Collections.Generic
 using namespace System.Globalization
 using namespace System.Text
 # [Globalization.StringInfo]
+
+'toask
+how to use spans
+
+    Since a Rune is a Unicode scalar value, it can be converted to UTF-8, UTF-16, or UTF-32 encoding. The Rune type has built-in support for conversion to UTF-8 and UTF-16.
+
+    The Rune.EncodeToUtf16 converts a Rune instance to char instances. To query the number of char instances that would result from converting a Rune instance to UTF-16, use the Rune.Utf16SequenceLength property. Similar methods exist for UTF-8 conversion.'
+
+
 $b ??= @{}
 
 $b.v_end_crlf = @'
@@ -24,6 +33,19 @@ if($false) {
 }
 
 function _inspectRune {
+    <#
+    .SYNOPSIS
+        inspect Text.Rune info
+    .NOTES
+
+        [Rune]::GetRuneAt( string, int )
+        [Rune]::TryGetRuneAt( str, int, [OutRef]Rune )
+
+        TryEncodeToUtf16(Span<char> destination, out int charsWritten);
+         TryEncodeToUtf8(Span<byte> destination, out int bytesWritten);
+    .EXAMPLE
+        'abc' | _iterRune | _inspectRune
+    #>
     param(
         [Parameter(Mandatory, ValueFromPipeline, ParameterSetName='fromPipe', ValueFromPipelineByPropertyName)]
         [Parameter(Mandatory, ParameterSetName='fromParam')]
@@ -45,26 +67,39 @@ function _inspectRune {
         $cultInfo = [Globalization.CultureInfo]::new('en-us')
 
         [pscustomobject]@{
-            Instance = $Target
-            Category = [Text.Rune]::GetUnicodeCategory( $Target )
-            GetNumericValue = [Text.Rune]::GetNumericValue( $Target )
+            Instance           = $Target
+            Category           = [Text.Rune]::GetUnicodeCategory( $Target )
+            GetNumericValue    = [Text.Rune]::GetNumericValue( $Target )
             GetUnicodeCategory = [Text.Rune]::GetUnicodeCategory( $Target )
-            IsControl = [Text.Rune]::IsControl( $Target )
-            IsDigit = [Text.Rune]::IsDigit( $Target )
-            IsLetter = [Text.Rune]::IsLetter( $Target )
-            IsLetterOrDigit = [Text.Rune]::IsLetterOrDigit( $Target )
-            IsLower = [Text.Rune]::IsLower( $Target )
-            IsNumber = [Text.Rune]::IsNumber( $Target )
-            IsPunctuation = [Text.Rune]::IsPunctuation( $Target )
-            IsSeparator = [Text.Rune]::IsSeparator( $Target )
-            IsSymbol = [Text.Rune]::IsSymbol( $Target )
-            IsUpper = [Text.Rune]::IsUpper( $Target )
-            IsWhiteSpace = [Text.Rune]::IsWhiteSpace( $Target )
-            ToLower = [Text.Rune]::ToLower( $Target, $cultInfo )
-            ToLowerInvariant = [Text.Rune]::ToLowerInvariant( $Target )
-            ToUpper = [Text.Rune]::ToUpper( $Target, $cultInfo )
-            ToUpperInvariant = [Text.Rune]::ToUpperInvariant( $Target )
+            IsBlank = [String]::IsNullOrWhiteSpace('' )
+            IsControl          = [Text.Rune]::IsControl( $Target )
+            IsDigit            = [Text.Rune]::IsDigit( $Target )
+            IsLetter           = [Text.Rune]::IsLetter( $Target )
+            IsLetterOrDigit    = [Text.Rune]::IsLetterOrDigit( $Target )
+            IsLower            = [Text.Rune]::IsLower( $Target )
+            IsNumber           = [Text.Rune]::IsNumber( $Target )
+            IsPunctuation      = [Text.Rune]::IsPunctuation( $Target )
+            IsSeparator        = [Text.Rune]::IsSeparator( $Target )
+            IsSymbol           = [Text.Rune]::IsSymbol( $Target )
+            IsUpper            = [Text.Rune]::IsUpper( $Target )
+            IsWhiteSpace       = [Text.Rune]::IsWhiteSpace( $Target )
+            ToLower            = [Text.Rune]::ToLower( $Target, $cultInfo )
+            ToLowerInvariant   = [Text.Rune]::ToLowerInvariant( $Target )
+            ToUpper            = [Text.Rune]::ToUpper( $Target, $cultInfo )
+            ToUpperInvariant   = [Text.Rune]::ToUpperInvariant( $Target )
 
+                        # props
+            IsAscii             = $Target.IsAscii
+            IsBmp               = $Target.IsBmp
+            Plane               = $Target.Plane
+            ReplacementChar     = $Target.ReplacementChar
+            Utf16SequenceLength = $Target.Utf16SequenceLength
+            Utf8SequenceLength  = $Target.Utf8SequenceLength
+            Value               = $Target.Value
+            # DecodeFromUtf16
+            # DecodeFromUtf8
+            EncodeToUtf16 = 'NYI.'
+            EncodeToUtf8 = 'NYI.'
         }
     }
 }
@@ -77,6 +112,8 @@ function _iterRune {
     .EXAMPLE
         "`u{27}`u{1f468}`u{1f3fc}`u{200d}`u{1f3ed}`u{27}" | _iterRune | ft
         "`u{27}`u{1f468}`u{1f3fc}`u{200d}`u{1f3ed}`u{27}" | _iterGrapheme
+
+        'abc' | _iterRune | _inspectRune
     #>
     [CmdletBinding()]
     param(
@@ -133,9 +170,15 @@ function _formatSymbol {
         # $_.EnumerateRunes().Value | %{
 
     $InputText.EnumerateRunes() | %{
-
-        'write-debug $_'
-    }
+        # $isControl = [Rune]::GetUnicodeCategory( $_ ) -eq [Globalization.UnicodeCategory]::Control
+        $isBlank = [Rune]::IsWhiteSpace( $_ ) -or [RUne]::IsControl( $_ )
+        if( [Rune]::IsControl( $_ ) ) {
+            [Rune]::new( $_.Value + 0x2400 )
+            # [char]::ConvertFromUtf32( $_.Value + 0x2400 )
+        } else {
+            $_
+        }
+    } | Join-String
 }
 
 _formatSymbol "`n`r"
@@ -146,6 +189,7 @@ function _summarizeText {
     .NOTES
         see more:
         - 5+ distinct definitions for keyword [Glyph] and [Grapheme] <https://www.unicode.org/glossary/#grapheme_cluster>
+        - [Character encoding in dotnet](https://learn.microsoft.com/en-us/dotnet/standard/base-types/character-encoding)
         - [graphemes](https://learn.microsoft.com/en-us/dotnet/standard/base-types/character-encoding-introduction#grapheme-clusters)
         - [TextElement from StringInfo.GetTextElementEnumerator](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.stringinfo.gettextelementenumerator?view=net-6.0)
         - [WellFormed Surrogate pairs](https://learn.microsoft.com/en-us/dotnet/standard/base-types/character-encoding-introduction#well-formed-encoding)
