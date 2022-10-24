@@ -223,6 +223,28 @@ function PString {
     
     showArgs $PSBoundParameters $Args
 }
+function OneParam {
+    <#
+    .SYNOPSIS
+        simplified version of PString()
+    #>
+    param(
+        # [Parameter()]
+        [String]$Text1
+    )        
+    showArgs $PSBoundParameters $Args
+}
+function OneParamAsAdvanced {
+    <#
+    .SYNOPSIS
+        simplified version of PString()
+    #>
+    param(
+        [Parameter()]
+        [String]$Text1
+    )        
+    showArgs $PSBoundParameters $Args
+}
 function OneParamFromRemaining {
     <#
     .SYNOPSIS
@@ -260,6 +282,7 @@ if ($true -or $ExtraDemos) {
     
     PString -Text1 $Text1 @Unbound
 }
+return
 ShowCommandSyntax 'OneParam'
 
 OneParam 'a' 'b'
@@ -271,8 +294,8 @@ OneParam 'a', 'b' 'c' 'd'
 OneParam bob cat dog
 OneParam 'bob cat dog'
 OneParam 'bob' 'cat' 'dog'
-OneParam 'bob', 'cat', 'dog'
 
+OneParam 'bob', 'cat', 'dog'
 return
 
 function InspectTheInspected { 
