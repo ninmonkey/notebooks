@@ -101,6 +101,14 @@ function showArray {
         showArray @(0..4) -Csv
     .NOTES
         future: will add data types
+    .LINK
+        ShowArgs
+    .LINK
+        ShowHash
+    .LINK
+        ShowArray
+    .LINK
+        Hr
     #>
     [Alias('ShowArray.2')]
     param (
@@ -144,16 +152,26 @@ if($ShowTestOutput) {
 function ShowArgs  { 
     <#
     .SYNOPSIS
-        This function is sautomatic, see showHast() and showArray() for control
+        top level function for users to use. This is automatic, see showHast() and showArray() for control
+    .LINK
+        ShowArgs
+    .LINK
+        ShowHash
+    .LINK
+        ShowArray
+    .LINK
+        Hr
     #>
+    # [Alias('ShowArgs.3')]    
     param(
+        # Their bound, not mine
         [hashtable]$BoundParametersObj,
 
-        [object]$ArgsRemaining,
-        
-        # Shorter output, good for longer arrays
+        [object]$ArgsRemaining,        
+        # for Shorter output, print as a Csv, good for longer arrays
         [Alias('AsCsv')][switch]$Csv,
-        # set to non-zero value to limit max lines to print
+
+        # Set a maximum row limit (for printing). 0 Means no limits
         [int]$AutoCsv = 0
     )
     if($AutoCsv -gt 0 -and $ArgsRemaining.count -gt $AutoCsv) {
@@ -162,35 +180,10 @@ function ShowArgs  {
     
     $newBound = [hashtable]::new( $BoundParametersObj ) # potentially not required
     showHash $BoundParametersObj -Label '$PSBoundParameters'
-    # showHash $PSBoundParameters -Label 'My $PSBoundParameters'
-    # showHash $NewBound -Label '$newBound'
     
     showArray $ArgsRemaining -Label "UnboundArgs: $($UnboundArgs.count)" -Csv:$Csv
-    # showArray $ArgsRemaining -Label "UnboundArgs: $($UnboundArgs.count)" -csv:(-not $AsList)
-}
-function PString.0 {
-    param(
-        [String]$Text 
-    )    
-    "`$PSBoundParameters:"
-    # $PSBoundParameters | Ft -AutoSize
-    "PSBoundParameters"
-    $PSBoundParameters.GetEnumerator() | %{ 
-        $Key = $_.Key ; $Value = $_.value
-        "$Key = $Value"
-    }
     
-    hr
-
-    [pscustomobject] [hashtable]::New($PSBoundParameters) | ft -auto
-hr
-
-    "`$Text = $Text"
-    "Uncaught args: $( $args.Count )"    
-
-    $args
 }
-
 function PString {
     <#
     .SYNOPSIS
@@ -201,26 +194,7 @@ function PString {
         [string]$Extra
     )    
     
-    # showHash $PSBoundParameters 'PSBoundParameters'
-    # showArray 
     showArgs $PSBoundParameters $Args
-    return
-    # showArgs $PSBoundParameters $Args
-    "`$PSBoundParameters:"
-    # $PSBoundParameters | Ft -AutoSize
-    "PSBoundParameters"
-    $PSBoundParameters.GetEnumerator() | %{ 
-        $Key = $_.Key ; $Value = $_.value
-        "$Key = $Value"
-    }
-hr
-    [pscustomobject] [hashtable]::New($PSBoundParameters) | ft -auto
-hr
-
-    "`$Text = $Text"
-    "Uncaught args: $( $args.Count )"    
-
-    $args
 }
 
 PString 'a', 'b' 'c' 'd' 0, 4, 5
