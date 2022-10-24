@@ -1,3 +1,4 @@
+hr
 function Note { 
     <#
     .SYNOPSIS
@@ -17,10 +18,10 @@ function Note {
     [CmdletBinding()]               
     param( 
         [Parameter(Mandatory, ValueFromRemainingArguments)]
-            [string]$Text )
+        [string]$Text )
 
-    if($script:DisableNotes) { return } 
-    switch($MyInvocation.InvocationName) {
+    if ($script:DisableNotes) { return } 
+    switch ($MyInvocation.InvocationName) {
         'SideNote' { 
             $Color = 'blue'
             $Prefix = 'SideNote: '
@@ -31,8 +32,8 @@ function Note {
         }
 
     }
-        "${Prefix}$Text" | write-host -fore $Color
-        "${Prefix}$Text" | write-host -fore $Color
+    "${Prefix}$Text" | Write-Host -fore $Color
+    "${Prefix}$Text" | Write-Host -fore $Color
 }
 
 function Hr {
@@ -75,13 +76,13 @@ function showHash {
         # Number of columns to align text with. Set to 0 to disable it
         [int]$PadLeft = 10
     )
-    if($Label) { 
-        "`n ==  $Label == `n"
+    if ($Label) { 
+        "`n == $Label == `n"
     }
     $Hash.GetEnumerator() | ForEach-Object { 
         $Key = $_.Key ; $Value = $_.value
         $KeyAligned = $Key.ToString().padLeft( $PadLeft, ' ')
-        if($null -eq $Value) { $Value = "<TrueNull>"}
+        if ($null -eq $Value) { $Value = '<TrueNull>' }
         "$KeyAligned = $Value"
     }
 }
@@ -122,34 +123,30 @@ function showArray {
         # print CSV instead?
         [Alias('AsCsv')][switch]$Csv
     )
-    if($Label) { 
+    if ($Label) { 
         "`n == $Label, Length = $($Array.Count) ==`n"
     }
-    $Array  = $Array | %{
-        if($null -eq $_) {
-            "<TrueNull>"
-        } else { $_ }
+    $Array = $Array | ForEach-Object {
+        if ($null -eq $_) {
+            '<TrueNull>'
+        }
+        else { $_ }
     }
-    if($Csv) { 
+    if ($Csv) { 
         $Array -join ', ' 
         return
     }
     
     $index = 0
-    foreach($item in $Array) { 
+    foreach ($item in $Array) { 
         $IdAligned = $Index.ToString().PadLeft( $PadLeft, ' ')
         "$IdAligned = $Item" 
         $Index++
     }
 }
 
-if($ShowTestOutput) { 
-    showArray (0..3) stuff
-    showArray (0..3 + 'a'..'c') -Csv stuff
-    showArray ('a', $null, 'e') 'Include a null'
-}
 
-function ShowArgs  { 
+function ShowArgs { 
     <#
     .SYNOPSIS
         top level function for users to use. This is automatic, see showHast() and showArray() for control
@@ -172,17 +169,51 @@ function ShowArgs  {
         [Alias('AsCsv')][switch]$Csv,
 
         # Set a maximum row limit (for printing). 0 Means no limits
-        [int]$AutoCsv = 0
+        [int]$AutoCsv = 0,
+        
+        # show scriptblock ? 
+        [ALias('SB')][switch]$IncludeCode
     )
-    if($AutoCsv -gt 0 -and $ArgsRemaining.count -gt $AutoCsv) {
+    if ($AutoCsv -gt 0 -and $ArgsRemaining.count -gt $AutoCsv) {
         $Csv = $true
     }
+    hr -fg purple
+
+    '{2}> {0}{1}' -f @( 
+        $call = Get-PSCallStack; $cfirst = $call | Select-Object -First  1 ; $clast = $call | Select-Object -Last 1    
+        $call[1].InvocationInfo.Line ?? '?' | Bat -l ps1
+        "`n"
+        hr
+        # "`n`n"  ?? ''
+    )
     
+
+
     $newBound = [hashtable]::new( $BoundParametersObj ) # potentially not required
-    showHash $BoundParametersObj -Label '$PSBoundParameters'
+    showHash $BoundParametersObj -Label '$PSBoundParameters'    
+    showArray $ArgsRemaining -Label 'UnboundArgs' -Csv:$Csv    
+    # grab ends
+    # hr
+    # $cfirst.InvocationInfo | iot2 -NotSkipMost
+    # hr
+    # $clast.InvocationInfo.MyCommand | iot2 -NotSkipMost
+}
+function ShowCommandSyntax {
+    param( [string]$CommandName )
+    $syn = Get-Command -syntax $CommandName
+    $syn ??= ''
+    $render = $syn | Bat -l ps1
     
-    showArray $ArgsRemaining -Label "UnboundArgs: $($UnboundArgs.count)" -Csv:$Csv
-    
+    # hr -fg '#c186b7'
+    # hr -fg '#c186b7'
+    # hr -fg '#330000'
+    # hr -fg '#330000'
+    hr -fg 'yellow'
+    hr -fg 'yellow'
+    "`n== Syntax == "
+    $render
+    # hr -fg '#c186b7'
+
 }
 function PString {
     <#
@@ -196,13 +227,58 @@ function PString {
     
     showArgs $PSBoundParameters $Args
 }
+function OneParam {
+    <#
+    .SYNOPSIS
+        simplified version of PString()
+    #>
+    param(
+        [String]$Text1
+    )    
+    
+    showArgs $PSBoundParameters $Args
+}
+if ($true -or $ExtraDemos) {     
 
-PString 'a', 'b' 'c' 'd' 0, 4, 5
-hr
-PString 'a', 'b' 'c' 'd'
-hr
+    
+    
+    showArray (0..3) stuff
+    showArray (0..3 + 'a'..'c') -Csv stuff
+    showArray ('a', $null, 'e') 'Include a null'
+
+
+
+    PString 'a', 'b' 'c' 'd' 0, 4, 5
+    hr
+    PString 'a', 'b' 'c' 'd'
+    hr
+
+    
+    PString -Text1 ('str1', 'str2') 'str3' 'str4'
+
+    $Text1 = 'str1', 'str2' 
+    $Unbound = 'str3', 'str4'   
+    PString -Text1 $Text1 $unbound
+    
+    PString -Text1 $Text1 @Unbound
+}
+ShowCommandSyntax 'OneParam'
+
+OneParam 'a' 'b'
+OneParam 'a', 'b' 'c'
+OneParam 'a', 'b' 'c' 'd'
+
 return
 
+function InspectTheInspected { 
+    param( $stuff )
+    # grab ends
+    $call = Get-PSCallStack; $cfirst = $call | Select-Object -First  1 ; $clast = $call | Select-Object -Last 1
+    hr
+    $cfirst.InvocationInfo | iot2 -NotSkipMost
+    hr
+    $clast.InvocationInfo | iot2 -NotSkipMost
+}
 Note @'
 Notice how "Text1 == str1 str2", how does that work? 
 The first positional parameter's type is one [String] string, not a list of strings
@@ -257,5 +333,5 @@ hr
 PString 'text', 'str2'
 
 
-write-warning 'I can maybe abstract using callstack or myinvocation info istead of the user caring? or will some contexts break?
+Write-Warning 'I can maybe abstract using callstack or myinvocation info istead of the user caring? or will some contexts break?
     ideal is user just runs ShowCmdInfo()'
