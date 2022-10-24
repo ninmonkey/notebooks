@@ -42,10 +42,12 @@ function showHash {
     $Hash.GetEnumerator() | ForEach-Object { 
         $Key = $_.Key ; $Value = $_.value
         $KeyAligned = $Key.ToString().padLeft( $PadLeft, ' ')
+        if($null -eq $Value) { $Value = "<TrueNull>"}
         "$KeyAligned = $Value"
     }
 }
-function showArray { # version: showArray.1
+function showArray { 
+    # version: showArray.1
     <#
     .synopsis
         pretty print arrays, making tests easier to visualize
@@ -73,6 +75,11 @@ function showArray { # version: showArray.1
     if($Label) { 
         "`n == $Label, Length = $($Array.Count) == `n"
     }
+    $Array  = $Array | %{
+        if($null -eq $_) {
+            "<TrueNull>"
+        } else { $_ }
+    }
     if($Csv) { 
         $Array -join ', ' 
         return
@@ -81,13 +88,14 @@ function showArray { # version: showArray.1
     $index = 0
     foreach($item in $Array) { 
         $IdAligned = $Index.ToString().PadLeft( $PadLeft, ' ')
-        "$IdAligned = $Item"
+        "$IdAligned = $Item" 
         $Index++
     }
 }
 
-showArray (0..5) stuff
+showArray (0..3) stuff
 showArray (0..3 + 'a'..'c') -Csv stuff
+showArray ('a', $null, 'e') 'Include a null'
 return
 function PString {
     param(
