@@ -1,3 +1,28 @@
+function Note { 
+    <#
+    .SYNOPSIS
+        allows inline text, which can be formatted special --- or even disabled globally
+    .EXAMPLE
+        Note 'foo bar'
+        SideNote 'foo bar'
+
+    .EXAMPLE
+        Note 'foo bar'
+        $script:DisableSideNotes = $true
+        Note
+            <nothing>
+    #>
+    # sugar for tutorial notes
+    [Alias('SideNote')]
+    [CmdletBinding()]               
+    param( 
+        [Parameter(Mandatory, ValueFromRemainingArguments)]
+            [string]$Text )
+
+    if($script:DisableNotes) { return } 
+
+    "Note: $Text" | write-host -fore yellow
+}
 function Hr {
     <#
     .SYNOPSIS
@@ -93,11 +118,31 @@ function showArray {
     }
 }
 
-showArray (0..3) stuff
-showArray (0..3 + 'a'..'c') -Csv stuff
-showArray ('a', $null, 'e') 'Include a null'
-return
-function PString {
+if($ShowTestOutput) { 
+    showArray (0..3) stuff
+    showArray (0..3 + 'a'..'c') -Csv stuff
+    showArray ('a', $null, 'e') 'Include a null'
+}
+
+function ShowArgs  { 
+    <#
+    .SYNOPSIS
+        This function is sautomatic, see showHast() and showArray() for control
+    #>
+    param(
+        [hashtable]$BoundParametersObj,
+
+        [object]$ArgsRemaining
+    )
+    'newBound'
+    $newBound = [hashtable]::new( $BoundParametersObj )
+    hr
+    showHash $BoundParametersObj -Label 'my paramFor $PSBoundParameters'
+    showHash $PSBoundParameters -Label 'My $PSBoundParameters'
+    showHash $NewBound -Label '$newBound'
+    showArray $ArgsRemaining -Label '$Args ( remaning args )' -Csv
+}
+function PString.0 {
     param(
         [String]$Text 
     )    
@@ -108,7 +153,7 @@ function PString {
         $Key = $_.Key ; $Value = $_.value
         "$Key = $Value"
     }
-    hr
+    
     hr
 
     [pscustomobject] [hashtable]::New($PSBoundParameters) | ft -auto
@@ -119,6 +164,62 @@ hr
 
     $args
 }
+
+function PString {
+    param(
+        [String]$Text1
+    )    
+    
+    # showHash $PSBoundParameters 'PSBoundParameters'
+    # showArray 
+    showArgs $PSBoundParameters $Args
+    # showArgs $PSBoundParameters $Args
+    return
+    "`$PSBoundParameters:"
+    # $PSBoundParameters | Ft -AutoSize
+    "PSBoundParameters"
+    $PSBoundParameters.GetEnumerator() | %{ 
+        $Key = $_.Key ; $Value = $_.value
+        "$Key = $Value"
+    }
+hr
+    [pscustomobject] [hashtable]::New($PSBoundParameters) | ft -auto
+hr
+
+    "`$Text = $Text"
+    "Uncaught args: $( $args.Count )"    
+
+    $args
+}
+Note 'Notice how "Text1 = str1 str2", how does that work? 
+the parameter is a single string, meaning type [string]
+the value passed was "str1, str2" which is an array. Meaning type [string[]]
+
+it''s as if you had used
+
+$Text1 = $str1, $str2
+$Remaining = $str3, $str4
+
+
+What''s happening is and "str2" are implicitly joined as one [string]
+happens when an array, in this case [String[]] is passed to [string] parameter
+It implicitly joine
+'
+
+$Text1 = $str1, $str2
+$Unbound = $str3, $str4
+PString -Text1 $Text1 $unbound
+SideNote 'Side note, you could use the splat operator here, to pass a list as unbound
+verses one parameter to a list 
+    PString -Text1 $Text1 @unbound
+
+'
+
+PString 'str1', 'str2' 'str3' 'str4'
+
+
+
+PString 'str1', 'str2' 'str3' 'str4'
 
 PString 'text'
 
