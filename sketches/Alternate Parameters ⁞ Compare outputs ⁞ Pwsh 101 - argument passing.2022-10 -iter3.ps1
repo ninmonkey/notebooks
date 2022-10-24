@@ -50,7 +50,8 @@ function Hr {
     "`n`n$Line`n`n"
 }
 
-function showHash {
+function showHash { 
+    # version: showHash.2
     <#
     .synopsis
         pretty print hashtables, making tests easier to visual
@@ -63,6 +64,7 @@ function showHash {
     .NOTES
         future: will add data types
     #>
+    [Alias('showHash.2')]
     param (
         # What to print
         [hashtable]$Hash,
@@ -84,7 +86,7 @@ function showHash {
     }
 }
 function showArray { 
-    # version: showArray.1
+    # version: showArray.2
     <#
     .synopsis
         pretty print arrays, making tests easier to visualize
@@ -94,10 +96,13 @@ function showArray {
             == stuff, Length = 9 ==
 
             z, y, 0, 1, 2, 3, 4, a, b
+    .EXAMPLE
+        showArray @(0..4)
+        showArray @(0..4) -Csv
     .NOTES
         future: will add data types
     #>
-    [Alias('ShowArray.1')]
+    [Alias('ShowArray.2')]
     param (
         # What to print
         $Array,
@@ -110,7 +115,7 @@ function showArray {
         [Alias('AsCsv')][switch]$Csv
     )
     if($Label) { 
-        "`n == $Label, Length = $($Array.Count) == `n"
+        "`n == $Label, Length = $($Array.Count) ==`n"
     }
     $Array  = $Array | %{
         if($null -eq $_) {
@@ -121,7 +126,7 @@ function showArray {
         $Array -join ', ' 
         return
     }
-    "$As"
+    
     $index = 0
     foreach($item in $Array) { 
         $IdAligned = $Index.ToString().PadLeft( $PadLeft, ' ')
@@ -144,14 +149,24 @@ function ShowArgs  {
     param(
         [hashtable]$BoundParametersObj,
 
-        [object]$ArgsRemaining
+        [object]$ArgsRemaining,
+        
+        # Shorter output, good for longer arrays
+        [Alias('AsCsv')][switch]$Csv,
+        # set to non-zero value to limit max lines to print
+        [int]$AutoCsv = 0
     )
-    # 'newBound'
-    $newBound = [hashtable]::new( $BoundParametersObj )
-    showHash $BoundParametersObj -Label 'my paramFor $PSBoundParameters'
-    showHash $PSBoundParameters -Label 'My $PSBoundParameters'
-    showHash $NewBound -Label '$newBound'
-    showArray $ArgsRemaining -Label '$Args ( remaning args )' -Csv
+    if($AutoCsv -gt 0 -and $ArgsRemaining.count -gt $AutoCsv) {
+        $Csv = $true
+    }
+    
+    $newBound = [hashtable]::new( $BoundParametersObj ) # potentially not required
+    showHash $BoundParametersObj -Label '$PSBoundParameters'
+    # showHash $PSBoundParameters -Label 'My $PSBoundParameters'
+    # showHash $NewBound -Label '$newBound'
+    
+    showArray $ArgsRemaining -Label "UnboundArgs: $($UnboundArgs.count)" -Csv:$Csv
+    # showArray $ArgsRemaining -Label "UnboundArgs: $($UnboundArgs.count)" -csv:(-not $AsList)
 }
 function PString.0 {
     param(
@@ -177,6 +192,10 @@ hr
 }
 
 function PString {
+    <#
+    .SYNOPSIS
+        function that has one 
+    #>
     param(
         [String]$Text1,
         [string]$Extra
@@ -203,9 +222,12 @@ hr
 
     $args
 }
-return
 
+PString 'a', 'b' 'c' 'd' 0, 4, 5
+hr
 PString 'a', 'b' 'c' 'd'
+hr
+return
 
 Note @'
 Notice how "Text1 == str1 str2", how does that work? 
