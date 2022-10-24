@@ -177,7 +177,7 @@ function ShowArgs {
     if ($AutoCsv -gt 0 -and $ArgsRemaining.count -gt $AutoCsv) {
         $Csv = $true
     }
-    hr -fg purple
+    hr -fg orange
 
     '{2}> {0}{1}' -f @( 
         $call = Get-PSCallStack; $cfirst = $call | Select-Object -First  1 ; $clast = $call | Select-Object -Last 1    
@@ -203,11 +203,7 @@ function ShowCommandSyntax {
     $syn = Get-Command -syntax $CommandName
     $syn ??= ''
     $render = $syn | Bat -l ps1
-    
-    # hr -fg '#c186b7'
-    # hr -fg '#c186b7'
-    # hr -fg '#330000'
-    # hr -fg '#330000'
+
     hr -fg 'yellow'
     hr -fg 'yellow'
     "`n== Syntax == "
@@ -227,17 +223,19 @@ function PString {
     
     showArgs $PSBoundParameters $Args
 }
-function OneParam {
+function OneParamFromRemaining {
     <#
     .SYNOPSIS
         simplified version of PString()
     #>
     param(
+        [Parameter(ValueFromRemainingArguments)]
         [String]$Text1
-    )    
-    
+    )        
     showArgs $PSBoundParameters $Args
 }
+
+
 if ($true -or $ExtraDemos) {     
 
     
@@ -267,6 +265,13 @@ ShowCommandSyntax 'OneParam'
 OneParam 'a' 'b'
 OneParam 'a', 'b' 'c'
 OneParam 'a', 'b' 'c' 'd'
+OneParam 'a', 'b' 'c' 'd'
+
+
+OneParam bob cat dog
+OneParam 'bob cat dog'
+OneParam 'bob' 'cat' 'dog'
+OneParam 'bob', 'cat', 'dog'
 
 return
 
