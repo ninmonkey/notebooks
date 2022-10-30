@@ -1,0 +1,77 @@
+#!pwsh
+
+using namespace System.Collections.Generic
+
+function Format-TypeNameInfo2  {
+    # sugar for notebooks, wrote to be short in definfition, ie; not best practices
+    [Alias('Ti2')]
+    param( [Parameter(ValueFromPipeline)]$Obj, [switch]$PassThru )
+    process {
+        $tInfo = if($Obj -is 'type') { $Obj }
+        elseif ($Obj -is 'string') { $Obj -as 'type' }
+        else { $Obj.GetType() }
+        if($PassThru) { return $tInfo }
+        # generics look bad if you remove this [string] coerce
+        '[{0}]' -f @( [string]$tInfo )
+    }
+ }
+
+function Ti { process {
+    <#
+    .synopsis
+       Show short type names.  wrote to be short in definfition, ie; not best practices
+    .EXAMPLE
+        supports all these cases, not bad for length
+
+        [list[string]]$s = 'a', 'b'
+        $s | _fmttt
+        ,$s | _fmttt
+        $null | _fmttt
+        3, "dsf", @(), @(,2) | _fmttt
+    #>
+    if($null -eq $_) { return }
+    ($_ -is 'type') ? $_ : ($_.GetType()) | Join-String { '[{0}]' -f @( [string]$_ ) }
+} }
+#  234 | ti
+# gi . |  ti
+# get-date | ti
+
+# ,234 | ti
+
+
+function LabelTypeInfo {
+    # using $Input is almost always a bad idea, because it has a 
+    # zillion edge cases, but this is a notebook
+    [Alias('Li')]
+    param( [string]$Name )
+    process {
+        $_ | Ti2 | Join-String -op "${Name}: "
+    }
+}
+
+
+$Numbers = [string]'123'    # [string]
+$Numbers | Ti 
+$Numbers | Li '$numbers'
+$numbers
+
+$Numbers | Ti
+'213'
+ti (get-date)
+,(get-date) | ti
+
+class User {
+   [string]$Name = 'anonymous'
+}
+
+,$me = [User]::new()
+$me | ti
+$numbers
+
+#!pwsh
+
+ [list[string]]$s = 'a', 'b'
+        $s | ti
+        ,$s | ti
+        $null | ti
+        3, "dsf", @(), @(,2) |% name
