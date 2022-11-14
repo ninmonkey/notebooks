@@ -10,6 +10,49 @@ how to use spans
 
     The Rune.EncodeToUtf16 converts a Rune instance to char instances. To query the number of char instances that would result from converting a Rune instance to UTF-16, use the Rune.Utf16SequenceLength property. Similar methods exist for UTF-8 conversion.'
 
+@'
+Example output
+
+
+. .\str_CrLf.ps1
+$here | _iterRune | ft
+[Text.StringBuilder]::new( $here ).Replace("`r", '' ).ToString() | _iterRune | ft
+
+. .\str_Lf.ps1
+$here | _iterRune | ft
+[Text.StringBuilder]::new( $here ).Replace("`r", '' ).ToString() | _iterRune | ft
+
+
+IsAscii IsBmp Plane Utf16SequenceLength Utf8SequenceLength Value
+------- ----- ----- ------------------- ------------------ -----
+   True  True     0                   1                  1    97
+   True  True     0                   1                  1    13
+   True  True     0                   1                  1    10
+   True  True     0                   1                  1    98
+
+
+IsAscii IsBmp Plane Utf16SequenceLength Utf8SequenceLength Value
+------- ----- ----- ------------------- ------------------ -----
+   True  True     0                   1                  1    97
+   True  True     0                   1                  1    10
+   True  True     0                   1                  1    98
+
+
+IsAscii IsBmp Plane Utf16SequenceLength Utf8SequenceLength Value
+------- ----- ----- ------------------- ------------------ -----
+   True  True     0                   1                  1    97
+   True  True     0                   1                  1    10
+   True  True     0                   1                  1    98
+
+
+IsAscii IsBmp Plane Utf16SequenceLength Utf8SequenceLength Value
+------- ----- ----- ------------------- ------------------ -----
+   True  True     0                   1                  1    97
+   True  True     0                   1                  1    10
+   True  True     0                   1                  1    98
+
+'@
+
 
 $b ??= @{}
 
@@ -45,6 +88,9 @@ function _inspectRune {
          TryEncodeToUtf8(Span<byte> destination, out int bytesWritten);
     .EXAMPLE
         'abc' | _iterRune | _inspectRune
+
+        "`u{27}`u{1f468}`u{1f3fc}`u{200d}`u{1f3ed}`u{27}" | _iterRune |ft
+        "`u{27}`u{1f468}`u{1f3fc}`u{200d}`u{1f3ed}`u{27}" | _iterGrapheme
     #>
     param(
         [Parameter(Mandatory, ValueFromPipeline, ParameterSetName='fromPipe', ValueFromPipelineByPropertyName)]
@@ -164,21 +210,70 @@ function _iterGrapheme {
 
 
 function _formatSymbol {
-    param( [string]$InputText  )
-    if($null -eq $InputText ) { throw "Expected string, found null" }
-        # if($_ -isnot 'string') { throw "Expected string, found $($_.GetType().Name)"}
-        # $_.EnumerateRunes().Value | %{
+    <#
+    .SYNOPSIS
+        re-wrote part of Format-ControlChar
+    .NOTES
+        not optimized
+        add flags:
+            only control
+            only whitespace
 
-    $InputText.EnumerateRunes() | %{
-        # $isControl = [Rune]::GetUnicodeCategory( $_ ) -eq [Globalization.UnicodeCategory]::Control
-        $isBlank = [Rune]::IsWhiteSpace( $_ ) -or [RUne]::IsControl( $_ )
-        if( [Rune]::IsControl( $_ ) ) {
-            [Rune]::new( $_.Value + 0x2400 )
-            # [char]::ConvertFromUtf32( $_.Value + 0x2400 )
-        } else {
-            $_
+    #>
+    [CmdletBinding()]
+    param(
+
+        [Parameter(Mandatory, ValueFromPipeline, ParameterSetName='fromPipe')]
+        [Parameter(Mandatory, ParameterSetName='fromParam')]
+        [string]$InputText,
+        [switch]$AllowWhitespace
+    )
+    begin {
+         [List[Object]]$Items = @()
+    }
+    process {
+        switch ($PSCmdlet.ParameterSetName) {
+            'fromPipe' { $items.Add( $InputText ) }
         }
-    } | Join-String
+    }
+    end {
+        # explict switch unecessary but makes intent more clear, especially since same var is both
+        switch ($PSCmdlet.ParameterSetName) {
+            'fromParam' { $Items.Add( $InputText ) }
+        }
+        if($Items.count -eq 0 -or $null -eq $Items ) {
+            throw "Expected Input Text, null"
+        }
+        foreach($curText in $items) {
+            $curText.EnumerateRunes() | %{
+                $shouldReplace = $false
+                $isBlank = [Rune]::IsWhiteSpace( $_ ) -or [RUne]::IsControl( $_ )
+                $isControl = [RUne]::IsControl( $_ )
+                $isWhitespace = [Rune]::IsWhiteSpace( $_ )
+                if($AllowWhitespace) {
+                    if($isControl -and -not $isWhitespace) {
+                        $shouldReplace = $true
+                    }
+                } else {
+                    if($isControl -or $isWhitespace) {
+                        $shouldReplace = $true
+                    }
+                }
+
+                if($ShouldReplace) {
+                    [Rune]::new( $_.Value + 0x2400 )
+                } else {
+                    $_
+                }
+            }
+                    # $isControl = [Rune]::GetUnicodeCategory( $_ ) -eq [Globalization.UnicodeCategory]::Control
+
+                # if( [Rune]::IsControl( $_ ) ) {
+
+            # } | Join-String
+        }
+        write-warning 'NYI, must debug _formatSymbol'
+    }
 }
 
 _formatSymbol "`n`r"
@@ -254,6 +349,23 @@ function _summarizeBag {
             JoinStr = $v -join '_'
         }
     }
+}
+
+function sb.Normalize.Lend {
+    [Text.StringBuilder]::new( $Input -join "`n" ).Replace("`r", '' ).ToString()
+    # param(
+    #     [Parameter(Mandatory, ValueFromPipeline)]
+    #     [string[]]$InputText
+    # )
+    # begin {
+    #     $sb = [Text.StringBuilder]::new()
+    # }
+    # process {
+    #     foreach($s in $InputText) {
+    #         $sb.AppendJoin
+    #      }
+    #     $sb.Append(
+    # }
 }
 # . _summarizeBag
 # $bagSummary | fl
