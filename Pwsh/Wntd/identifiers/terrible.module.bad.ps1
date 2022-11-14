@@ -12,6 +12,10 @@
 'Examples of terrible practices, perhaps even evil. At a minimum, cursed.'
 'Of course it does not support WinPS, did you think I was a monster?'
 
+function dropIfNull { 
+    param()
+}
+
 function todo.span.rand {
 @'
 get array of rand bytes or number

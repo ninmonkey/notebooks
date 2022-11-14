@@ -1,6 +1,6 @@
 #!pwsh
 
-using namespace System.Collections.Generic
+using namespace System.Collections.Generic # these are tiny helper functions, examples are below
 
 function Format-TypeNameInfo2  {
     # sugar for notebooks, wrote to be short in definfition, ie; not best practices
@@ -32,12 +32,6 @@ function Ti { process {
     if($null -eq $_) { return }
     ($_ -is 'type') ? $_ : ($_.GetType()) | Join-String { '[{0}]' -f @( [string]$_ ) }
 } }
-#  234 | ti
-# gi . |  ti
-# get-date | ti
-
-# ,234 | ti
-
 
 function LabelTypeInfo {
     # using $Input is almost always a bad idea, because it has a 
@@ -50,28 +44,81 @@ function LabelTypeInfo {
 }
 
 
-$Numbers = [string]'123'    # [string]
-$Numbers | Ti 
-$Numbers | Li '$numbers'
-$numbers
+if($false) {  # extra tests
 
-$Numbers | Ti
-'213'
-ti (get-date)
-,(get-date) | ti
+    234 | ti
+    gi . |  ti
+    get-date | ti
+
+    ,234 | ti
+
+    $Numbers = [string]'123' 
+    $Numbers | Ti 
+    $Numbers | Li '$numbers'
+    $numbers
+
+    $Numbers | Ti
+    '213'
+    ti (get-date)
+    ,(get-date) | ti
+
+    class TestUser {
+        [string]$Name = 'anonymous'
+    }
+
+    ,$me = [TestUser]::new()
+    $me | ti
+    $numbers
+}
+
+#!pwsh
 
 class User {
+    [ValidateNoatn]
    [string]$Name = 'anonymous'
+   [int]$Age = 0 
 }
 
 ,$me = [User]::new()
 $me | ti
 $numbers
 
-#!pwsh
 
  [list[string]]$s = 'a', 'b'
         $s | ti
         ,$s | ti
         $null | ti
         3, "dsf", @(), @(,2) |% name
+
+#!pwsh
+
+class User {
+    [ValidateNotNullOrEmpty()]
+    [string]$Name = 'anonymous'
+
+    [int]$Age = 0
+}
+
+# automatic validation
+
+
+
+, $me = [User]::new()
+$me | ti
+$numbers
+
+throw 'do example where a
+
+        [User]::new()
+        $userVar
+        @{ Name = "jen" }
+
+with [List[User]] and Jen changes to that type
+'
+
+
+[list[string]]$s = 'a', 'b'
+$s | ti
+, $s | ti
+$null | ti
+3, 'dsf', @(), @(, 2) | ForEach-Object name

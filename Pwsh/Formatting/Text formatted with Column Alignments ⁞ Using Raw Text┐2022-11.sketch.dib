@@ -1,0 +1,63 @@
+#!pwsh
+
+# Import-module PipeScript -MinimumVersion 0.1.7
+$srcText = @'
+["winget ⇥ \twinget install \tinstall is the first command below the root","winget sh⇥ \twinget show \tshow is the first command that starts with sh","winget source l⇥ \twinget source list \tlist is the first sub-command of source that starts with l","winget -⇥ \twinget --version \t--version is the first argument defined for the root","winget install power⇥ \twinget install \"Power Toys\" \t\"Power Toys\" is the first package whose Id, Name, or Moniker starts with power","winget install \"Power Toys\" --version ⇥ \twinget install \"Power Toys\" --version 0.19.2 \t0.19.2 is the highest version of Power Toys at the time of writing"]
+'@ | convertfrom-json
+function nb.Pager {
+    <#
+    .synopsis
+        minimal, tiny wrapper to capture output that's too long, yet easy to disable
+    .NOTES
+        vscode setting defaults to { "notebook.output.textLineLimit": 30 }
+    #>
+    param( [Alias('NoLimit')][switch]$PassThru, [int]$Limit = 25 )
+    if($PassThru) {  $Input ; return }
+    $Input | Select -first $Limit
+}
+
+#!pwsh
+
+[Text.StringBuilder]$sb
+$srcText | %{
+   $a, $b, $c = $_ -split '\t'
+   $w = 30 # width
+   $charSpace = ' '
+   
+   $splat_sharedJoin_suffixes  = @{
+      op = '| '
+      os =  ' |'
+   }
+   $wSuffix = ($splat_sharedJoin_suffixes.op, $splat_sharedJoin_suffixes.os -join '').length
+   @(
+      'Input'.PadLeft($w - $wSuffix, $charSpace) | Join-String @splat_sharedJoin_suffixes
+      $a.padRight($w, $charSpace) 
+
+      'Result'.PadLeft($w-$wSuffix, $charSpace) | Join-String @splat_sharedJoin_suffixes
+      $b.padRight($w, $charSpace)
+
+      'Reason'.PadLeft($w-$wSuffix, $charSpace) | Join-String @splat_sharedJoin_suffixes
+      $c.padRight($w, $charSpace)
+   # ) | Join-String -sep  " "
+   ) | Join-String -sep  "`n"
+} | nb.Pager 20
+
+#!pwsh
+
+$srcText | %{
+   $a, $b, $c = $_ -split '\t'
+   $w = 30
+   $char = '_'
+   $char = ' '
+   $dentDepth = ' ' * 4 -join ''
+   
+   'Input'.PadRight($w - 4, ' ') | Join-String -op '| ' -os ' |'
+   $a.padLeft(30, $char)
+
+   'Result'.PadRight($w-4, ' ') | Join-String -op '| ' -os ' |'
+   $b.padLeft(30, $char)
+
+   'Reason'.PadRight($w-4, ' ') | Join-String -op "$dentDepth" -os "`n"   
+   $c.padLeft(30, $char)
+
+} | nb.Pager 25
