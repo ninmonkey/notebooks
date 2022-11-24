@@ -1,0 +1,24 @@
+#!pwsh
+
+Import-module PipeScript -MinimumVersion 0.1.7
+$srcText = @'
+["winget ⇥ \twinget install \tinstall is the first command below the root","winget sh⇥ \twinget show \tshow is the first command that starts with sh","winget source l⇥ \twinget source list \tlist is the first sub-command of source that starts with l","winget -⇥ \twinget --version \t--version is the first argument defined for the root","winget install power⇥ \twinget install \"Power Toys\" \t\"Power Toys\" is the first package whose Id, Name, or Moniker starts with power","winget install \"Power Toys\" --version ⇥ \twinget install \"Power Toys\" --version 0.19.2 \t0.19.2 is the highest version of Power Toys at the time of writing"]
+'@ | convertfrom-json
+
+#!pwsh
+
+$srcTx |%{
+   $a, $b, $c = $_ -split '\t'
+   $w = 30
+
+   'Input'.PadLeft($w-4, ' ') | Join-String -op '| ' -os ' |'
+
+   $a.padRight(30, '_')
+
+   'Result'.PadLeft($w-4, ' ') | Join-String -op '| ' -os ' |'
+   $b.padRight(30, '_')
+
+   'Reason'.PadLeft($w-4, ' ') | Join-String -op '| ' -os ' |'
+   $c.padRight(30, '_')
+hr;
+}
