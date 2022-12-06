@@ -1,3 +1,5 @@
+**todo**: configure git to diff `ipynb` files as Json docs
+
 - [notebooks](#notebooks)
   - [Links](#links)
   - [Example notebooks](#example-notebooks)

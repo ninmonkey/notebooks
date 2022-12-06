@@ -1,0 +1,40 @@
+#!pwsh
+
+Import-Module NameIt -ea stop
+
+#!pwsh
+
+$names = NameIt\Ig -Template '[person]' -Count 15
+| %{ ($_ -replace '\s+', '.'), '@fakename.com' -join '' }
+| %{ $_.ToLower() }
+| sort
+
+$names | select -first 10
+
+#!pwsh
+
+$names
+| sort
+| select -first 10
+| %{
+    '{0}: CacheEvent: LoadFromFile: Added: [{1}]' -f @(
+        '2022-12-06 20:15:59Z'
+        $_ | Join-String -double # let it deal with the right escapes
+    )
+}
+
+#!markdown
+
+target output
+```log
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["armando.mcclure@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["brenton.stephens@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["danielle.horne@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["ella.church@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["giancarlo.holland@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["giovani.morales@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["guillermo.silva@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["jaylen.gilmore@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["joslyn.pace@fakename.com"]
+2022-12-06 20:15:59Z: CacheEvent: LoadFromFile: Added: ["jovan.salazar@fakename.com"]
+```
