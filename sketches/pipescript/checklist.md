@@ -123,11 +123,27 @@ all functions where { $_.Source -eq 'pipescript' } | Select -first 3
 
 # wip: sorting
 all functions where { $_.Source -eq 'pipescript' } order by ... | select first 3
-
 ```
 
 ## ps
 
+example converts PID id numbers, to colors. Colors are easier to remember/see patterns.
+To genericalize to give unique fo
+```ps1
+Ps7┐ ps -Id 100336, 18104
+
+ NPM(K)    PM(M)      WS(M)     CPU(s)      Id  SI ProcessName Pid Name
+ ------    -----      -----     ------      --  -- ----------- --------
+    105    72.10      77.94      20.55   18104   1 pwsh        orange
+    149   148.66     260.39      29.44  100336   1 pwsh        green
+```
+```ps1
+ps | fw
+  pwsh.exe [18104 orange]
+  pwsh.exe [100336 green]
+```
+
+example showing dot notation sugar
 ```ps1
 $self = ps where Pid is $PID
 
