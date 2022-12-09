@@ -1,0 +1,64 @@
+#!pwsh
+
+# You can control coercing with strong types
+[string[]]$NameList = 12, '34' # coerces to [string[]]
+[object[]]$AnyList =  12, '34' # keeps objects as is, [object[]]
+
+[Collections.Generic.List[string]]$list = 12, '34' # is [List[string]]
+[pscustomobject]@{
+   ElementTypes = $List | % GetType | Join-String Name -sep ', '
+   SelfType = ,$List | % GetType | Join-String Name -sep ', '
+}
+
+[Collections.Generic.List[int]]$list = '3.14', 0x2345
+[pscustomobject]@{
+   ElementTypes = $List | % GetType | Join-String Name -sep ', '
+   SelfType = ,$List | % GetType | Join-String Name -sep ', '
+} | ft
+# hr
+$list | % GetType | % Name
+,$list | % GetType | % Name
+
+#!pwsh
+
+<#
+Notebook utilites. Designed to be terse commands ran in notebooks. Ie: They don't follow best practices, or style guidelines
+
+Currently not used in the examples because I didn't want to abstract things
+    making it harder to see what's going on.
+
+#>
+function str.Type { 
+    <#
+    .synopsis
+        render an objects type as a short name
+    #>
+    param(
+        [switch]$WithNamespace,
+        [Parameter(Mandatory, ValueFromPipeline)]
+        $InputObject
+    )
+    process {
+        if($null -eq $InputObject){ return '<trueNull>' }
+        # $tinfo = if($InputObject -is 'type') {
+        #     $InputObject
+        # } else {
+        #     ($InputObject)?.GetType()
+        # }
+        $tinfo = $InputObject.GetType()
+
+
+        if(-not $WithNamespace) {             
+            return $tinfo.GetType().Name
+        }
+        # ((,$_.GetType()).ToString()) -replace '\bSystem\.', ''
+        # ((,$_.GetType()).ToString()) -replace '\bSystem\.', ''
+    }
+}
+
+'....'
+$NameList | str.Type
+str.Type $NameList
+,$NameList | str.Type -WithNamespace
+'....'
+# $list.ToString()

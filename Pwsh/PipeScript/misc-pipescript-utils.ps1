@@ -2,7 +2,7 @@ Import-Module PipeScript -MinimumVersion 0.1.7 # maybe earlier
 function transpileTillCooked { 
     <#
     .synopsis
-        repeat transpiling, until fully done
+        repeat transpiling, until fully done. should be redundant in newer versions.
     .DESCRIPTION
         it's sugar for:
 
