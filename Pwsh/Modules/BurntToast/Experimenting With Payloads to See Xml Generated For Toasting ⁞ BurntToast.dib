@@ -1,0 +1,65 @@
+#!pwsh
+
+function nb.ToastIt.1 {
+    <#
+    .synopsis
+        wraps BurntToast with defaults and a simpler api
+    .NOTES
+        -Verbose will show XML generated
+        -Title appears to be first line of Xml
+        -Text seems to be an additional 4 lines
+        -for text> 4+ items, it truncates it in the window
+        -but -join "`n" on newline, and it preserves text.
+    .EXAMPLE
+        toastIt -Title 'title' -Text (0..9)
+            > only shows 0..3
+    #>
+    # mini sugar using defaults
+    [Alias('nb.ToastIt')] # if on, then this is the default version
+    param(
+        # this coerces to n-number of lines
+        [parameter(Mandatory)]
+        [string[]]$Text,
+
+        # this is the big bolded section
+        [string]$Title,
+
+        # [string]$Sound #
+        [switch]$NotSilent
+    )
+    $textList = @(
+        if ($title) { $title }
+        $Text | Join-String -sep "`n"
+    )
+    $textList = @(
+        $title
+        $Text | Join-String -sep "`n"
+    )
+
+
+
+    $splatIt = @{
+        # The parameter requires at least 0 value(s) and no more than 3
+        Text    = $TextList
+        Silent  = $true
+        Verbose = $true
+        Debug   = $false  # debug: waits on user to choose yest in a prompt, in polyglots
+        AppLogo = Get-Item -ea silentlyContinue 'C:\Users\cppmo_000\SkyDrive\Documents\2018\art\avatar.png'
+    }
+    $SplatIt | write-debug
+    if (-not $splatIt.AppLogo) {
+        "Path did not exist, ignoring param -AppLogo. Path: '$($splatIt.AppLogo)'"
+        | Write-Warning
+        $splatIt.Remove('AppLogo')
+    }
+    if ($NotSilent) { $SplatIt.Silent = $False }
+    New-BurntToastNotification @splatIt
+}
+
+#!pwsh
+
+ nb.ToastIt.1 -Title 'Title' -Text 'Line1' #-Debug:$false -Verbose:$false 
+
+#!pwsh
+
+New-BurntToastNotification -Text 'hi world' -verbose
