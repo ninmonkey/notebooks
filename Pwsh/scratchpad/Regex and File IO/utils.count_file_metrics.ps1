@@ -117,17 +117,18 @@ function inspectAll {
     }
 
     $PathExcel = getPath 'whitespace_summary' -ext 'xlsx'
+    Remove-Item $PathExcel
     $Pkg = Open-ExcelPackage $PathExcel
 
     $Results | Export-Excel -ExcelPackage $Pkg -TableName 'fileMetricSummary' -WorksheetName 'Summary'
 
-    Close-ExcelPackage -ExcelPackage $Pkg -ea 'ignore' # export-excel must close it
+    # Close-ExcelPackage -ExcelPackage $Pkg -ea 'ignore' # export-excel must close it
     "wrote: '$PathExcel'" | Write-Host -BackgroundColor 'red' -fore 'white'
 
 }
 
-$file = Get-Item 'G:\temp\nbout\export\explicit_jstr_CRNL.txt' -ea stop
-summarizeFile $file
+# $file = Get-Item 'G:\temp\nbout\export\explicit_jstr_CRNL.txt' -ea stop
+# summarizeFile $file
 
 inspectAll
 'utils.metrics: Loaded' | Write-Host
