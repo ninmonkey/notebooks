@@ -1,0 +1,74 @@
+---
+# document 1
+codename: YAML
+name: YAML ain't markup language
+release: 2001
+---
+# document 2
+uses:
+ - configuration language
+ - data persistence
+ - internet messaging
+ - cross-language data sharing
+---
+# document 3
+company: spacelift
+domain:
+ - devops
+ - devsecops
+tutorial:
+   - name: yaml
+   - type: awesome
+   - rank: 1
+   - born: 2001
+author: omkarbirade
+published: true
+...
+
+tests: 
+- Exp: |
+BLANK() = BLANK
+  Result: false
+- Exp: |
+BLANK() = 0
+  Result: true
+  
+---
+# document 1
+codename: YAML
+name: YAML ain't markup language
+release: 2001
+---
+# document 2
+uses:
+ - configuration language
+ - data persistence
+ - internet messaging
+ - cross-language data sharing
+---
+---
+# document 1
+codename: YAML
+name: YAML ain't markup language
+release: 2001
+---
+# document 2
+uses:
+ - configuration language
+ - data persistence
+ - internet messaging
+ - cross-language data sharing
+---
+# document 3
+company: spacelift
+domain:
+ - devops
+ - devsecops
+tutorial:
+   - name: yaml
+   - type: awesome
+   - rank: 1
+   - born: 2001
+author: omkarbirade
+published: true
+...

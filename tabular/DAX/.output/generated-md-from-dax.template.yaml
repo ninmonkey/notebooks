@@ -1,0 +1,27 @@
+---
+# document 1: Header
+description: Experiment, Converting Arrays to Markdown/Html
+title: Experiment, Converting Arrays to Markdown/Html
+---
+# DocData
+Coercible Compare:
+  - Ex: Blank() = Blank()
+    Result: true
+  - Ex: Blank() = 0
+    Result: true
+  - Ex: Blank() = ""
+    Result: true
+Exactly Equal:
+  - Ex: Blank() == Blank()
+    Result: true
+  - Ex: Blank() == 0
+    Result: false
+  - Ex: Blank() == ""
+    Result: false
+    # ✅
+    # 🔻😟 ⛔
+
+# test1: [ Ex: "stuff", Result: "Other" ]
+  # - Ex: "blank"
+  # Result: "false"
+  
