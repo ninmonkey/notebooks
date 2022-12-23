@@ -1,0 +1,50 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!pwsh
+
+# server is up summary 
+
+[object[]]$server_names = '1.1.1.1', '8.8.8.8', 'some-invalid-domain-existing-domain'
+
+
+$results ??= Test-Connection -TimeoutSeconds 1 -TargetName $server_names -Count 1
+$Summary = $server_names | %{
+    $currentName = $_ 
+    $isOnline = $results.Destination -contains $currentName
+
+    [pscustomobject]@{
+        Server = $currentName
+        State = if($IsOnline) { 'UP' } else { 'DOWN' }
+        # SomeOtherProperty = '...'
+    }
+}
+
+$summary | ft
+
+"`nExport Csv`n"
+$summary | ConvertTo-Csv
+
+#!markdown
+
+<!--
+# server is up summary 
+[object[]]$server_names = '1.1.1.1', '8.8.8.8', 'some-invalid-domain-existing-domain'
+
+$results ??= Test-Connection -TimeoutSeconds 1 -TargetName $server_names -Count 1
+$summary = $server_names | %{
+    $currentName = $_ 
+    $isOnline = $results.Destination -contains $currentName
+
+    [pscustomobject]@{
+        Server = $currentName
+        State = if($IsOnline) { 'UP' } else { 'DOWN' }
+        
+    }
+}
+$summary | ft
+
+"`nExport Csv`n"
+$summary | ConvertTo-Csv
+>
