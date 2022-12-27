@@ -1,0 +1,36 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!csharp
+
+var data = new[] { 2, 1, 3 };
+var sorted = data.OrderBy(static e => e);
+var sortedDesc = data.OrderByDescending(static e => e);
+
+Console.WriteLine( sortedDesc );
+var asArray = sortedDesc.ToArray<int>();
+
+//Console.WriteLine( for x in  asArray.GetEnumerator() );
+  //  Console.WriteLine( "sdf: {0}", 23 );
+//}
+
+#!markdown
+
+## What's New: Linq Ordering
+
+New: dotnet7
+
+```csharp
+var data = new[] { 2, 1, 3 };
+var sorted = data.Order();
+var sortedDesc = data.OrderByDescending();
+```
+
+Old
+
+```csharp
+var data = new[] { 2, 1, 3 };
+var sorted = data.OrderBy(static e => e);
+var sortedDesc = data.OrderByDescending(static e => e);
+```
