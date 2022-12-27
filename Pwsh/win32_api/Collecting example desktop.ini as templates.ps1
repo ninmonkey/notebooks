@@ -1,3 +1,4 @@
+$AutoRunGridViewSelect = $false 
 @'
 ## About
 
@@ -35,7 +36,8 @@ Finding Collecting desktop Template Shell32 files
 ## Others / tangents
 
 - maybe more: <https://learn.microsoft.com/en-us/windows/win32/msi/shortcut-table>
-
+    - <https://learn.microsoft.com/en-us/windows/win32/msi/feature-table>
+- [aux verbs](https://learn.microsoft.com/en-us/windows/win32/intl/using-registry-string-redirection#create-resources-for-verb-protocol-and-auxusertype-strings)
 
 '@
 
@@ -46,21 +48,23 @@ $Cfg = @{
 $Query ??= @{ }
 $Query.UserProfile3 ??= SearchForIni -PathRoot C:\Users\cppmo_000 -Depth 3
 $Query.UserProfile_all3 ??= SearchForIni -PathRoot C:\Users\cppmo_000 -Depth 3 -All
+if ($AutoRunGridViewSelect) { 
 
-if ( -not (gcm 'fzf' -ea ignore -CommandType Application )) {
-    $Query.UserSelect ??= $Query.UserProfile_all3 | % Fullname | sort | fzf -m
-}
-else { 
-    'is fzf not in path? '
-    # $Query.UserSelect ??= $Query.UserProfile_all3 | % Fullname | sort | Out-GridView -PassThru
-    $Query.UserSelect ??= $Query.UserProfile_all3 | sort | select Name, Directory | Out-GridView -PassThru | gi 
+    if ( -not (gcm 'fzf' -ea ignore -CommandType Application )) {
+        $Query.UserSelect ??= $Query.UserProfile_all3 | % Fullname | sort | fzf -m
+    }
+    else { 
+        'is fzf not in path? '
+        # $Query.UserSelect ??= $Query.UserProfile_all3 | % Fullname | sort | Out-GridView -PassThru
+        $Query.UserSelect ??= $Query.UserProfile_all3 | sort | select Name, Directory | Out-GridView -PassThru | gi 
+    }
 }
 
 
 function SearchForIni { 
     <#
     .SYNOPSIS
-        local possible desktopini files
+        search for directories paired with 'desktop.ini'
     .notes
     .future:
         make it stepp-able? currently it can't stream
@@ -77,7 +81,7 @@ function SearchForIni {
         [Alias('IncludeOtherFilenames')]
         [switch]$All
     )
-    
+    write-warning 'does not currently copy all folder attributes'
     $lsSplat = @{
         Force  = $true
         Path   = gi -ea 'stop' $PathRoot  
@@ -107,7 +111,7 @@ $searchForIniSplat = @{
 }
 
 SearchForIni @searchForIniSplat
-function FindDesktopIni {
+function GetDesktopIni {
     <#
     .SYNOPSIS
         grabs a directory, and the desktop.ini file it uses
@@ -185,7 +189,7 @@ function FindDesktopIni {
 cached queries, try:
 
     $targetDir = Get-Item $findDesktopIniSplat.Path
-    $res = FindDesktopIni @findDesktopIniSplat -TestOnly -ea break 
+    $res = GetDesktopIni @findDesktopIniSplat -TestOnly -ea break 
     $res | ft -auto 
     hr
     gci $cfg.DestRoot -Recurse *
@@ -196,27 +200,28 @@ cached queries, try:
 '@ | write-warning 
 
 # . { 
-    # run examples
-    SearchForIni -PathRoot ~ -Depth 1 | ft name, fullname
+# run examples
+SearchForIni -PathRoot ~ -Depth 1 | ft name, fullname
 
-    $findDesktopIniSplat = @{
-        Path              = 'C:\Users\cppmo_000\SkyDrive\Documents\2022\dotfiles_git'
-        Verbose           = $true
-        InformationAction = 'Continue'
-        # TestOnly          = $true
-    }
+$findDesktopIniSplat = @{
+    Path              = 'C:\Users\cppmo_000\SkyDrive\Documents\2022\dotfiles_git'
+    Verbose           = $true
+    InformationAction = 'Continue'
+    # TestOnly          = $true
+}
+$findDesktopIniSplat.Path = 'C:\Users\cppmo_000\SkyDrive\Documents\2021\dotfiles_git\everythingSearch'
 
-    $targetDir = Get-Item $findDesktopIniSplat.Path
-    $res = FindDesktopIni @findDesktopIniSplat -TestOnly -ea break 
-    $res | ft -auto 
-    hr
-    gci $cfg.DestRoot -Recurse *
-    hr
+$targetDir = Get-Item $findDesktopIniSplat.Path
+$res = GetDesktopIni @findDesktopIniSplat -TestOnly -ea break 
+$res | ft -auto 
+hr
+gci $cfg.DestRoot -Recurse *
+hr
 # }
 write-warning 'remove initial markdown, move to MD doc '
 
 
-throw 'Left off: 
-    Copy the directory itself, to preserve system or whichever properties it has
+throw 'Left off:
+- [ ] need to copy **Directory** so that attributes are preserved
 '
 
