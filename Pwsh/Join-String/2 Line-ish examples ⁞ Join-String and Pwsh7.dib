@@ -1,0 +1,29 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!pwsh
+
+ls *.code-workspace | Join-string -sep "`n" { '- <file:///{0}>' -f $_.FullName } 
+
+#!pwsh
+
+cd 'C:\Users\cppmo_000\SkyDrive\Documents\2022\client_BDG\self' -ea stop
+
+'
+As markdown file:// fullpaths
+'
+ls *.code-workspace | Join-string -sep "`n" { '- <file:///{0}>' -f $_.FullName } 
+
+#!pwsh
+
+cd 'C:\Users\cppmo_000\SkyDrive\Documents\2022\client_BDG\self' -ea stop
+'
+As forward fullpaths file:// fullpaths
+'
+ls *.code-workspace
+| Join-string -sep "`n" {  # with forward slashes
+    '- <file:///{0}>' -f @( 
+        ($_ | gi -ea stop | % FullName) -replace '\\', '/' # and spaces: -replace ' ', '%20' 
+    )
+} 
