@@ -18,7 +18,9 @@ example: <https://github.com/sharmaabhishekk/sharmaabhishekk.github.io/blob/mast
 
 - <a href="./Examples%20with%20Null%20coalescing%20%E2%81%9E%20part%201%20%E2%81%9E%20handling%20null%20values.2022-12.ipynb">Examples with Null coalescing ⁞ part 1 ⁞ handling null values</a>
 
+----
 
+![myGif](https://ninmonkeys.com/blog/wp-content/uploads/2022/11/wt-%E2%94%90-PrefixPipe-%E2%94%90-DoesNotBreakOnComments-2022-11ep0.gif)
 
 <!--
 
