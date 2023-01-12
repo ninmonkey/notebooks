@@ -31,6 +31,10 @@ $robo_splat = @{
     Options           = $Cfg
 }
 
+Write-Warning 'to improve perf:
+    -  [ ] no percentages when not in the terminal
+    -  [ ] furtuher 
+'
 # Robo.Copy @robo_splat
 Push-Location 't:\'
 [object[]]$AllPaths = @(
@@ -94,20 +98,30 @@ Push-Location 't:\'
     # 'temp_delete_1month'
     # 'Users'
     # 'Windows'
-) | Get-Item
-
+) | Get-Item -ea stop -Force 
+# $AllPaths = @()
 if ($false) {
     # before loop
     $Cfg.Source = 'T:\2020_11_from_E'
     # $Cfg.Dest = Join-Path $Cfg.DestRoot '2ls020_11_from_E'
     $Cfg.Dest = Join-Path $Cfg.DestRoot '2020_11_from_E'
-    $Cfg.Log = Join-Path $Cfg.DestRoot 'robo.copy.log'
+    $Cfg.Log = Join-Path $Cfg.DestRoot 'robo.copy.log'    
+}
+if (  $allPaths.count -le 0 ) {
+    # } -not $AllPaths) { 
+    throw 'Empty $AllPaths list'
+}
+# rotate, replace, zip.
+if (Test-Path $Cfg.Log) {
+    # Once per full app invoke.
+    $lastLog = Compress-Archive -Path $Cfg.Log -DestinationPath ($Cfg.Log + '.zip') -Verbose
+    Clear-Content -Path $Cfg.Log
 }
 $AllPaths | ForEach-Object { 
     $curOuterPath = $_
 
     # $Cfg.Source = Join-Path 'T:' $curOuterPath
-    $Cfg.Source = Get-Item $curOuterPath -ea stop 
+    $Cfg.Source = Get-Item -LiteralPath $curOuterPath -ea stop  -Force
     # $Cfg.Dest = Join-Path $Cfg.DestRoot '2ls020_11_from_E'
     $Cfg.Dest = Join-Path $Cfg.DestRoot $curOuterPath.BaseName #'2020_11_from_E'
     $Cfg.Log = Join-Path $Cfg.DestRoot 'robo.copy.log'
@@ -134,14 +148,17 @@ $AllPaths | ForEach-Object {
     )
     # Robo.Copy @robo_splat -Recurse -LimitOutput -Confirm
     # Robo.Copy @robo_splat -Recurse -WithoutWhatIf
-    Robo.Copy @robo_splat -Recurse -WithoutWhatIf -LimitOutput
+    
+    Robo.Copy @robo_splat -Recurse -WithoutWhatIf -LimitOutput -ListOnly
+    
 
     ToastIt -Title '🤖Robo.Copy' -Text @(
         '🔴 completed: {0}' -f @( $Cfg.Source)
         'to: {0}' -f @( $Cfg.Dest)
     )    
 }
-sleep -sec 1
+Start-Sleep -sec 1
+
 ToastIt -Title '🥂 Copy Complete' -text @(
     $AllPaths | Join-String -sep ', ' -single
     $AllPaths | Join-String -sep "`n  -" -single
