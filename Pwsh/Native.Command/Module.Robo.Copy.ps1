@@ -19,6 +19,10 @@ function Robo.Copy {
         [Alias('/S')]
         [switch]$Recurse,
 
+
+        # general switch to ignore some extra outputs
+        [switch]$LimitOutput,
+
         # returns the command line args that was built, without executing
         [switch]$CommandPassthru,
         # quick help
@@ -55,6 +59,9 @@ function Robo.Copy {
     }
     if($Recurse) {
         $Config.Using.Recurse = $true
+    }
+    if($LimitOutput) {
+        $Config.Using.Tee = $false
     }
 
     Set-Location $Config.Dest -ea Ignore | out-null
