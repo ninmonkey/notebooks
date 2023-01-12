@@ -128,9 +128,21 @@ $AllPaths | ForEach-Object {
     }
     # Robo.Copy @robo_splat -WhatIf
 
-    ToastIt -Title '🤖Robo.Copy' -Text '🟢 started'
+    ToastIt -Title '🤖Robo.Copy' -Text @(
+        '🟢 started: {0}' -f @( $Cfg.Source)
+        'to: {0}' -f @( $Cfg.Dest)
+    )
     # Robo.Copy @robo_splat -Recurse -LimitOutput -Confirm
     # Robo.Copy @robo_splat -Recurse -WithoutWhatIf
     Robo.Copy @robo_splat -Recurse -WithoutWhatIf -LimitOutput
-    ToastIt -Title '🤖Robo.Copy' -Text '🔴 completed'
+
+    ToastIt -Title '🤖Robo.Copy' -Text @(
+        '🔴 completed: {0}' -f @( $Cfg.Source)
+        'to: {0}' -f @( $Cfg.Dest)
+    )    
 }
+sleep -sec 1
+ToastIt -Title '🥂 Copy Complete' -text @(
+    $AllPaths | Join-String -sep ', ' -single
+    $AllPaths | Join-String -sep "`n  -" -single
+)
