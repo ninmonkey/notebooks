@@ -83,3 +83,5 @@ if ($false) {
     $render_args = Robo.Copy @robo_splat -whatif -infa Ignore -Debug:$false -Verbose:$false
     $render_args = Robo.Copy @robo_splat -whatif
 }
+# Robo.Copy @robo_splat -WhatIf
+Robo.Copy @robo_splat -Recurse

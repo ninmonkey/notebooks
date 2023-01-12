@@ -49,8 +49,12 @@ function Robo.Copy {
             BackupMode            = $null
             RestartableBackupMode = $true
             UnbufferedIO          = $true
-            LogAppend = $true            
+            LogAppend = $true                        
         }
+        MaxDepth = $Null # false?
+    }
+    if($Recurse) {
+        $Config.Using.Recurse = $true
     }
 
     Set-Location $Config.Dest -ea Ignore | out-null
@@ -67,10 +71,15 @@ function Robo.Copy {
 
     
     [Collections.Generic.List[Object]]$RoboArgs = @(
-        (Get-Item -ea stop $Config.Source) | Join-String -DoubleQuote
-        $Config.Dest | Join-String -DoubleQuote
-        $Config.Using.Recurse ? '/S' : ''
-        '/COPYALL'
+        # (Get-Item -ea stop $Config.Source) | Join-String -DoubleQuote
+        (Get-Item -ea stop $Config.Source)
+
+        # $Config.Dest | Join-String -DoubleQuote
+        $Config.Dest
+
+        $Config.Using.Recurse ? '/S' : $null
+        # '/COPYALL'
+        '/COPY:DAT'  # data, attribute, timestamp
         if ($False) { 
             # /COPY:<flags> 
             # Data, attributes, timestamps, NTFS control list, Owner, AuditInfo
@@ -106,8 +115,14 @@ function Robo.Copy {
             /compress 	Requests network compression during file transfer, if applicable.
             #>
 
+            
         }
+        # if($Config.MaxDepth) {
+        # $Config.Recurse ? '/S' : $null
 
+        if($Config.MaxDepth -as 'int') {
+            '/LEV:{0}' -f @( $Config.MaxDepth )
+        }
 
         # z: Copies files in restartable mode
         $Config.Using.RestartableMode ? '/z' : $null
