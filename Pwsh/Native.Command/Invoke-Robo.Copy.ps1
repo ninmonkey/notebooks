@@ -130,6 +130,7 @@ $AllPaths | ForEach-Object {
 
     ToastIt -Title '🤖Robo.Copy' -Text '🟢 started'
     # Robo.Copy @robo_splat -Recurse -LimitOutput -Confirm
-    Robo.Copy @robo_splat -Recurse -Confirm
+    # Robo.Copy @robo_splat -Recurse -WithoutWhatIf
+    Robo.Copy @robo_splat -Recurse -WithoutWhatIf -LimitOutput
     ToastIt -Title '🤖Robo.Copy' -Text '🔴 completed'
 }

@@ -23,6 +23,9 @@ function Robo.Copy {
         # general switch to ignore some extra outputs
         [switch]$LimitOutput,
 
+        [Alias('Force')]
+        [switch]$WithoutWhatIf,
+
         # returns the command line args that was built, without executing
         [switch]$CommandPassthru,
         # quick help
@@ -63,6 +66,9 @@ function Robo.Copy {
     if($LimitOutput) {
         $Config.Using.Tee = $false
     }
+    if($WithoutWhatIf) {
+        $Config.Using.WhatIf = $false
+    }
 
     Set-Location $Config.Dest -ea Ignore | out-null
 
@@ -79,7 +85,7 @@ function Robo.Copy {
     
     [Collections.Generic.List[Object]]$RoboArgs = @(
         # (Get-Item -ea stop $Config.Source) | Join-String -DoubleQuote
-        (Get-Item -ea stop $Config.Source)
+        (Get-Item -ea stop -LiteralPath $Config.Source -Force) # force for hidden
 
         # $Config.Dest | Join-String -DoubleQuote
         $Config.Dest
@@ -165,7 +171,7 @@ function Robo.Copy {
     $RoboArgs | Join-String -op 'Robocopy.exe ' -sep ' '
     | Write-Information
 
-    $logPath? = Get-Item -ea ignore $Config.Log
+    $logPath? = Get-Item -ea ignore -LiteralPath $Config.Log
     $path = $logPath? ?? $Config.Log
 
     $strTarget = "`ncopy from:`n  {0}`nTo:`n  {1}`n`nLog: {2}`n" -f @(
@@ -176,7 +182,11 @@ function Robo.Copy {
 
     $StrTarget | Write-Verbose
 
-    if ($PSCmdlet.ShouldProcess( $strTarget , 'Robocopy.Copy')) {
+    if($Config.using.WhatIf) {
+        if ($PSCmdlet.ShouldProcess( $strTarget , 'Robocopy.Copy')) {
+            & Robocopy @RoboArgs
+        }
+    } else {
         & Robocopy @RoboArgs
     }
 
