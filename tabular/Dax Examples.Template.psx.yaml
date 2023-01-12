@@ -1,0 +1,16 @@
+---
+# document 1: Header
+codename: YAML
+name: YAML ain't markup language
+release: 2001
+---
+# DocData
+- Ex: BLANK() == blank() | " sdfds
+  Result: other
+- Ex: 2Stuff
+  Result: other
+
+# test1: [ Ex: "stuff", Result: "Other" ]
+  # - Ex: "blank"
+  # Result: "false"
+  
