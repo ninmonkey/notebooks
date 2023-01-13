@@ -38,14 +38,17 @@ function choice.directory {
         throw "${Path} did not resolve!"
     }
     $Potential = Get-ChildItem $RootDir -Force -Directory
+
+    if($Potential.count -le 1) { throw "Potential count bad" }
+
     $script:fzf_choice = $Potential
     | Sort-Object FullName
     | fzf -m
 
     @(        
         'Selected {0} of {1}' -f @(
-            $script:fzf_choice.count
-            $Potential.count
+            $script:fzf_choice.count ?? '<null?>'
+            $Potential.count ?? '<null?>'
         )
         $choices.count        
     ) | Write-Information -infa 'Continue'
@@ -121,6 +124,15 @@ Push-Location 't:\'
     'C:\Users\cppmo_000\SkyDrive\Documents'
 
 ) | Get-Item -ea stop -Force 
+
+throw 'left off:
+    - [ ] make the wrapper deal with subdirs, so I can treat them as one root copy
+    so many remove Config RootDir  ? or one of the 3
+
+    
+from:   <file://C:\Users\cppmo_000\SkyDrive\Documents>
+    to: <file:///H:\robo_root\skydrive>
+'
 # $AllPaths = @()
 if ($false) {
     # # before loop
