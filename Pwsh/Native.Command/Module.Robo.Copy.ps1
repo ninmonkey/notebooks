@@ -31,7 +31,24 @@ Some, (but not all) options .
                /NJH :: No Job Header.
                /NJS :: No Job Summary.
 
-           /UNICODE :: output status as UNICODE.
+/UNICODE :: output status as UNICODE.
+
+::
+:: Retry Options :
+::
+
+    /R:n :: number of Retries on failed copies: default 1 million.
+    /W:n :: Wait time between retries: default is 30 seconds.
+
+    /REG :: Save /R:n and /W:n in the Registry as default settings.
+
+    /TBD :: Wait for sharenames To Be Defined (retry error 67).
+
+    /LFSM :: Operate in low free space mode, enabling copy pause and resume (see Remarks). 
+
+    /LFSM:n[KMG] :: /LFSM, specifying the floor size in n [K:kilo,M:mega,G:giga] bytes.
+
+
 
 #>
 '@
@@ -44,6 +61,19 @@ function Robo.Copy {
     .NOTES
         see also. desktop.ini files are copied
             <https://learn.microsoft.com/en-us/windows/win32/shell/how-to-customize-folders-with-desktop-ini>
+    .EXAMPLE        
+    .EXAMPLE        
+        # test, as a list only
+        Robo.Copy @robo_splat -Recurse -LimitOutput -ListOnly
+    .EXAMPLE            
+        # skip any inner ShouldProcess prompts
+        Robo.Copy @robo_splat -Recurse -LimitOutput -ListOnly -WithoutWhatIf
+    .EXAMPLE        
+        # misc 
+
+        Robo.Copy @robo_splat -Recurse -LimitOutput -ListOnly
+        Robo.Copy @robo_splat -Recurse -LimitOutput -Confirm   
+        Robo.Copy @robo_splat -Recurse -LimitOutput
     .EXAMPLE        
         Robo.Copy @robo_splat -CommandPassThru | join-string -sep ' ' { $_ | out-string }            
     #>
@@ -84,7 +114,7 @@ function Robo.Copy {
         Get-Command robo.copy -Syntax
         return
     }
-
+Documents
 
     $Config = mergeHashtable -other $Options -BaseHash @{
         Using    = @{
@@ -97,9 +127,20 @@ function Robo.Copy {
             BackupMode            = $null
             RestartableBackupMode = $true
             UnbufferedIO          = $true
-            LogAppend             = $true                        
+            LogAppend             = $true
+            RetryCount            = 5
+            RetryDelay            = 3
+            LogTailLinesAtEnd     = 40
         }
         MaxDepth = $Null # false?
+    }
+    
+    
+    if ($Config.Using.RetryCount) {        
+        '/R:{0}' -f @( $Config.Using.RetryCount ) # default 1million
+    }
+    if ($Config.Using.RetryDelay) {        
+        '/W:{0}' -f @( $Config.Using.RetryDelay ) # default seconds between retries # default 30
     }
     if ($Recurse) {
         $Config.Using.Recurse = $true
@@ -110,7 +151,7 @@ function Robo.Copy {
     if ($WithoutWhatIf) {
         $Config.Using.WhatIf = $false
     }
-    if($ListOnly) { 
+    if ($ListOnly) { 
         $Config.Using.ListOnly
     }
 
@@ -240,6 +281,10 @@ function Robo.Copy {
     'wrote: "{0}"' -f @(
         (Get-Item -ea ignore $Config.Log) ?? $config.Log
     ) | Write-Information -infa Continue
+
+    if ($Config.using.LogTailLinesAtEnd -as 'int') { 
+        Get-Content $Config.Log -Tail $Config.Using.LogTailLinesAtEnd
+    }
 }
 
 # $Cfg = @{
