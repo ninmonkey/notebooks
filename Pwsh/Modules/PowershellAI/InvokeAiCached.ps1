@@ -1,4 +1,4 @@
-
+Import-Module PowerShellAI -ea 'stop' -passThru
 [Collections.Generic.List[Object]]$queryResults = @()
 
 class QueryCacheItem { 
