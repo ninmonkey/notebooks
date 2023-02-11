@@ -1,5 +1,6 @@
 # complete vs code
 impo ninmonkey.console # only part used is 'New-SafeFileTime'
+throw "write-warning '.... not finished, need to finalize args for pviot tables'"
 @'
 refs:
 - <file:///E:\PSModulePath_2022\ImportExcel\7.6.0\Public\Add-PivotTable.ps1>
@@ -12,6 +13,28 @@ $Pkg.Workbook.Worksheets[1].Tables = [OfficeOpenXml.Table.ExcelTable[]]
 
 
 '@
+
+# enable or disable super verbose commands.
+function Enable-ModuleSuperVerbose {
+    [CmdletBinding()]
+    param(
+        [ArgumentCompletions('ImportExcel')]
+        [Parameter(Mandatory, Position = 0)][string]$ModuleName,
+
+        [switch]$Disable
+    )
+    Get-Command -m ImportExcel | ForEach-Object {
+        $renderKey = "$ModuleName\{0}:Verbose'" -f @( $_.Name )
+        if (-not $Disable) {
+            'added: {0}' -f @($renderKey) | Write-Verbose
+            $PSDefaultParameterValues[ $renderKey ] = $true
+        }
+        else {
+            'removed: {0}' -f @($renderKey) | Write-Verbose
+            $PSDefaultParameterValues.Remove( $renderKey )
+        }
+    }
+}
 
 $App = @{
     Export            = @{
@@ -36,40 +59,18 @@ $PropList = @{
 
 }
 
-# enable or disable super verbose commands.
-function Enable-ModuleSuperVerbose {
-    [CmdletBinding()]
-    param(
-        [ArgumentCompletions('ImportExcel')]
-        [Parameter(Mandatory, Position = 0)][string]$ModuleName,
+# Enable-ModuleSuperVerbose 'ImportExcel' -Verbose -Disable:(-not $App.UsingSuperVerbose)
 
-        [switch]$Disable
-    )
-    Get-Command -m ImportExcel | ForEach-Object {
-        $renderKey = "$ModuleName\{0}:Verbose'" -f @( $_.Name )
-        if (-not $Disable) {
-            'added: {0}' -f @($renderKey) | Write-Verbose
-            $PSDefaultParameterValues[ $renderKey ] = $true
-        }
-        else {
-            'removed: {0}' -f @($renderKey) | Write-Verbose
-            $PSDefaultParameterValues.Remove( $renderKey )
-        }
-    }
-}
-
-Enable-ModuleSuperVerbose 'ImportExcel' -Verbose -Disable:(-not $App.UsingSuperVerbose)
-
-$App.Export.FullTemplate = Join-Path $App.Export.Root $App.Export.Template
 $eaIgnore = @{
     ErrorAction = 'ignore'
 }
 
 
+$App.Export.FullTemplate = Join-Path $App.Export.Root $App.Export.Template
 $Dest = New-SafeFileTime -TemplateString $App.Export.FullTemplate -verbose
-
 'write: <{0}>' -f @( $Dest )
 Remove-Item @eaIgnore $Dest
+
 $Pkg = Open-ExcelPackage -Path $Dest -Create
 
 $exportExcelSplat = @{
@@ -154,6 +155,7 @@ $pkg = Get-Service @eaIgnore
 | Select-Object @eaIgnore -p $PropList.ServicesInclude
 | Select-Object -First 10
 | Export-Excel @exportExcelSplat -ExcelPackage $Pkg
+
 
 $Pvt = Add-PivotTable @addPivot_processes -PassThru -ExcelPackage $Pkg
 $Pvt = Add-PivotTable @addPivot_services -PassThru -ExcelPackage $Pkg
