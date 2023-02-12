@@ -1,5 +1,8 @@
 Import-Module ImportExcel
-$mapping = @(  // easily replace this with a csv file
+
+# Mapping is easily replaced by a CSV to make it easier to use
+
+$mapping = @(  
     @{ Regex = 'dog'                 ; To = 'dog'   }
     @{ Regex = 'bdg|lizard|elephant' ; To = 'other' }
 )
