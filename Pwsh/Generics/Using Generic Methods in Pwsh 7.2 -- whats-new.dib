@@ -1,0 +1,73 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!pwsh
+
+function Hr { # visual sugar to give space
+    $w = $host.ui.RawUI.WindowSize.Width # returns the wrong width in a cell
+    $w = 25
+    "`n{1}{0}`n" -f @(
+        '-' * $w -join ''
+        ( $global:__hrLineCount++ )
+    )
+}
+function Json { # more visual sugar. Visualize objects
+     $Input | ConvertTo-Json -compress -depth 2
+}
+
+[Collections.Generic.List[Object]]$lob = @('a', 3)
+[Collections.Generic.List[String]]$lobSTeR = @('z', 9)
+$letters = @('a'..'e')
+    
+$lob.Add( $letters )
+    $lob | Json
+
+$lob.AddRange( $letters )
+    $lob | Json
+
+$lobSTeR.Add( $letters) 
+    $lob | Json
+
+'so far, cool beans'
+
+#!markdown
+
+- [ ] todo: summarize conversation at <https://discord.com/channels/180528040881815552/447476117629304853/1067849953092837376>
+
+#!pwsh
+
+$lobSTeR.AddRange( $Letters )
+    $LobSter | Json
+
+
+# examples that all fail fails for syntax or type reasons:
+# fails on my [List[String]]
+$lobSTeR.AddRange( ('a', 'b', 'c') )
+hr
+$lobSTeR.AddRange( @('a', 'b', 'c') )
+hr
+$lobSTeR.AddRange( [object[]]('a', 'b', 'c') )
+hr
+# works on my [List[String]]
+$lobSTeR.AddRange( [string[]]('a', 'b', 'c') )
+$lobSTeR | json
+
+#!markdown
+
+```ps1
+Cannot convert argument "collection",
+    with value: "System.Object[]",
+
+for "AddRange" to type "System.Collections.Generic.IEnumerable`1[System.String]":
+    "Cannot convert the "System.Object[]" value
+        of type "System.Object[]"
+        to type "System.Collections.Generic.IEnumerable`1[System.String]
+```
+
+#!pwsh
+
+$lobster.AddRange( $letters )
+    hr
+
+    

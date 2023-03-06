@@ -4,6 +4,7 @@ throw "write-warning '.... not finished, need to finalize args for pviot tables'
 @'
 refs:
 - <file:///E:\PSModulePath_2022\ImportExcel\7.6.0\Public\Add-PivotTable.ps1>
+- <file:///C:\Users\cppmo_000\SkyDrive\Documents\2022\My_Github\notebooks\Pwsh\Modules\ImportExcel\MultiplePivotTables.ps1>
 
 $Pvt    = [OfficeOpenXml.Table.PivotTable.ExcelPivotTable]
 $Pkg    = [OfficeOpenXml.ExcelPackage]

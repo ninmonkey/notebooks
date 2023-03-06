@@ -112,3 +112,30 @@ ADDRESS( row_num, column_num, [abs_num], [a1], [sheet_text] )
 # - martin: {name: Martin D'vloper, job: Developer, skill: Elite}
 
 ```
+
+###  Maybe duplicate. Tries a bunch
+
+```ps1
+
+@("hi"; 'world') | Set-content -Path 'greeting_implicit.txt' -PassThru | Format-ControlChar
+"hi`nworld" | sc -path 'greet_explicit.txt'
+$raw2 = (gc -Raw 'greeting_implicit.txt') -split ([System.Environment]::NewLine) 
+$raw2.count
+
+"hi`nworld" | Set-Content -path 'greet_explicit.txt' -PassThru
+$raw3 = (gc -Raw 'greet_explicit.txt') -split ([System.Environment]::NewLine) 
+$raw3.count
+
+@('hi'; 'world')
+| Join-String -sep "`n"
+| Set-Content -path 'joinblank_explicit.txt' -PassThru
+$raw4 = (gc -Raw 'joinblank_explicit.txt') -split ([System.Environment]::NewLine) 
+$raw4.count
+
+@('hi'; 'world')
+| Join-String -sep "`n"
+| Join-String -sep ''
+| Set-Content -path 'joinblank_explicit.txt' -PassThru
+$raw4 = (gc -Raw 'joinblank_explicit.txt') -split ([System.Environment]::NewLine) 
+$raw4.count
+```
