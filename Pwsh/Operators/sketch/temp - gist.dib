@@ -1,0 +1,85 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!pwsh
+
+# Expected values
+$null -eq ( ($null)?.GetType() )
+
+$null -eq ( ($null)?.GetType().bar )
+
+$null -eq ('')?.FooBar()
+
+#!pwsh
+
+$testId = 0 ; $samples3 = '', 'bob', "sdf`n", $null, "`n"
+
+function testNewUser {
+    # very nested / messy code, to make notebooks shorter
+    process { 
+        $t = $_ # t is the [t]arget abbreviated
+        [pscustomobject]@{ 
+            Id           = $testId++
+            Name1        = ($t)?.bat() ?? '<anonymousA>'
+            Name2        = ($t)?.bat().Name ?? '<anonymousB>'
+            
+            # Name3        = if ($t) { 
+            #     ($t)?.ToString().Name ?? '<anonymousC>'
+            # } 
+
+            Render       = ($t)?.bat() -replace '\s+', '␠'
+
+            TrueNull     = $null -eq $t 
+            TrueEmptyStr = $t -is 'string' -and $t.length -eq 0
+            IsBlank      = [string]::IsNullOrWhiteSpace( $t )
+            IsEmpty      = [string]::IsNullOrEmpty( $t )
+        }
+    } 
+}
+
+
+,$null | testNewUser | Ft -auto
+$null | testNewUser | Ft -auto
+'bob', $null | testNewUser | Ft -auto
+
+#!pwsh
+
+$testId = 0 ; $samples3 = '', 'bob', "sdf`n", $null, "`n"
+
+function testNewUser9 {
+    # very nested / messy code, to make notebooks shorter
+    [CmdletBinding()]
+    param()
+    process { 
+        $t = $_ # t is the [t]arget abbreviated
+        $t = $null
+        [pscustomobject]@{ 
+            TrueNull     = $null -eq $t 
+            Id           = $testId++
+            Name1        = ($t)?.GetType() ?? '<anonymousA>'
+            Name2        = ($t)?.GetType().Name ?? '<anonymousB>'
+            
+            # Name3        = if ($t) { 
+            #     ($t)?.ToString().Name ?? '<anonymousC>'
+            # } 
+
+            Render       = ($t)?.GetType() -replace '\s+', '␠'
+
+            TrueEmptyStr = $t -is 'string' -and $t.length -eq 0
+            IsBlank      = [string]::IsNullOrWhiteSpace( $t )
+            IsEmpty      = [string]::IsNullOrEmpty( $t )
+        }
+    } 
+}
+
+$null, '' |  testNewUser9 | Ft -auto
+$null | testNewUser9 | Ft -auto
+,$null | testNewUser9 | Ft -auto
+$null, $Null | testNewUser9 | Ft -auto
+return 
+
+'bob', $null | testNewUser9 | Ft -auto
+return
+
+$null | testNewUser9 | Ft -auto
