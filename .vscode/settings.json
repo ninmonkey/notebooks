@@ -1,0 +1,27 @@
+{
+    // "powerquery.sdk.defaultExtension": "${workspaceFolder}\\bin\\AnyCPU\\Debug\\${workspaceFolderBasename}.mez",
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "type": "powerquery",
+                "request": "launch",
+                "name": "Test powerquery file",
+                "program": "${workspaceFolder}/${command:AskForPowerQueryFileName}"
+            },
+            {
+                "name": "🧪🐜de bug harness.",
+                "type": "PowerShell",
+                "request": "launch",
+                "script": "${workspaceFolder}/sketches/debug_harness.ps1",
+                "cwd": "${workspaceFolder}",
+                "presentation": {
+                    "hidden": false,
+                    "group": "aaa",
+                    "order": 1
+                }
+            },
+        ],
+        "compounds": []
+    }
+}
