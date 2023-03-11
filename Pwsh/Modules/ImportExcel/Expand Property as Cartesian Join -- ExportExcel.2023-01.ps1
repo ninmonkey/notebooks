@@ -1,4 +1,4 @@
-Write-Warning 'mostly written'
+Write-Warning 'mostly written,finish'
 function Excel.JoinOn.OwnProperty {
     <#
 .SYNOPSIS
