@@ -10,6 +10,17 @@ class Animal {
         $this.Species = $Species
         $this.Greeting = $Greeting
    }
+   [string] AnimalSound () {
+        return 'the {0} says {1}' -f @(
+            $this.Species,
+            $this.Greeting
+        )
+   }
+   [string] ToString() {
+        return 'Animal: {0}' -f @(
+            $this.species
+        )
+   }
 }
 
 function New-Animal {
