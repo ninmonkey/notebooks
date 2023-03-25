@@ -2,6 +2,35 @@
 # . 'H:\data\2023\pwsh\notebooks\sketches\__import__.notebook.ps1'
 # no current path in notebooks
 
+# Export-Pipescript -InputPath (Get-Item './../toc/buffer.ps.md') -Verbose
+Export-Pipescript -InputPath 'H:\data\2023\pwsh\notebooks\toc\buffer.ps.md' -Verbose
+
+function debug.exportErrors {
+    'note: formatting is not transformed yet, see Tabify.* instead'
+
+
+    err | Get-Error | ForEach-Object {
+        $curErr = $_
+        if ($_ -isnot 'System.Management.Automation.ErrorRecord') {
+
+            'warning, format expected [ErrorRecord] type is not an error record {0}' -f @(
+            ($_)?.GetType().FullName
+            )
+        }
+        $meta = @{}
+        $meta.PSTypeName = 'notebooks.ErrorRecord.'
+        $Meta.ErrorCategoryInfo ??= [System.Management.Automation.ErrorCategoryInfo]$curErr.ErrorCategoryInfo
+        $Meta.ErrorDetails ??= [System.Management.Automation.ErrorDetails]$curErr.ErrorDetails
+        $Meta.Exception ??= [System.Exception]$curErr.Exception
+        $Meta.ErrorQualifedName ??= [string]$curErr.FullyErrorQualifedName
+        $Meta.ScriptStackTrace ??= [string]$curErr.ScriptStackTrace
+        $Meta.InvocationInfo ??= [System.Management.Automation.InvocationInfo]$curErr.InvocationInfo
+        return [PSCustomObject]
+    }
+}
+
+return
+
 
 
 

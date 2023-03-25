@@ -5,22 +5,22 @@ class Animal {
     Animal () {
         $this.Species = 'ghost'
         $this.Greeting = 'boo!'
-     }
+    }
     Animal ( [string]$Species, [string]$Greeting ) {
         $this.Species = $Species
         $this.Greeting = $Greeting
-   }
-   [string] AnimalSound () {
+    }
+    [string] AnimalSound () {
         return 'the {0} says {1}' -f @(
             $this.Species,
             $this.Greeting
         )
-   }
-   [string] ToString() {
-        return 'Animal: {0}' -f @(
+    }
+    [string] ToString() {
+        return '[Animal( Species: {0} )]' -f @(
             $this.species
         )
-   }
+    }
 }
 
 function New-Animal {
@@ -46,7 +46,7 @@ You can get similar results with a factory pattern, ex:
         [ArgumentCompletions('Cat', 'Dog', 'Other')]
         [string]$Species ) {
     }
-    $Greeting = switcH($Species) {
+    $Greeting = switcH ($Species) {
         'Cat' { 'Meow' }
         'Dog' { 'woof' }
         default { 'Moo? Woof?' }
