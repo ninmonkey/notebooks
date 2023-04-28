@@ -1,3 +1,6 @@
+## Control Flow and Error Handling
+
+```ps1
 function LoadConfig {
     [CmdletBinding()]
     param(
@@ -14,7 +17,9 @@ function LoadConfig {
     $pathRequired = Get-Item -ea 'stop' $RequiredImport
 
     # if missing, continues while printing an error
-    $pathExtra    = Get-Item -ea 'continue' $OptionalImport
+    if($PSBoundParameters.ContainsKey('OptionalImport')) {
+        $pathExtra    = Get-Item -ea 'continue' $OptionalImport
+    }
 
     # if missing, sometimes you don't show want to clog up the user's console
     # giving errors without ending execution
@@ -39,10 +44,16 @@ function LoadConfig {
     'hi world'
     WriteHr
 }
+```
 
+## sample invokes
+
+```ps1
 LoadConfig -require 'config.json' -OptionalImport 'some bad path.json'
 LoadConfig -require '.' -OptionalImport 'some bad path.json'
+```
 
+```ps1
 function WriteHr {
     $w = $host.ui.RawUI.WindowSize.Width
     $chars = '-' * $w -join ''
@@ -50,4 +61,8 @@ function WriteHr {
     $padding, $chars, $padding -join ''
 }
 
-LoadConfig -require '.' -OptionalImport 'some bad path.json'
+LoadConfig -RequiredImport '.' -OptionalImport '.'
+LoadConfig -RequiredImport '.' -OptionalImport 'some bad path.json'
+LoadConfig -RequiredImport '.'
+LoadConfig -RequiredImport 'bad path'
+```
