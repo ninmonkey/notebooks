@@ -40,8 +40,25 @@ $results = get-alias
 
 }~~~
 
-## try 3 : shows table of all
+## try 3 : simplified #4
 
+
+~~~pipescript{
+
+$results = get-alias 
+| ? Source -EQ 'pipescript'
+| select-Object -ea ignore ModuleName, ResolvedCommandName, DisplayName,  Synopsis, Namespace, CommandType
+| Sort-Object ModuleName, ResolvedCommandName, Name, DisplayName -ea ignore 
+
+# simplify for readability 
+
+[pscustomobject]@{ 
+    Table = $Results
+    | Select -Exclude 'ModuleName'
+}
+}~~~
+
+## Try 4 verbose
 
 ~~~pipescript{
 
@@ -50,8 +67,11 @@ $results = get-alias
 | select-Object ModuleName, ResolvedCommandName, DisplayName, Segments, Separator, Synopsis, Namespace, CommandType #, Parameters
 | Sort-Object ModuleName, Name, DisplayName, ResolvedCommandName
 
+# simplify for readability 
+
 [pscustomobject]@{ 
     Table = $Results
+    | Select -Exclude 'ModuleName'
 }
 }~~~
 
