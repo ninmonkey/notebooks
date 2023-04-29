@@ -1,0 +1,118 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!markdown
+
+- see: <file:///H:\data\2023\pwsh\PsModules\NotebookUtils\Write-HtmlUnorderedList ▸ html.2023.ps1>
+- 
+- [NotebookUtils Write-HtmlUnorderedList ▸ html.2023.ps1](file:///H:\data\2023\pwsh\PsModules\NotebookUtils\Write-HtmlUnorderedList%20▸%20html.2023.ps1)
+
+#!pwsh
+
+$tLate ??= @{} 
+$tLate.StyleCore = @'
+<style>
+/* * { color: red; } */
+li .li-title { 
+    /* color: blue;  */
+    color: #1b66c9 ; /* google bold blue */
+}
+li .li-content {
+    /* color: green; */
+    color: #b4daf8 ; /* google light blue */
+}
+</style>
+'@
+
+$tLate.BodyList = @'
+<ul>
+
+<li>
+<span class="li-title">title</span>
+<span class="li-content">body</span>
+</li>
+<li>
+sdfad sadfds
+</li>
+<li>
+sdfad sadfds
+</li>
+
+</ul>
+'@
+$tLate.UL = @{
+    Begin = '<ul>'
+    Process = '<li>{0}</li>'
+    End = '</ul>'
+}
+
+function Write-HtmlUnorderedList {
+    <#
+    .synopsis
+    Write-HtmlUnorderedList
+    .description
+    Write-HtmlUnorderedList
+    .example
+        'a'..'e' | Write-HtmlUnorderedList
+        Gci -recurse | Write-HtmlUnorderedList
+    #>
+    [CmdletBinding()]
+    [Alias('Html.UL')]
+    param(
+        [Parameter(mandatory, ValueFromPipeline)]
+        [object]$InputObject, # or string? 
+
+        [Parameter()]
+        [hashtable]$Options = @{}
+    )
+    begin {
+        [Text.StringBuilder]$StrB = [string]::Empty
+        [void]$StrB.appendLine( $tLate.UL.Begin )
+    }
+    process {
+        [void]$StrB.AppendLine(@(
+            $tLate.UL.Process -f @( $InputObject )
+        ))
+    }
+    end {
+        [void]$StrB.appendLine( $tLate.UL.End )
+        return $StrB.ToString()
+    }
+}
+
+'a'..'e' | Html.UL
+
+#!pwsh
+
+$tLate ??= @{} 
+$tLate.StyleCore = @'
+<style>
+/* * { color: red; } */
+li .li-title { 
+    /* color: blue;  */
+    color: #1b66c9 ; /* google bold blue */
+}
+li .li-content {
+    /* color: green; */
+    color: #b4daf8 ; /* google light blue */
+}
+</style>
+'@
+
+$tLate.BodyList = @'
+<ul>
+
+<li>
+<span class="li-title">title</span>
+<span class="li-content">body</span>
+</li>
+<li>
+sdfad sadfds
+</li>
+<li>
+sdfad sadfds
+</li>
+
+</ul>
+'@
