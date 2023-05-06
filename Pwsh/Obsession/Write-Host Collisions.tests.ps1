@@ -1,9 +1,11 @@
 BeforeAll {
     Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore' # -Force # -ea ignore
     # $PesterPreference = 'Diagnostic' #  'Detailed', 'Diagnostic', 'Minimal', 'None', 'Normal'
+    $PesterPreference = 'Minimal'
 }
 Describe 'Write-Host overlapping features' {
     BeforeEach {
+        # redundant probably, but it's pester scoping so I don't know for sure.
         Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore' # -Force # -ea ignore
     }
     It 'VersionTest' {
@@ -18,12 +20,12 @@ Describe 'Write-Host overlapping features' {
             Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore' # -Force # -ea ignore
         }
         It 'Pipe: DoesNotThrow' {
-            { 'hi world' | Microsoft.PowerShell.Utility\Write-Host -ea stop } | Should -Not -Throw #-Because 'implicit match else guard would be nice.'
+            { 'hi world' | Microsoft.PowerShell.Utility\Write-Host -ea stop | Out-Null } | Should -Not -Throw #-Because 'implicit match else guard would be nice.'
         }
         It 'NicerErrorLog: Param: -FgColor: Orange' {
             try {
                 'hi world' | Microsoft.PowerShell.Utility\Write-Host -fg orange -ea stop
-                Set-ItResult - -Because 'Parameterset does not (currently) have a matching parameterset in 7.3'
+                Set-ItResult -Because 'Parameterset does not (currently) have a matching parameterset in 7.3'
             }
             catch {
                 Set-ItResult -Pending -Because 'Parameterset does not (currently) have a matching parameterset in 7.3'
@@ -56,8 +58,8 @@ Describe 'Write-Host overlapping features' {
 
     Context 'pipeworks\Write-Host' {
         BeforeAll {
-            # redundant probably, but it's pester scopes so beware
-            Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore' # -Force # -ea ignore
+
+            Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore' # -Force
             Import-Module Pipeworks -PassThru
         }
         It 'Pipe: DoesNotThrow' {
@@ -70,8 +72,3 @@ Describe 'Write-Host overlapping features' {
     }
 
 }
-
-
-# Pipeworks\Write-Host
-# pansies\Write-Host
-# Microsoft.PowerShell.Utility\Write-Host
