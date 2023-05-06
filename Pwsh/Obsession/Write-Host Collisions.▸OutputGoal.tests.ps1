@@ -1,10 +1,36 @@
-BeforeAll {
-    Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore'
-    # $PesterPreference = 'minimal' # not currently taking effect
+#Requires -Version 7.0
 
-    @'
-Demonstrate how each condition renders
-'@
+BeforeAll {
+    # Push-Location $PSScriptRoot
+    $global:Error.Clear()
+    $Uni = @{
+        NullStr = "`u{2400}"
+    }
+    Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore'
+    $Config = @{ DisplayEnvInfo = $true }
+    function dumpEnvInfo {
+
+        param(
+            [string]$excludedModulesRegex = '(^microsoft.*)|(^PowerShellEditor(Services|suite))|^EditorServices|^ugit'
+        )
+        @(
+            'about: Demonstrates how conditions render differently.'
+            'Pwsh: {0}' -f $PSVersionTable.PSVersion.ToString()
+            # 'PesterPreference: {0}' -f ( $PesterPreference ?? $Uni.NullStr )
+            # 'global: PesterPreference: {0}' -f ( $global:PesterPreference ?? $Uni.NullStr )
+            ''
+            Get-Module
+            | Where-Object Name -NotMatch $excludedModulesRegex
+            | Sort-Object name
+            | Join-String -sep ', ' { $_.Name, $_.Version -join ' = ' } #-single
+
+        ) | Join-String -sep "`n" | Write-Host
+    }
+
+    if ($Config.DisplayEnvInfo) {
+        dumpEnvInfo
+    }
+
 
 }
 <#
@@ -12,8 +38,12 @@ Demonstrate how each condition renders
 #>
 Describe 'ModuleA' {
     BeforeAll {
+        $global:__originalPath = Get-Location
+        Push-Location $PSScriptRoot -ea 'stop' -StackName 'npest'
         $PesterPreference = 'diagnostic' # not taking effect
         $PesterPreference = 'minimal' # not taking effect
+        'PesterPreference: {0}' -f ( $PesterPreference ?? $Uni.NullStr )
+        'global: PesterPreference: {0}' -f ( $global:PesterPreference ?? $Uni.NullStr )
     }
     It 'Feature1' {
         $true | Should -Be $True
@@ -38,6 +68,9 @@ Describe 'ModuleA' {
     }
     It 'Feature4-none' {
         Set-ItResult -Skipped
+    }
+    AfterAll {
+        Pop-Location -StackName 'npest'
     }
 }
 Context 'Part2' {
