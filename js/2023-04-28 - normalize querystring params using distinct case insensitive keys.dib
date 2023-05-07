@@ -1,0 +1,162 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"javascript","items":[{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+/*
+let test_auto   = URL_update( sample_url ); //, null, null );
+let test_append   = URL_update( sample_url, {a: "Zed", q: 42} ); //, null, null );
+let test_unique = URL_update( sample_url, null, { AllowRepeatedKeys: false } );
+let test_duplicate = URL_update( sample_url, null, { AllowRepeatedKeys: true } );
+log(`Orig   ${sample_url}`)
+log(`Append ${test_append}`)
+log(`Auto   ${test_auto}`)
+log(`Unique ${test_unique}`)
+log(`Duplic ${test_duplicate}`)
+*/
+
+#!javascript
+
+function log(x) { console.log(`=> ㏒ ${x}`); }
+
+function URL_update(url, toAppend = {} , options) {
+    /*
+    about  : normalizes a url's query string with distinct, case-insensitive keys
+    input  : url as a string
+    output : url as a string
+
+    ## notes
+
+        url.searchParams is read only
+
+    ## example
+
+    input : http://foo.com/bar?R=first&b=3&r=last
+    output: http://foo.com/bar?r=last&b=3
+
+    */
+
+    // if (toAppend) {
+    //     throw 'NYI: todo next'
+    // }
+    const config = options ?? {
+        AllowRepeatedKeys: false
+    }
+    const originalURL = new URL(url)
+    const newURL = new URL(url);
+
+    // if appending,
+    // new URLSearchParams([
+    //     ...Array.from(url.searchParams.entries()),
+    //     ...Object.entries(params),
+    // ]
+    
+    let mergedParams = new URLSearchParams(
+        originalURL.searchParams.entries()
+    )
+    if(toAppend) { 
+        mergedParams = new URLSearchParams([
+            ...Array.from( originalURL.searchParams.entries()),
+            ...Object.entries( toAppend ),        
+        ])
+    }
+
+    // const mergedParams = new URLSearchParams([
+    //     ...Array.from( originalURL.searchParams.entries())
+    //     ...Object.entries(
+    //         URLSearchParams( toAppend )
+    //     )
+    // ])
+
+    Array.from(
+        mergedParams.keys()).forEach(
+            (key) => newURL.searchParams.delete(key)
+        )
+    // there's probably a more idiomatic way to ensure it exists and is empty, as an instance's member
+    // case sensitive removal
+
+    for (const [key, value] of mergedParams) {
+        const key_ci = key.toLowerCase()
+        if (config.AllowRepeatedKeys) {
+            newURL.searchParams.append(key_ci, value)
+        } else {
+            newURL.searchParams.set(key_ci, value)
+        }
+    }
+    return newURL
+}
+
+const sample_url = 'http://foo.com/bar?R=first&b=3&r=last'
+let x = URL_update( sample_url, null )
+let y = URL_update( sample_url, { a: "FurtherLast", t : 42} )
+log(`
+in  [2]: ${sample_url}
+out [2]: ${x}
+
+in  [3]: sample_url, { a: "FurtherLast", t : 42 } 
+out [3]: ${y}
+
+`)
+
+#!javascript
+
+function log(x) { console.log(`=> ㏒ ${x}`); }
+
+function URL_update_basic(url, toAppend, options) {
+    /*
+    about  : normalizes a url's query string with distinct, case-insensitive keys
+    input  : url as a string
+    output : url as a string
+
+    ## notes
+
+        url.searchParams is read only
+
+    ## example
+
+    input : http://foo.com/bar?R=first&b=3&r=last
+    output: http://foo.com/bar?r=last&b=3
+
+    */
+
+    if (toAppend) {
+        throw 'NYI: todo next'
+    }
+    const config = options ?? {
+        AllowRepeatedKeys: false
+    }
+    const originalURL = new URL(url)
+    const newURL = new URL(url);
+
+    // if appending,
+    // new URLSearchParams([
+    //     ...Array.from(url.searchParams.entries()),
+    //     ...Object.entries(params),
+    // ]
+
+    Array.from(
+        originalURL.searchParams.keys()).forEach(
+            (key) => newURL.searchParams.delete(key)
+        )
+    // there's probably a more idiomatic way to ensure it exists and is empty, as an instance's member
+    // case sensitive removal
+
+    for (const [key, value] of originalURL.searchParams) {
+        const key_ci = key.toLowerCase()
+        if (config.AllowRepeatedKeys) {
+            newURL.searchParams.append(key_ci, value)
+        } else {
+            newURL.searchParams.set(key_ci, value)
+        }
+    }
+    return newURL
+}
+
+const sample_url = 'http://foo.com/bar?R=first&b=3&r=last'
+let x = URL_update_basic( sample_url )
+log(`
+in  [1]: ${sample_url}
+out [1]: ${x}
+
+`)
