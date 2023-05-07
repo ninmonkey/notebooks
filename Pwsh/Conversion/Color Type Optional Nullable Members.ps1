@@ -20,6 +20,8 @@ class ColorRGBA {
         https://github.com/PoshCode/Pansies/blob/main/Source/Assembly/RgbColor.cs
     .LINK
         https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_ansi_terminals?view=powershell-7.4
+    .LINK
+        https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/update-typedata?view=powershell-7.3
     #>
 
     [Int]$Red
@@ -29,6 +31,7 @@ class ColorRGBA {
     hidden [ValidateNotNullOrEmpty()][string]$rawRgbString
 
     static [object] ParseRgbHexString ( [string]$HexString ) {
+        # parse throws an exception on failure
         if ( [ColorRGBA]::RegexHexString -match $HexString ) {
             $matches.remove(0)
             $matches.PSTypeName = 'ColorRgba.ParsedHexString'
@@ -37,8 +40,17 @@ class ColorRGBA {
         throw "InvalidRgbaHexStringException: Could not parse: '$HexString'"
     }
 
+    [ColorRGBA] TransformFromString( [string]$HexString) {
+        $parsed = [ColorRGBA]::ParseRgbHexString( $HexString )
+        $newColor = [ColorRGBA]::new( $Parsed.Red, $Parsed.Green, $Parsed.Blue, ($Parsed.Alpha ?? $null))
+        # does this return null properly?
+        # maybe It should be try {} catch{ CmdletTerminatingError } ; return Obj
+        return $newColor
+    }
+
     static [bool] IsValidRgbHexString( [string]$HexString ) {
-        $clean = $HexString -replace [Regex]::Escape('\#'), ''
+        # IsValid can write errors, but returns a boolean
+        $clean = $HexString.ToLower() -replace [Regex]::Escape('\#'), ''
 
         if ($clean.Length -notin (6, 8)) {
             'Could not parse Input "{0}"! Length {1} ≠ 6 or 8 !' -f @(
@@ -70,12 +82,8 @@ class ColorRGBA {
 '@
 
     ColorRGBA ( [string]$RgbHexString ) {
-        $this.rawRgbString = $RgbHexString -replace '\#', ''
+        $color = [ColorRGBA]::ParseRgbHexString( $RgbHexString )
 
-        if ( -not [ColorRGBA]::IsValidRgbHexString( $this.rawRgbString ) ) {
-            $ex = 'Invalid RgbHexString {0}' -f @( Join-String -inp $this.rawRgbString -SingleQuote )
-            throw $ex
-        }
         $This.Red = 0
         $This.Green = 0
         $This.Blue = 0
@@ -107,7 +115,6 @@ class ColorRGBA {
     [string] ToString() {
         return '<ColorRgba {HexString: {0}, HasAlpha: {1} }>' -f @(
             $this.HasAlphaComponent()
-
         )
     }
 }
@@ -118,8 +125,27 @@ $colorType = @{
     Force       = $true
     Verbose     = $True
 }
+Update-TypeData @colorType -MemberType 'AliasProperty' -MemberName 'R' -Value 'Red'
+Update-TypeData @colorType -MemberType 'AliasProperty' -MemberName 'G' -Value 'Green'
+Update-TypeData @colorType -MemberType 'AliasProperty' -MemberName 'B' -Value 'Blue'
+Update-TypeData @colorType -MemberType 'AliasProperty' -MemberName 'A' -Value 'Alpha'
 
 Update-TypeData @colorType -MemberType 'AliasProperty' -MemberName 'ToPansies' -Value 'AsPansiesRgbColor' # not sure whether alias to a method is valid, maybe codepmethod?
+Update-TypeData @colorType -MemberType 'ScriptProperty' -MemberName 'RGB' -Value {
+    throw 'left off, need format string for 2 digit hex char'
+    '{0}{1}{2}' -f @(
+        $this.Red, $this.Green, $This.Blue
+    )
+}
+throw 'left off, need format string for 2 digit hex char'
+Update-TypeData @colorType -MemberType 'ScriptProperty' -MemberName 'RGBA' -Value {
+    '{0}{1}{2}{3}' -f @(
+        $this.Red,
+        $this.Green,
+        $This.Blue,
+        $This.Alpha ?? 0
+    )
+}
 
 Update-TypeData @colorType -MemberType 'ScriptProperty' -MemberName 'HasAlpha' -Value {
     return (-not ($null -eq $this.Alpha))
