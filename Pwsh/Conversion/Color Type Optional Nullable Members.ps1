@@ -5,6 +5,10 @@ try:
     $pestStub = gi -ea stop 'c:\Users\cppmo_000\.vscode\extensions\ms-vscode.powershell-2023.5.0\modules\PowerShellEditorServices\InvokePesterStub.ps1'
     $target   = gi -ea stop 'h:\data\2023\pwsh\notebooks\Pwsh\Conversion\Color Type Optional Nullable Members.tests.ps'
     . $PestStub -ScriptPath $PestTarget -All -MinimumVersion5 -Output 'FromPreference'#>
+
+
+# throw "Wi: never finished '$PSCommandPath' of '$PSScriptRoot'"
+
 class ColorRGBA {
     <#
     .NOTES
@@ -24,8 +28,17 @@ class ColorRGBA {
     [Nullable[Int]]$Alpha
     hidden [ValidateNotNullOrEmpty()][string]$rawRgbString
 
-    static [bool] IsValidRgbHexString( [string]$String ) {
-        $clean = $String -replace [Regex]::Escape('\#'), ''
+    static [object] ParseRgbHexString ( [string]$HexString ) {
+        if ( [ColorRGBA]::RegexHexString -match $HexString ) {
+            $matches.remove(0)
+            $matches.PSTypeName = 'ColorRgba.ParsedHexString'
+            return [PSCustomObject]$matches
+        }
+        throw "InvalidRgbaHexStringException: Could not parse: '$HexString'"
+    }
+
+    static [bool] IsValidRgbHexString( [string]$HexString ) {
+        $clean = $HexString -replace [Regex]::Escape('\#'), ''
 
         if ($clean.Length -notin (6, 8)) {
             'Could not parse Input "{0}"! Length {1} ≠ 6 or 8 !' -f @(
@@ -43,11 +56,26 @@ class ColorRGBA {
         }
         return $true
     }
+    static [string] $RegexHexString = @'
+(?xi)
+    \#?
+    (?<HexString>
+        (?<Hex6>
+            (?<Red>[0-9a-fA-F]{2})
+            (?<Green>[0-9a-fA-F]{2})
+            (?<Blue>[0-9a-fA-F]{2})
+            (?<Alpha>[0-9a-fA-F]{2})?
+        )
+    )
+'@
 
     ColorRGBA ( [string]$RgbHexString ) {
         $this.rawRgbString = $RgbHexString -replace '\#', ''
 
-
+        if ( -not [ColorRGBA]::IsValidRgbHexString( $this.rawRgbString ) ) {
+            $ex = 'Invalid RgbHexString {0}' -f @( Join-String -inp $this.rawRgbString -SingleQuote )
+            throw $ex
+        }
         $This.Red = 0
         $This.Green = 0
         $This.Blue = 0
