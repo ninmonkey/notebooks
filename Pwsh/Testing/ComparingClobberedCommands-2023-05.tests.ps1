@@ -20,54 +20,77 @@ BeforeAll {
     ) | Format-Table -AutoSize | oss | Out-Host
     $PestTarget = Get-Item 'H:/data/2023/pwsh/notebooks/Pwsh/Testing/ComparingClobberedCommands-2023-05.tests.ps1'
 }
+<#
+original
+( $whost = gcm write-host -All ) | ft -AutoSize
+
+    'world' | & $whost[0] -fore green
+    'world' | & $whost[1] -fore green
+    'world' | & $whost[2] -fore green
+
+    'world' | & $whost[0] -fg blue
+    'world' | & $whost[1] -fg green
+    'world' | & $whost[2] -fg green
+#>
+
 Describe 'Testing ClobberingWriteHost...' {
     BeforeAll {
         # future, do all permutations of which order each module is
         $whost = Get-Command 'write-host' -All
         $Terror = @{ 'errorAction' = 'Stop' }
+
+        $TargetModules = @(
+            @{  ResolvedCommand = 'Microsoft.PowerShell.Utility\Write-Host' }
+            @{  ResolvedCommand = 'Pipeworks\Write-Host' }
+            @{  ResolvedCommand = 'Pansies\Write-Host' }
+        )
     }
     Context 'Module: <ResolvedCommand>' -ForEach @(
         @{  ResolvedCommand = 'Microsoft.PowerShell.Utility\Write-Host' }
         @{  ResolvedCommand = 'Pipeworks\Write-Host' }
         @{  ResolvedCommand = 'Pansies\Write-Host' }
+
+    ) {
+
         # Get-Command @Terror -Name
         It 'each <ResolvedCommand>' {
             # $ResolvedCommand | Should -Not -BeNullOrEmpty
             $TRue | Should -Be $true
 
         }
-    )
 
-    It 'Module <ModuleName> Should Not Throw' -ForEach @(
-        @{
-            Func     = Get-Command @Terror -Name 'Pansies\Write-Host'
-            InputObj = 'hi world'
-            Params   = @{
-                Fg = 'blue'
+
+        It 'Module <Func> Should Not Throw' -ForEach @(
+            @{
+                Func     = Get-Command @Terror -Name 'Pansies\Write-Host'
+                InputObj = 'hi world'
+                Params   = @{
+                    Fg = 'blue'
+                }
             }
-        }
-        @{
-            Func     = Get-Command @Terror -Name 'Pipeworks\Write-Host'
-            InputObj = 'hi world'
-            Params   = @{
-                Fg = 'blue'
+            @{
+                Func     = Get-Command @Terror -Name 'Pipeworks\Write-Host'
+                InputObj = 'hi world'
+                Params   = @{
+                    Fg = 'blue'
+                }
             }
+        ) {
+            {
+
+                'hi world' | Write-Host
+
+                # 'world' | & $whost[0] -fore green
+                # 'world' | & $whost[1] -fore green
+                # 'world' | & $whost[2] -fore green
+
+                # 'world' | & $whost[0] -fg blue
+                # 'world' | & $whost[1] -fg green
+                # throw 'bad'
+                # 'world' | & $whost[2] -fg green
+            } | Should -Not -Throw
+
+
         }
-    ) {
-        {
-
-            'hi world' | Write-Host
-
-            # 'world' | & $whost[0] -fore green
-            # 'world' | & $whost[1] -fore green
-            # 'world' | & $whost[2] -fore green
-
-            # 'world' | & $whost[0] -fg blue
-            # 'world' | & $whost[1] -fg green
-            # throw 'bad'
-            # 'world' | & $whost[2] -fg green
-        } | Should -Not -Throw
-
-
     }
 }
