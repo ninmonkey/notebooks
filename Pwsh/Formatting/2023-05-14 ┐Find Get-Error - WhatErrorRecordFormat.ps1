@@ -95,9 +95,11 @@ function __Export.ErrorFormatData {
         $shortName = $shortName -replace ([Regex]::escape('#')), '_'
         '   => shortName: {0}' -f $shortName | Write-Host
 
+        $Path = Join-Path './export' "${shortName}.ps1xml"
+        Get-FormatData -TypeName $curTypeName -PowerShellVersion 7.3
+        | Export-FormatData -Path $Path -Verbose -IncludeScriptBlock
 
-
-
+        $Path | WroteFile.Message
     }
 }
 
