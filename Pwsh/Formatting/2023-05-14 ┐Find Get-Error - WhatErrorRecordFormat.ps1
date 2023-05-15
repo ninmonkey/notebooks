@@ -105,8 +105,8 @@ function __Export.ErrorFormatData {
 
 __Export.ErrorFormatData
 
-Write-Warning 'early exit... collect types'
-return
+# Write-Warning 'early exit... collect types'
+# return
 
 function __makeError.Sample1 {
     Join-Path '.' 'someFakepath' | Get-Item -ea 'continue'
