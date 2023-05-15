@@ -43,8 +43,19 @@ It's declared as returning / involving:
 
     internal const string ErrorRecordPSExtendedError = "System.Management.Automation.ErrorRecord#PSExtendedError";
     internal const string ExceptionPSExtendedError = "System.Exception#PSExtendedError";
+    https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.extendedtypedefinition?view=powershellsdk-7.2.0
 
 '@
+
+$Bag.TypeName = @{}
+$bag.TypeName.ToJsonSerialization = [System.Collections.ListDictionaryInternal]
+[Collections.Generic.List[Object]]$bag.TypeName.FromGetError = @(
+    'System.Exception'
+    'System.Exception#PSExtendedError'
+    'System.Management.Automation.ErrorRecord'
+    'System.Management.Automation.ErrorRecord#PSExtendedError'
+)
+
 
 Push-Location $PSScriptRoot
 function WroteFile.Message {
@@ -59,9 +70,38 @@ function __Collect.ErrorFormatData {
     | ConvertTo-Json -Depth 99 | Set-Content $Path
 
     $Path | WroteFile.Message
+
+    Get-FormatData -TypeName $bag.TypeName.FromGetError
+
+    $gfd = Get-FormatData -TypeName $bag.TypeName.FromGetError
+    # $gfd_one.FormatViewDefinition | fl | iot2
+    $gfd_one.FormatViewDefinition | io -SortBy Reported | Format-Table Reported, Type, Name, Value
 }
 
 __Collect.ErrorFormatData
+
+function __Export.ErrorFormatData {
+    # 'System.Exception'
+    # 'System.Exception#PSExtendedError'
+    # 'System.Management.Automation.ErrorRecord'
+    # 'System.Management.Automation.ErrorRecord#PSExtendedError'
+    $bag.TypeName.FromGetError | ForEach-Object {
+        $curTypeName = $_
+        '::Export FormatData: {0}' -f $curTypeName | Write-Host
+
+        $shortName = $curTypeName
+        $shortName = $shortName -replace ([Regex]::Escape('System.Management.Automation.')), ''
+        $shortName = $shortName -replace ([Regex]::Escape('System.')), ''
+        $shortName = $shortName -replace ([Regex]::escape('#')), '_'
+        '   => shortName: {0}' -f $shortName | Write-Host
+
+
+
+
+    }
+}
+
+__Export.ErrorFormatData
 
 Write-Warning 'early exit... collect types'
 return
@@ -88,6 +128,3 @@ $serr1.Count | Join-String -op 'err1: '
 ## type names maybe related or invlovled
 [ValidateNotNull()][Hashtable]$Bag ??= @{}
 
-$Bag.TypeName = @{}
-$bag.TypeName.ToJsonSerialization = [System.Collections.ListDictionaryInternal]
-$bag.TypeName.FromGetError = [System.Management.Automation.ErrorRecord]
