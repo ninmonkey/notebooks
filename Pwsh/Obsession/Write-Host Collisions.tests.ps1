@@ -1,6 +1,6 @@
 #Requires -Version 7.0
 
-BeforeAll {
+BeforeAll { # cleanup examples 2023-05-08
     Remove-Module 'Pipeworks', 'Pansies' -ea 'ignore' # -Force # -ea ignore
     # $PesterPreference = 'Diagnostic' #  'Detailed', 'Diagnostic', 'Minimal', 'None', 'Normal'
     $PesterPreference = 'Minimal'

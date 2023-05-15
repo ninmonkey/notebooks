@@ -26,7 +26,25 @@ It's declared as returning:
     - [Exception#PSExtendedError]
 '@
 
+Push-Location $PSScriptRoot
+function WroteFile.Message {
+    # $Path
+    $Input | Get-Item -ea 'ignore' | Join-String -f 'Wrote: <file:///{0}>'
+}
 
+function __Collect.ErrorFormatData {
+    $Path = './export\FormatData.ErrorRecord.json'
+
+    Get-FormatData -TypeName ([System.Management.Automation.ErrorRecord])
+    | ConvertTo-Json -Depth 99 | Set-Content $Path
+
+    $Path | WroteFile.Message
+}
+
+__Collect.ErrorFormatData
+
+Write-Warning 'early exit... collect types'
+return
 
 function __makeError.Sample1 {
     Join-Path '.' 'someFakepath' | Get-Item -ea 'continue'

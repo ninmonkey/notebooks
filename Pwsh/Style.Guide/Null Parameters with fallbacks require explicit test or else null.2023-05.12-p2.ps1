@@ -68,6 +68,7 @@ because it passes empty strings to
 
 
 $PSDefaultParameterValues['OutHost:TreatBlanksAsNull'] = $true
+# $PSDefaultParameterValues['OutHost:TreatBlanksAsNull'] = $false
 # 'fg and bg  ' | OutHost -fg gray80 -bg '25727b'
 'fg and bg  ' | OutHost -bg '#25727b'
 'fg and bg  ' | OutHost -bg 'blue'
@@ -89,6 +90,42 @@ function microtest {
     'hi' | New-Text -fg $x -bg $y
     | Join-String
 }
+# microtest
+
+<#
+output:
+
+Pwsh> microtest
+
+    'hi' | New-Text -fg $x -bg $y
+                                ~~
+    Cannot bind parameter 'BackgroundColor'. Cannot convert
+    value "" to type "PoshCode.Pansies.RgbColor". Error: "Color
+    value can't be an empty string."
+
+#>
+function microtest2 {
+    # simplificaiton of the above
+    # $x = $null
+    $x ??= 'red'
+    # $y = ''
+    $y = ''
+    $y ??= 'yellow'
+
+    # $newTextSplat = @{
+    #     Fg = $x
+    #     Bg = $y
+    # }
+    # $newTextSplat = @{
+    #     Fg = $x ?? 'magenta'
+    #     Bg = $y ?? 'cyan'
+    # }
+
+    'hi2' | New-Text -fg $x -bg $y
+    | Join-String
+}
+microtest2
+
 <#
 output:
 
