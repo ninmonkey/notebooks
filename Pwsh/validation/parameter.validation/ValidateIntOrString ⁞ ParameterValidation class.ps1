@@ -1,3 +1,5 @@
+# thread started at <https://discord.com/channels/180528040881815552/447476117629304853/1110201488472539296>
+# About: Creating a validator to allow integers or string, nothing else.
 class ValidateStringOrInt : System.Management.Automation.ValidateEnumeratedArgumentsAttribute {
     [Object]$Value
     [void]ValidateElement( $Element ) {
@@ -19,3 +21,11 @@ Remove-Variable @('a'..'z') -ea 'ignore'
 [ValidateStringOrInt()]$c = '123.3'
 { [ValidateStringOrInt()]$e = 23.435 } | Should -Throw
 Get-Variable @('a'..'z') -ea 'ignore' | ft
+
+Describe 'Stuff' {
+    BeforeAll {
+        $samples = @( ... )
+    }
+    It 'b' {}
+
+}
