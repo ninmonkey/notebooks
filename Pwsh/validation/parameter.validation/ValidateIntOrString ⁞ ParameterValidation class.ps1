@@ -22,10 +22,3 @@ Remove-Variable @('a'..'z') -ea 'ignore'
 { [ValidateStringOrInt()]$e = 23.435 } | Should -Throw
 Get-Variable @('a'..'z') -ea 'ignore' | ft
 
-Describe 'Stuff' {
-    BeforeAll {
-        $samples = @( ... )
-    }
-    It 'b' {}
-
-}

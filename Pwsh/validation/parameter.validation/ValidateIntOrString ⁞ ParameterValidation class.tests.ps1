@@ -1,3 +1,30 @@
+<#
+ New settings in
+    5.2: <https://pester.dev/docs/commands/New-PesterConfiguration>
+        old config: <https://pester.dev/docs/usage/configuration>
+    5.3: <https://pester.dev/docs/usage/output#stacktraceverbosity>
+    5.4: <https://pester.dev/docs/usage/output#rendermode>
+
+Stack Verbosity
+    None, FirstLine, Filtered (default), Full
+
+CIFormat
+
+    None, Auto (default), AzureDevops, GithubActions
+
+RenderMode
+    Auto (default), ANSI, ConsoleColor, PlainText
+
+
+#>
+
+
+$pref = $PesterPreference = [PesterConfiguration]::Default
+$PesterPreference.Debug.WriteDebugMessages = $false
+$PesterPreference.Output.Verbosity = 'None'
+
+
+
 BeforeAll {
     $PSStyle.OutputRendering = 'ansi'
 
@@ -6,7 +33,7 @@ BeforeAll {
     '::imported' | Write-Host -fore green
 }
 
-Describe 'ValidateIntStringFlat <Value>' -ForEach @(
+Describe 'ValidateIntString <Value> is <ExpectType>' -ForEach @(
     @{
         Exp         = { [ValidateStringOrInt()]$SomeInt = 123 }
         ExpectType  = 'int'
@@ -58,31 +85,31 @@ Describe 'ValidateIntStringFlat' {
         { [ValidateStringOrInt()]$chars = 'abcd' } | Should -Not -Throw
     }
     # It 'A Expected <Value> Exactly <ExpectType>' -ForEach @( Samples ) {
-    It 'Expected <Value> as <ExpectType> where throwing is <IsThrow>' -ForEach @(
+    It 'Expected <Value> as <ExpectType> where throwing is <ShouldThrow>' -ForEach @(
         @{
-            Exp         = { [ValidateStringOrInt()]$SomeInt = 123 }
+            Exp         = { [ValidateStringOrInt()]$someKind = 123 ; $someKind }
             ExpectType  = 'int'
             Value       = 123
             ShouldThrow = $false
         }
         @{
-            Exp         = { [ValidateStringOrInt()]$SomeInt = '123' }
+            Exp         = { [ValidateStringOrInt()]$someKind = '123' ; $someKind }
             ExpectType  = 'int'  #  can I auto-assert as int
             Value       = '123'
             ShouldThrow = $false
         }
         @{
-            Exp         = { [ValidateStringOrInt()]$SomeInt = '123.4' }
+            Exp         = { [ValidateStringOrInt()]$someKind = '123.4' ; $someKind }
             ExpectType  = 'string'
             Value       = '123.4'
             ShouldThrow = $false
         }
         @{
-            Exp         = { [ValidateStringOrInt()]$SomeInt = $null }
+            Exp         = { [ValidateStringOrInt()]$someKind = $null ; $someKind }
             ShouldThrow = $true
         }
         @{
-            Exp         = { [ValidateStringOrInt()]$SomeInt = '' }
+            Exp         = { [ValidateStringOrInt()]$someKind = ''; $someKind }
             ExpectType  = 'string'
             Value       = ''
             ShouldThrow = $false # unless I want blanks. for now allow it.
@@ -101,5 +128,55 @@ Describe 'ValidateIntStringFlat' {
 
     }
 
+
+}
+
+Describe 'Minipest <Value>' -ForEach @(
+    # @{
+    #     Exp         = { [ValidateStringOrInt()]$SomeInt = 123; $SomeInt }
+    #     ExpectType  = 'int'
+    #     Value       = 123
+    #     ShouldThrow = $false
+    # }
+    @{
+        Exp         = { [ValidateStringOrInt()]$someKind = 123 ; $someKind }
+        ExpectType  = 'int'
+        Value       = 123
+        ShouldThrow = $false
+    }
+    @{
+        Exp         = { [ValidateStringOrInt()]$someKind = '123' ; $someKind }
+        ExpectType  = 'int'  #  can I auto-assert as int
+        Value       = '123'
+        ShouldThrow = $false
+    }
+    @{
+        Exp         = { [ValidateStringOrInt()]$someKind = '123.4' ; $someKind }
+        ExpectType  = 'string'
+        Value       = '123.4'
+        ShouldThrow = $false
+    }
+    @{
+        Exp         = { [ValidateStringOrInt()]$someKind = $null ; $someKind }
+        ShouldThrow = $true
+    }
+    @{
+        Exp         = { [ValidateStringOrInt()]$someKind = ''; $someKind }
+        ExpectType  = 'string'
+        Value       = ''
+        ShouldThrow = $false # unless I want blanks. for now allow it.
+    }
+) {
+    It 'is <Value>' {
+        & $Exp | Should -Be $Value
+    }
+
+    It 'If ShouldThrow <ShouldThrow> and isType <Value>' {
+        if ($ShouldThrow) {
+            Set-ItResult -Skipped -Because 'WouldHaveThrown, ie: no value.'
+            return # appears to ignore later Should statements, so, maybe redundant?
+        }
+        & $Exp | Should -BeOfType $ExpectType
+    }
 
 }
