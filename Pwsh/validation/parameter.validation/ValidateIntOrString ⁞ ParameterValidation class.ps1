@@ -14,11 +14,11 @@ class ValidateStringOrInt : System.Management.Automation.ValidateEnumeratedArgum
         }
     }
 }
-# inner tests to work right
-Remove-Variable @('a'..'z') -ea 'ignore'
-[ValidateStringOrInt()]$a = '123'
-[ValidateStringOrInt()]$b = 123
-[ValidateStringOrInt()]$c = '123.3'
-{ [ValidateStringOrInt()]$e = 23.435 } | Should -Throw
-Get-Variable @('a'..'z') -ea 'ignore' | ft
-
+<#
+    Remove-Variable @('a'..'z') -ea 'ignore'
+    [ValidateStringOrInt()]$a = '123'
+    [ValidateStringOrInt()]$b = 123
+    [ValidateStringOrInt()]$c = '123.3'
+    { [ValidateStringOrInt()]$e = 23.435 } | Should -Throw
+    Get-Variable @('a'..'z') -ea 'ignore' | ft
+#>
