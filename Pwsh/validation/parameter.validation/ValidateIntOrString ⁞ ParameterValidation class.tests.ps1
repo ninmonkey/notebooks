@@ -1,4 +1,5 @@
 <#
+See Improved version: <file://./parameter.validation\ValidateIntOrString%20⁞%20ParameterValidation%20class.tests.ps1>
  New settings in
     5.2: <https://pester.dev/docs/commands/New-PesterConfiguration>
         old config: <https://pester.dev/docs/usage/configuration>

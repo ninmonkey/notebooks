@@ -23,8 +23,6 @@ $pref = $PesterPreference = [PesterConfiguration]::Default
 $PesterPreference.Debug.WriteDebugMessages = $false
 $PesterPreference.Output.Verbosity = 'None'
 
-
-
 BeforeAll {
     $PSStyle.OutputRendering = 'ansi'
 
@@ -34,8 +32,8 @@ BeforeAll {
     '::imported' | Write-Host -fore green
 }
 
-Context 'Parent' {
-    Describe 'ValidatingIntOrString <Value> as <ExpectType>' -ForEach @(
+Context 'Attribute [ValidatingIntOrString]' {
+    Describe '<Value> as <ExpectType>' -ForEach @(
         @{
             Exp         = { [ValidateStringOrInt()]$SomeInt = 123; $SomeInt }
             ExpectType  = 'int'
@@ -71,11 +69,14 @@ Context 'Parent' {
             ShouldThrow = $false # unless I want blanks. for now allow it.
         }
     ) {
-        It 'is <Value>' {
+        It 'Is equal to <Value>' {
             & $Exp | Should -Be $Value
         }
 
-        It 'If ShouldThrow <ShouldThrow> and isType <Value>' {
+        It 'If <Value> ShouldThrow <ShouldThrow> and did' {
+            $Exp | Should -Throw -Not:$(-not $ShouldThrow)
+        }
+        It 'If ShouldThrow <ShouldThrow> and <Value> isType <ExpectType>' {
             if ($ShouldThrow) {
                 Set-ItResult -Skipped -Because 'WouldHaveThrown, ie: no value.'
                 return # appears to ignore later Should statements, so, maybe redundant?
