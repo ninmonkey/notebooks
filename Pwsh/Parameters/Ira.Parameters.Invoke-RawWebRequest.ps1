@@ -1,4 +1,12 @@
 # the context is from <https://discord.com/channels/180528040881815552/447477006385414174/1108361002535374958>
+
+function doEnc {
+    param(
+        [Text.Encoding]
+        $Encoding = ''
+    )
+}
+
 function Invoke-RawWebRequest.Fancy {
     # using the types [Uri] and [Http.HttpMethod]
     # and body suggests default query strings
