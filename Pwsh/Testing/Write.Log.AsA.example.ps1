@@ -2,12 +2,10 @@
 
 
 function FormatStuff {
-    $Input | Join-String -f "`n - {0}" -op "Stuff"
+    $Input
+    | Join-String -f "`n - {0}" -op "Stuff"
 }
 
-Label 'section' 'start'
-Write.Log.AsA CurrentLine
-Write.Log.AsA PSCommandPath
 
 function AddStuff.Basic {
     param (
@@ -19,8 +17,9 @@ function AddStuff.Basic {
 
     Write.Log.AsA CurrentLine
     Write.Log.AsA PSCommandPath
-
 }
+
+AddStuff.Basic -A 10 -B 20
 
 function AddStuff.WithBind {
     [CmdletBinding()]
@@ -41,8 +40,9 @@ function AddStuff.WithProc {
          [object]$b
     )
     process {
+        $cur = $_
         $addSome = $a + $b
-        $addSome
+        $addSome | Join-string -op "item $cur = "
 
         Write.Log.AsA CurrentLine
         Write.Log.AsA PSCommandPath
@@ -55,6 +55,19 @@ function AddStuff.WithProc {
     }
 }
 
+
+Label 'section' 'start'
+Write.Log.AsA CurrentLine
+Write.Log.AsA PSCommandPath
+
 hr -fg magenta
 Label 'section' 'Basic'
-AddStuff.Basic
+AddStuff.Basic -A 10 -B 20
+
+hr -fg magenta
+Label 'section' 'WithBind'
+AddStuff.WithBind -A 10 -B 20
+
+hr -fg magenta
+Label 'section' 'WithProc'
+'a'..'c' | AddStuff.WithProc -A 10 -B 20
