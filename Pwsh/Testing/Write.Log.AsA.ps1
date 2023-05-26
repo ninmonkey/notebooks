@@ -54,19 +54,19 @@ function Write.Log.AsA  {
     switch ($OutputFormat) {
         'PSCommandPath' {
             # was: $render = Abbr.Path $PSCommandPath
-            $render = Abbr.Path $PSCommandPath
+            $render = $PSCommandPath
             | Join-String -op '__in: ' -f '{0}'
             break
         }
         'WriteFile' {
             # was: $render = Abbr.Path $TargetItem
-            $render = Abbr.Path $TargetItem
+            $render = $TargetItem
             | Join-String -f '::Write: <file:///{0}>'
             break
         }
         'ReadFile' {
             # was: $render = Abbr.Path $TargetItem
-            $render = Abbr.Path $TargetItem
+            $render = $TargetItem
             | Join-String -f '::Read: <file:///{0}>'
             break
         }
