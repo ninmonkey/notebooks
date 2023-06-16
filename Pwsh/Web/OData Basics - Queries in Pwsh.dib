@@ -1,0 +1,34 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!markdown
+
+ODATA basics
+
+- [OData.org/GettingStarted](https://www.odata.org/getting-started/)
+- [Import Postman Collection](https://www.postman.com/collections/bf7d9130241aaa7160d8)
+
+#!pwsh
+
+$PSDefaultParameterValues['ConvertTo-Json:Depth'] = 10
+$PSDefaultParameterValues['ConvertTo-Json:WarningAction'] = 'Ignore'
+
+#!pwsh
+
+$url = @'
+http://services.odata.org/V4/TripPinService/People('russellwhyte')
+'@
+$url
+$response = Invoke-RestMethod -Uri $url
+$response
+$response | ConvertTo-Json 
+
+#!pwsh
+
+$url = @'
+https://services.odata.org/v4/TripPinServiceRW/People?$top=2 &amp; $select=FirstName, LastName &amp; $filter=Trips/any(d:d/Budget gt 3000)
+'@
+$url
+$response = Invoke-RestMethod -Uri $url
+$response | ConvertTo-Json -wa ignore
