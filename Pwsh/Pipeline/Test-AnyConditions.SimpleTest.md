@@ -57,7 +57,8 @@ $prefixes   | CountOf 'prefixes'| Join.UL
 $all_items  | CountOf 'all'     | Grid
 $query1     | CountOf 'Found1'  | Join.UL
 $query2     | CountOf 'Found2'  | Join.UL
-
+```
+<!--
 h1 'Example1: -Regex: using Block{ Block{} }'
 
 
@@ -67,10 +68,9 @@ $query2     | Join.UL
 
 h1 'Example2: -Regex: using Func{ Block{} }'
 
-
 hr
 $all_items | Grid
 $prefixes  | Join.UL
 hr
 $query2     | Join.UL
-```
+-->
