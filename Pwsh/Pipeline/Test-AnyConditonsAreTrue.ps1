@@ -39,20 +39,28 @@ function Test-AllFalse {
     ( @($all) -eq $false).Count -eq $all.Count
 }
 
-$bases = 'c:\a', 'c:\foo\bin', 'c:\temp'
-    | Sort-Object -Unique
-    | CountOf 'Bases'
+$bases =
+    'c:\a', 'c:\foo\bin', 'c:\temp'
+        | Sort-Object -Unique
+        | CountOf 'Bases'
 
 $all_items = @(
-    'g:\foo', 'c:\foo\dist\bin'
-    'c:\b', 'c:\e\z', 'c:\aa\b'
-    'c:\foo\bar', 'c:\bar\dist\foo', 'c:\temp\foo\bar',
-    'c:\foo\bin\bar\a', 'c:\tempstuff'
-)
+        'g:\foo', 'c:\foo\dist\bin', 'c:\b', 'c:\e\z', 'c:\aa\b'
+        'c:\foo\bar', 'c:\bar\dist\foo', 'c:\temp\foo\bar',
+        'c:\foo\bin\bar\a', 'c:\tempstuff'
+    )
+        | Sort-Object -Unique
+        | CountOf 'AllItems'
 
 $prefixes = foreach($pattern in $bases) {
     '^' + [regex]::Escape($pattern)
 }
+
+h1 'Example0: ...'
+
+$bases      | CountOf 'bases' | Grid
+$all_items  | CountOf 'all'   | Grid
+
 
 h1 'Example1: -Regex: using Block{ Block{} }'
 
@@ -74,7 +82,7 @@ $all_items | ?{
 return
     # | Sort-Object -Unique
     # | CountOf 'all'
-
+<#
 
 h1 'Example3: -like: Func{ Block{} }'
 
@@ -110,3 +118,4 @@ $strings | ?{ ( $_ -like "*${match}*" ) -eq $true }.count -gt 0
 $filtered = $others | ?{
     (( $_ -like "*${_}*" ) -eq $true ).count -gt 0
 }
+#>
