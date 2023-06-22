@@ -26,6 +26,32 @@ Describe 'Test-AnyTrueCommands' {
             $Inputs | Test-AllTrue | Should -Be $Expected
         }
     }
+    Context 'Test-AllFalse' {
+        It '<Inputs> is <Expected>' -ForEach @(
+            @{
+                Inputs = $true, $true, $false
+                Expected = $false
+            }
+            @{
+                Inputs = $false, $false
+                Expected = $true
+            }
+            # @{
+            #     Inputs = '' # depends on coercion
+            #     Expected = $true
+            # }
+            @{
+                Inputs = $false, $null, $true
+                Expected = $false
+            }
+            # @{
+            #     Inputs = @() # depends on coercion
+            #     Expected = $false
+            # }
+        ) {
+            $Inputs | Test-AllFalse | Should -Be $Expected
+        }
+    }
     Context 'Test-AnyTrue' {
         It '<Inputs> is <Expected>' -ForEach @(
             @{
