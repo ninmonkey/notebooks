@@ -42,22 +42,41 @@ function InspectScriptBlock {
         [FunctionInfo]$InputFunctionInfo
     )
     function __inspect.ScriptBlock {
-
-        return [PSCustomObject]@{
+        [CmdletBinding()]
+        param(
+            [ValidateNotNullOrEmpty()]
+            [ValidateNotNull()]
+            [Parameter(Mandatory, Position=0)]
+            [object]$InputObject
+        )
+        $Info = [ordered]@{
             PSTypeName = 'ninfo.Inspect.ScriptBlock'
-            Is = @{
+            FullTypeName = $InputObject.GetType().FullName
+            Is = [ordered]@{
                 TrueNull = $null -eq $InputScriptBlock
                 StringNullOrEmpty = [string]::IsNullOrEmpty( $InputScriptBlock )
             }
         }
+
+        return [PSCustomObject]$Info
     }
     function __inspect.FunctionInfo {
-        return [PSCustomObject]@{
+        [CmdletBinding()]
+        param(
+            [ValidateNotNullOrEmpty()]
+            [ValidateNotNull()]
+            [Parameter(Mandatory, Position=0)]
+            [object]$InputObject
+        )
+        $info = [ordered]@{
             PSTypeName = 'ninfo.Inspect.FunctionInfo'
-            Is = @{
+            FullTypeName = $InputObject.GetType().FullName
+            Is = [ordered]@{
                 TrueNull = $null -eq $InputFunctionInfo
                 StringNullOrEmpty = [string]::IsNullOrEmpty( $InputScriptBlock )
             }
+
+            return [PSCustomObject]$info
         }
     }
 
@@ -67,7 +86,7 @@ function InspectScriptBlock {
             $info = __inspect.FunctionInfo -inputObject $InputFunctionInfo
             break
         }
-        'AsScriptBlock' {
+        FullTypeName
             write-verbose '=> __inspect.ScriptBlock'
             $info = __inspect.ScriptBlock -inputObject $InputScriptBlock
             break
@@ -80,7 +99,8 @@ function InspectScriptBlock {
 
 $sb = $Sample.TrueEmpty
 $Sample.GetEnumerator() | %{
-    $results = InspectScriptBlock -InputScriptBlock $_.Value
+    # $results = InspectScriptBlock -InputScriptBlock $_.Value
+    $results = InspectScriptBlock -InputObject $_.Value -ea 'break' #FunctionInfo $_.Value
     $query = [PSCustomObject]@{
         PSTypeName = 'ninfo.Inspection.Pairs'
         Name = $_.Key
