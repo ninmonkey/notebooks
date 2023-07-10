@@ -2,9 +2,9 @@ using namespace System.Management
 using namespace System.Management.Automation
 using namespace System.Collections.Generic
 # 2023-07-09
-
+goto $PSScriptRoot
 # function TrueEmptyAsFunction {}
-remove-item 'function:\TrueEmptyAsFunction' -ea 'ignore'
+Remove-Item 'function:\TrueEmptyAsFunction' -ea 'ignore'
 New-Item 'function:\TrueEmptyAsFunction' -Value {} #-ea 'continue'
 # New-Item 'function:\TrueEmptyAsFunction2' -Value TrueEmptyAsFunction
 
@@ -18,7 +18,7 @@ $Sample.TrueEmpty = {}
 $Sample.EmptyString = { [string]::StringEmpty }
 $Sample.EmptyStringLiteral = { '' }
 $Sample.NullLiteral = { $null }
-$Sample.EmptyOutput = { $x = 0  }
+$Sample.EmptyOutput = { $x = 0 }
 $Sample.TrueEmptyAsFunction = Get-Item 'function:\TrueEmptyAsFunction'
 
 function InspectScriptBlock {
@@ -32,13 +32,13 @@ function InspectScriptBlock {
         [ValidateNotNullOrEmpty()]
         [ValidateNotNull()]
         [Alias('SB', 'Expression', 'ScriptBlock')]
-        [Parameter(ParameterSetName='AsScriptBlock')]
+        [Parameter(ParameterSetName = 'AsScriptBlock')]
         [ScriptBlock]$InputScriptBlock,
 
         [ValidateNotNullOrEmpty()]
         [ValidateNotNull()]
         [Alias('Function')]
-        [Parameter(ParameterSetName='AsFunctionInfo')]
+        [Parameter(ParameterSetName = 'AsFunctionInfo')]
         [FunctionInfo]$InputFunctionInfo
     )
     function __inspect.ScriptBlock {
@@ -46,14 +46,14 @@ function InspectScriptBlock {
         param(
             [ValidateNotNullOrEmpty()]
             [ValidateNotNull()]
-            [Parameter(Mandatory, Position=0)]
+            [Parameter(Mandatory, Position = 0)]
             [object]$InputObject
         )
         $Info = [ordered]@{
-            PSTypeName = 'ninfo.Inspect.ScriptBlock'
+            PSTypeName   = 'ninfo.Inspect.ScriptBlock'
             FullTypeName = $InputObject.GetType().FullName
-            Is = [ordered]@{
-                TrueNull = $null -eq $InputScriptBlock
+            Is           = [ordered]@{
+                TrueNull          = $null -eq $InputScriptBlock
                 StringNullOrEmpty = [string]::IsNullOrEmpty( $InputScriptBlock )
             }
         }
@@ -65,28 +65,27 @@ function InspectScriptBlock {
         param(
             [ValidateNotNullOrEmpty()]
             [ValidateNotNull()]
-            [Parameter(Mandatory, Position=0)]
+            [Parameter(Mandatory, Position = 0)]
             [object]$InputObject
         )
         $info = [ordered]@{
-            PSTypeName = 'ninfo.Inspect.FunctionInfo'
+            PSTypeName   = 'ninfo.Inspect.FunctionInfo'
             FullTypeName = $InputObject.GetType().FullName
-            Is = [ordered]@{
-                TrueNull = $null -eq $InputFunctionInfo
+            Is           = [ordered]@{
+                TrueNull          = $null -eq $InputFunctionInfo
                 StringNullOrEmpty = [string]::IsNullOrEmpty( $InputScriptBlock )
             }
-
-            return [PSCustomObject]$info
         }
+        return [PSCustomObject]$info
     }
 
-    switch($PSCmdlet.ParameterSetName){
+    switch ($PSCmdlet.ParameterSetName) {
         'AsFunctionInfo' {
-            write-verbose '=> __inspect.FunctionInfo'
+            Write-Verbose '=> __inspect.FunctionInfo'
             $info = __inspect.FunctionInfo -inputObject $InputFunctionInfo
             break
         }
-        FullTypeName
+        'AsScriptBlock' {
             write-verbose '=> __inspect.ScriptBlock'
             $info = __inspect.ScriptBlock -inputObject $InputScriptBlock
             break
@@ -94,20 +93,29 @@ function InspectScriptBlock {
         default { throw "Unexpected ParameterSetName: '$($PSCmdlet.ParameterSetName)'" }
     }
     return $Info
-
 }
 
 $sb = $Sample.TrueEmpty
-$Sample.GetEnumerator() | %{
+$summary = @(
+    InspectScriptBlock -InputScriptBlock $Sb
+ )
+ $Summary
+
+hr -fg magenta
+write-warning 'Early Exit!!!'
+return
+
+
+$Sample.GetEnumerator() | % {
     # $results = InspectScriptBlock -InputScriptBlock $_.Value
     $results = InspectScriptBlock -InputObject $_.Value -ea 'break' #FunctionInfo $_.Value
     $query = [PSCustomObject]@{
         PSTypeName = 'ninfo.Inspection.Pairs'
-        Name = $_.Key
+        Name       = $_.Key
         Inspection = $results ?? "`u{2400}"
     }
     $Info.Add( $query )
 }
 return
 # function Dotils.Invoke-TipOfTheDay  {
-import-module Dotils -force -verb -PassThru #*>$Null
+Import-Module Dotils -Force -verb -PassThru #*>$Null
