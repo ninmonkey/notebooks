@@ -18,7 +18,11 @@ $Sample.TrueEmpty = {}
 $Sample.EmptyString = { [string]::StringEmpty }
 $Sample.EmptyStringLiteral = { '' }
 $Sample.NullLiteral = { $null }
+$Sample.EmptyNoOutputMany = { $x = 10; $z = 30; }
+$Sample.NoOutputWithPipeline = { 0..10 | Out-Null }
 $Sample.EmptyOutput = { $x = 0 }
+$Sample.FromStringCoerce_TrueEmpty = '{}'
+$Sample.FromStringCoerce_TrueEmptyString = '{ [string]::StringEmpty }'
 $Sample.TrueEmptyAsFunction = Get-Item 'function:\TrueEmptyAsFunction'
 
 function InspectScriptBlock {
@@ -52,7 +56,7 @@ function InspectScriptBlock {
         $Info = [ordered]@{
             PSTypeName   = 'ninfo.Inspect.ScriptBlock'
             FullTypeName = $InputObject.GetType().FullName
-            Is           = [ordered]@{
+            Is           = [pscustomobject][ordered]@{
                 TrueNull          = $null -eq $InputScriptBlock
                 StringNullOrEmpty = [string]::IsNullOrEmpty( $InputScriptBlock )
             }
@@ -71,7 +75,7 @@ function InspectScriptBlock {
         $info = [ordered]@{
             PSTypeName   = 'ninfo.Inspect.FunctionInfo'
             FullTypeName = $InputObject.GetType().FullName
-            Is           = [ordered]@{
+            Is           = [pscustomobject][ordered]@{
                 TrueNull          = $null -eq $InputFunctionInfo
                 StringNullOrEmpty = [string]::IsNullOrEmpty( $InputScriptBlock )
             }
@@ -96,9 +100,14 @@ function InspectScriptBlock {
 }
 
 $sb = $Sample.TrueEmpty
-$summary = @(
+[List[Object]]$summary = @(
     InspectScriptBlock -InputScriptBlock $Sb
+    InspectScriptBlock -InputScriptBlock $sample.EmptyString
+    InspectScriptBlock -InputScriptBlock $sample.EmptyStringLiteral
  )
+ Hr
+ $Summary | s -prop Name -ExpandProperty Is -ea 0
+ Hr
  $Summary
 
 hr -fg magenta
