@@ -11,6 +11,9 @@ function DoStuff {
         Multiple says
             not all, not none, allow any other combinations
 
+        It gets messy though, when coercion is involved
+
+
     #>
     [CmdletBinding()]
     param(
@@ -18,12 +21,20 @@ function DoStuff {
     )
 
     $IsOk? =
-        $PSBoundParameters['Stuff'] -xor
+        $PSBoundParameters['Stuff']     -xor
             $PSBoundParameters['Other'] -xor
             $PSBoundParameters['A']     -xor
             $PSBoundParameters['B']
 
+    $IsSlightlyMoreOkay? =
+        $PSBoundParameters.ContainsKey('Stuff')     -xor
+            $PSBoundParameters.ContainsKey('Other') -xor
+            $PSBoundParameters.ContainsKey('A')     -xor
+            $PSBoundParameters.ContainsKey('B')
+
+
     $IsOk? | Join-String -f 'Are you Ok? {0}'
+    $IsSlightlyMoreOkay? | Join-String -f 'Are you Slightly Ok? {0}'
 
     $PSCmdlet.MyInvocation.BoundParameters
         | ConvertTo-Json -Depth 0 -wa 'ignore' -Compress
