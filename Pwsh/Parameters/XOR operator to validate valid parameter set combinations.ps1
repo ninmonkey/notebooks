@@ -20,6 +20,11 @@ function DoStuff {
         $Stuff, $Other, $A, $B
     )
 
+    $PSCmdlet.MyInvocation.BoundParameters
+        | ConvertTo-Json -Depth 0 -wa 'ignore' -Compress
+        | Join-String -op 'Func: '
+        | write-verbose
+
     $IsOk? =
         $PSBoundParameters['Stuff']     -xor
             $PSBoundParameters['Other'] -xor
@@ -32,14 +37,8 @@ function DoStuff {
             $PSBoundParameters.ContainsKey('A')     -xor
             $PSBoundParameters.ContainsKey('B')
 
-
     $IsOk? | Join-String -f 'Are you Ok? {0}'
     $IsSlightlyMoreOkay? | Join-String -f 'Are you Slightly Ok? {0}'
-
-    $PSCmdlet.MyInvocation.BoundParameters
-        | ConvertTo-Json -Depth 0 -wa 'ignore' -Compress
-        | Join-String -op 'Func: '
-        | write-verbose
 }
 
 <# examples #>
