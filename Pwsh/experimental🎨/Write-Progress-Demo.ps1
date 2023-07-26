@@ -33,6 +33,16 @@ function EnumerateItems3 {
          }
 
 }
+function EnumerateItems4 {
+     $Items = @( $Input  | Select -first $LimitSize)
+     $Items.count
+     $items
+         | %{
+              Write-Progress -id 0 -Activity "act $_"
+              sleep -ms $SleepMS
+         }
+
+}
 
 function RunDemo {
     <#
