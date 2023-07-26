@@ -67,26 +67,26 @@ function RunDemo {
         [alias('Max')]
         [int]$LimitMaxResults = 5
     )
-    $script:limitSize = $LimitMaxResults
-    $script:sleepMS = $SleepMS
+    end {
+        $script:limitSize = $LimitMaxResults
+        $script:sleepMS = $SleepMS
 
-    Join-String -op 'Running demos: ' -sep ', ' -Inp $OutputType
+        Join-String -op 'Running demos: ' -sep ', ' -Inp $OutputType
 
-    # if( $MyInvocation.ExpectingInput
+        if( $MyInvocation.ExpectingInput ) {
+            $sample = @(  $InputObject )
+        } else {
+            $sample = Get-Module
+        }
 
-    # if($Null -eq $InputObject){
-    #     $sample = Get-Module
-    # } else {
-        $sample = @(  $InputObject )
-    # }
-
-    switch($OutputType) {
-        { $true } { hr -ExtraLines 2 -fg 'gray50' }
-        '1' { $Sample | EnumerateItems1 }
-        '2' { $Sample | EnumerateItems2 }
-        '3' { $Sample | EnumerateItems3 }
-        '4' { $Sample | EnumerateItems4 }
-        default { }
+        switch($OutputType) {
+            { $true } { hr -ExtraLines 2 -fg 'gray50' }
+            '1' { $sample | EnumerateItems1 }
+            '2' { $sample | EnumerateItems2 }
+            '3' { $sample | EnumerateItems3 }
+            '4' { $sample | EnumerateItems4 }
+            default { }
+        }
     }
 }
 
