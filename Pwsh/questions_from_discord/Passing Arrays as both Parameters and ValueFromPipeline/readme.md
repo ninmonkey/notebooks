@@ -7,7 +7,7 @@
 
 ![screenshot](./screenshot.png)
 
-- full code: [Passing Arrays as both Parameters and ValueFromPipeline.ps1)](./Passing%20Arrays%20as%20both%20Parameters%20and%20ValueFromPipeline.ps1)
+- full code: [Passing Arrays as both Parameters and ValueFromPipeline.ps1](./Passing%20Arrays%20as%20both%20Parameters%20and%20ValueFromPipeline.ps1)
 
 ## About 
 
