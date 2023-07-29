@@ -1,7 +1,6 @@
 ## About 
 
 
-
 The [core question](https://discord.com/channels/180528040881815552/447522509244465152/1134622818026401802) was how do you write a function that allows you to pass as parameters or from the pipeline, like
 
 ```ps1
@@ -16,6 +15,7 @@ Install-SqlServer -ServerObject 'server1', 'server2'
 
 - [About](#about)
 - [Misc tips](#misc-tips)
+- [Short, Summarized version](#short-summarized-version)
 - [`$InputObject` and `-Begin`](#inputobject-and--begin)
 - [misc Array notes](#misc-array-notes)
 - [quick note on Array types](#quick-note-on-array-types)
@@ -35,6 +35,43 @@ Install-SqlServer -ServerObject 'server1', 'server2'
 - If you're using Pwsh, you could rewrite some of the logging
     using 'Join-String'
     and null operators like '??'
+
+## Short, Summarized version
+
+Here's a simplified version [of the full code](./Passing%20Arrays%20as%20both%20Parameters%20and%20ValueFromPipeline.ps1)
+
+```ps1
+function Install-SqlServer {
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'high')]
+    param(
+        # Your array of server names as a parameter or from the pipeline
+        [ValidateNotNullorEmpty()]
+        [Parameter(Mandatory, ParameterSetName = 'InstallByCollection', ValueFromPipeline)]
+        [Alias('InputObject')]
+        [string[]]$ServerObject,
+        ... 
+    )
+    begin {
+        [Collections.Generic.List[Object]]$_servers = @()
+        if ( -not $PSCmdlet.MyInvocation.ExpectingInput) {
+            $_servers.addRange( $ServerObject )
+        }            
+    }
+    process {
+        if ($PSCmdlet.MyInvocation.ExpectingInput) {
+            $_servers.addRange(@(
+                $ServerObject
+            ))
+        }
+    }
+    end {     
+        $_servers | ForEach-Object {
+            $ServerName = $_
+            # do work 
+        }
+    }
+}
+```
 
 ## `$InputObject` and `-Begin`
 
