@@ -1,15 +1,6 @@
-
-- [About](#about)
-- [Misc tips](#misc-tips)
-- [`$InputObject` and `-Begin`](#inputobject-and--begin)
-- [misc Array notes](#misc-array-notes)
-- [quick note on Array types](#quick-note-on-array-types)
-
-![screenshot](./screenshot.png)
-
-- full code: [Passing Arrays as both Parameters and ValueFromPipeline.ps1](./Passing%20Arrays%20as%20both%20Parameters%20and%20ValueFromPipeline.ps1)
-
 ## About 
+
+
 
 The [core question](https://discord.com/channels/180528040881815552/447522509244465152/1134622818026401802) was how do you write a function that allows you to pass as parameters or from the pipeline, like
 
@@ -17,6 +8,18 @@ The [core question](https://discord.com/channels/180528040881815552/447522509244
 Install-SqlServer -ServerObject 'server1', 'server2'
 'server1', 'server2' | Install-SqlServer
 ```
+
+- full code: [Passing Arrays as both Parameters and ValueFromPipeline.ps1](./Passing%20Arrays%20as%20both%20Parameters%20and%20ValueFromPipeline.ps1)
+
+![screenshot](./screenshot.png)
+
+
+- [About](#about)
+- [Misc tips](#misc-tips)
+- [`$InputObject` and `-Begin`](#inputobject-and--begin)
+- [misc Array notes](#misc-array-notes)
+- [quick note on Array types](#quick-note-on-array-types)
+
 
 ## Misc tips
 
