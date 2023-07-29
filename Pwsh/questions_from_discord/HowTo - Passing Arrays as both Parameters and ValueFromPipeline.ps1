@@ -70,37 +70,6 @@ Function test.Install-SqlServer {
             # note: did you want this to be exclusive of the other inputs?  if yes, use mandatory
             # default { throw "Warning: Unhandled parameterSet! $Switch"}
         }
-
-        $PSBoundParameters.ContainsKey('ServerObject')
-        # you can include $PSCmdlet.ParameterSetName
-
-        return
-
-        switch ($PSCmdlet.ParameterSetName) {
-            'InstallByCollection' { foreach ($object in $ServerObject) { $_servers += $object } }
-            'InstallByConfigFile' {
-                $_servers += $ServerConfigFile
-            }
-            'InstallByParameters' {
-                $_servers += [ordered]@{
-                    ServerName        = $ServerName
-                    InstanceName      = $InstanceName
-                    Port              = $Port
-                    Version           = $Version
-                    Edition           = $Edition
-                    ManagedAccont     = $ManagedAccount
-                    InstallSSIS       = $InstallSSIS
-                    InstallPrometheus = $InstallPrometheus
-                }
-            }
-            default { throw "'Invalid ParameterSet detected of '$($PSCmdlet.ParameterSetName)'. " }
-        }
-        'servers start'
-        # "`t$($_servers)"-+
-
-        foreach ($s in $_servers) { "`t$s" }
-        'servers end'
-        'begin end'
     }
     process {
         'Enter: -Process' | Write-Verbose

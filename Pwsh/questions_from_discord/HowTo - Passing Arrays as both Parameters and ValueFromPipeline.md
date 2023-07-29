@@ -5,6 +5,9 @@
 - [misc Array notes](#misc-array-notes)
 - [quick note on Array types](#quick-note-on-array-types)
 
+![screenshot](./img/2021-03-02-11-30-48.png)
+
+- [**Full Code**](./HowTo%20-%20Passing%20Arrays%20as%20both%20Parameters%20and%20ValueFromPipeline.ps1)
 
 ## About 
 
