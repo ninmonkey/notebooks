@@ -1,53 +1,19 @@
-<#
-Original question: <https://discord.com/channels/180528040881815552/447522509244465152/1134622818026401802>
-    The core question was how do you write a function that allows you to pass as parameters or from the pipeline, like
-
-    Install-SqlServer -ServerObject 'server1', 'server2'
-    'server1', 'server2' | Install-SqlServer
-
-
-notes:
-
-When using arrays, if you want to add items one at a time, this
-
-    $list.AddRange( $InputList )
-
-is short for
-
-    foreach($item in $InputList) {
-        $list.Add( $item )
-    }
-
-if you include @() you can throw expressions in there, like
-
-    $list.AddRange(@(
-        Get-ChildItem -Path c:\ -depth 2  | Select -first 10  | Sort Name
-    ))
-
-- if a parameter like $Port should be valid in both parameter sets,
-    don't set a parameterSetName so it's valid in both
-- instead of [array] either use @() or [object[]]
-- if you want a changeable array use [List[Object]]
-- for parameters when you use 'Mandatory', it's $true by default
-- if the flag isn't defined, it's false implicitly, or use Foo = $false
-- if a parameter is a [bool] you want to use [switch] instead
-- a [switch] parameter is implicity false if it's not an argument
-- If you're using Pwsh, you could rewrite some of the logging
-    using 'Join-String'
-    and null operators like '??'
-
-when passing by pipeline, like:
-
-    ... | Install-SqlServer
-
-    $ServerObject will be $null when you're in the begin {} block, it doesn't exist yet
-
-- setting the right DefaultParameterSetName, like the from the pipline,
-    can fix some parametersetname issues. Or at least it can make positional parameters
-    resolve easier, meaning autocomplete easier
-
-#>
 Function test.Install-SqlServer {
+    <#
+    .SYNOPSIS
+        how to pass arrays as both parameters and from the pipeline
+    .DESCRIPTION
+        How to support both of these:
+
+        Install-SqlServer -ServerObject 'server1', 'server2'
+        'server1', 'server2' | Install-SqlServer
+    .notes
+    Written to run on PS5 and 7
+    The orignal question was from: <https://discord.com/channels/180528040881815552/447522509244465152/1134622818026401802>
+
+    For details, see: "HowTo - Passing Arrays as both Parameters and ValueFromPipeline.md"
+
+    #>
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'high')]
     param(
         # Your array of server names as a parameter or from the pipeline
@@ -60,7 +26,7 @@ Function test.Install-SqlServer {
         # note: did you want this to be exclusive of the other inputs?  if yes, use mandatory
         # if it would compliment the pipeline, don't set it as mandatory
         [Alias('Config')]
-        [Parameter(Mandatory, ParameterSetName = 'InstallByConfig')]
+        [Parameter(Mandatory, ParameterSetName = 'InstallByConfigFile')]
         [string]$ServerConfig,
 
         [Parameter(ParameterSetName = 'InstallByParameters', ValueFromPipelineByPropertyName)]
@@ -73,32 +39,35 @@ Function test.Install-SqlServer {
 
     begin {
         [Collections.Generic.List[Object]]$_servers = @()
-        'Enter: -Begin' | write-verbose
+        'Enter: -Begin' | Write-Verbose
         $PSBoundParameters | ConvertTo-Json -wa 0 -Depth 2 | Write-Debug
 
         '   ExpectingInput? {0}' -f $PSCmdlet.MyInvocation.ExpectingInput | Write-Verbose
-        '   ParameterSetName = {0}' -f $PSCmdlet.ParameterSetName | write-verbose
+        '   ParameterSetName = {0}' -f $PSCmdlet.ParameterSetName | Write-Verbose
         '   ServerObject[ {0} ] => [ {1} ]' -f @(
             $ServerObject.count
             $ServerObject -join ', '
         ) | Write-Verbose
         '   InstallSSIS? {0} ' -f $InstallSSIS | Write-Verbose
 
-        # here I'm testing if there's anything being piped, regardless of which parameterset I'm in
-        if($PSCmdlet.MyInvocation.ExpectingInput) {
-            $_servers.addRange( $ServerObject )
-        }
 
-        switch($PSCmdlet.ParameterSetName) {
+
+        switch ($PSCmdlet.ParameterSetName) {
             # Usually I set default to throw an exception, because it causes some errors
             # that otherwise a typo could silently go through without errors
             'InstallByConfigFile' {
-                $names = Get-Item -ea 'stop' -LiteralPath $Config
+                $names = Get-Item -ea 'stop' -LiteralPath $ServerConfig
                 $_servers.AddRange(@(
-                    $Names
-                ))
+                        $Names
+                    ))
             }
-            default { write-debug "no special Switch logic was used for '$Switch'"  }
+            default {
+                # here I'm testing if there's anything being piped, regardless of which parameterset I'm in
+                if ( -not $PSCmdlet.MyInvocation.ExpectingInput) {
+                    $_servers.addRange( $ServerObject )
+                }
+            }
+            # note: did you want this to be exclusive of the other inputs?  if yes, use mandatory
             # default { throw "Warning: Unhandled parameterSet! $Switch"}
         }
 
@@ -119,7 +88,7 @@ Function test.Install-SqlServer {
                     Port              = $Port
                     Version           = $Version
                     Edition           = $Edition
-                    ManagedAccont    = $ManagedAccount
+                    ManagedAccont     = $ManagedAccount
                     InstallSSIS       = $InstallSSIS
                     InstallPrometheus = $InstallPrometheus
                 }
@@ -136,50 +105,57 @@ Function test.Install-SqlServer {
     process {
         'Enter: -Process' | Write-Verbose
         $PSBoundParameters | ConvertTo-Json -wa 0 -Depth 2 | Write-Debug
-        '   ParameterSetName = {0}' -f $PSCmdlet.ParameterSetName | write-verbose
+        '   ParameterSetName = {0}' -f $PSCmdlet.ParameterSetName | Write-Verbose
         '   ExpectingInput? {0}' -f $PSCmdlet.MyInvocation.ExpectingInput | Write-Verbose
         '   ServerObject[ {0} ] => [ {1} ]' -f @(
             $ServerObject.count
             $ServerObject -join ', '
         ) | Write-Verbose
         '   InstallSSIS? {0} ' -f $InstallSSIS | Write-Verbose
-        # '-Begin: ServerObject[ {0} ] => { {1} }' -f @(
-        #     $ServerObject.count
-        #     ($ServerObject -join ', ')
-        # ) | Write-Verbose
 
-        # $PSCmdlet.MyInvocation.ExpectingInput
-        #     | Join-String -op '-Process: ExpectingInput?' | Write-Verbose
-        # $ServerObject
-        #     | Join-String -op '-Process: ServerObject' -sep ', ' | write-verbose
-        return
-
-
+        if ($PSCmdlet.MyInvocation.ExpectingInput) {
+            $_servers.addRange(@(
+                    $ServerObject
+                ))
+        }
     }
     end {
         'Enter: -End' | Write-Verbose
         $PSBoundParameters | ConvertTo-Json -wa 0 -Depth 2 | Write-Debug
-        '   ParameterSetName = {0}' -f $PSCmdlet.ParameterSetName | write-verbose
+        '   ParameterSetName = {0}' -f $PSCmdlet.ParameterSetName | Write-Verbose
         '   ExpectingInput? {0}' -f $PSCmdlet.MyInvocation.ExpectingInput | Write-Verbose
         '   ServerObject[ {0} ] => [ {1} ]' -f @(
             $ServerObject.count
             $ServerObject -join ', '
         ) | Write-Verbose
         '   InstallSSIS? {0} ' -f $InstallSSIS | Write-Verbose
+
+        $_servers | ForEach-Object {
+            $ServerName = $_
+            $record = [ordered]@{
+                PSTypeName  = 'InstallSql.SummaryRecord.'
+                ServerName  = $ServerName
+                Port        = $Port
+                InstallSSIS = $InstallSSIS
+            }
+
+            [pscustomobject]$record
+
+        }
     }
 }
-'Using -Debug gives you a super verbose output of the parameters' | write-host -fore 'red'
+'Using -Debug gives you a super verbose output of the parameters' | Write-Host -fore 'red'
 $sharedSplat = @{
     Verbose = $true
-    Debug = $false
+    Debug   = $false
+    # ea      = 'break'
 }
 
-'using a config' | Write-host -fore 'blue'
+'using a config' | Write-Host -fore 'blue'
 test.Install-SqlServer -Config 'servers.txt' @sharedSplat -ea 'break'
-return
 
-'Passing as parameters' | Write-host -fore 'blue'
+'Passing as parameters' | Write-Host -fore 'blue'
 test.Install-SqlServer -ServerObject 'server1', 'server2' @sharedSplat
 
-'piping values' | Write-host -fore 'blue'
+'piping values' | Write-Host -fore 'blue'
 'server1', 'server2' | test.Install-SqlServer @sharedSplat
