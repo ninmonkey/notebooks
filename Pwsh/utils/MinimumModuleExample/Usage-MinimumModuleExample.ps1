@@ -1,6 +1,6 @@
 ## Step1: Generate the *.psd1, like:
 $newModuleManifestSplat = @{
-    Path              = 'Mintils.psd1'
+    Path              = './Mintils/Mintils.psd1'
     RootModule        = 'Mintils.psm1'
     Author            = 'Jake Bolton <jake.bolton.314@gmail.com>'
     Copyright         = '2023'

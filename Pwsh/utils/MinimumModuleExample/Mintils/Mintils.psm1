@@ -24,6 +24,8 @@ function Test-IsBlank {
         [switch]$TestIsTrueNull
     )
     if( $TestIsTrueNull ) {
+        # note: because of coercion, always place $null on the LHS of the comparison operator
+        # because the RHS is coerced to the type of the LHS
         return $null -eq $string
     }
 
