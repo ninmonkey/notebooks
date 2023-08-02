@@ -25,6 +25,11 @@ Test-IsBlank @()                 # true
 Test-IsBlank @() -TestIsTrueNull # false
 ```
 
+Check out the final files:
+
+- [Mintils.psm1](./Mintils/Mintils.psm1)
+- [Mintils.psd1](./Mintils/Mintils.psd1)
+
 ![screen](./img/usage-screenshot.png)
 
 
