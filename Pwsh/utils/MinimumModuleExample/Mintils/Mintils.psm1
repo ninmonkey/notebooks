@@ -16,7 +16,7 @@ function Test-IsBlank {
         [AllowNull()]
         [AllowEmptyCollection()]
         [AllowEmptyString()]
-        [Parameter(Mandatory, ValueFromPipeline)]
+        [Parameter(Mandatory, Position=0)]
         [object]$String,
 
         # only treat true nulls as blank. non-nulls are false
