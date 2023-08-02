@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'Mintils.ps1'
+RootModule = 'Mintils.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.0.1'
@@ -18,7 +18,7 @@ ModuleVersion = '0.0.1'
 # CompatiblePSEditions = @()
 
 # ID used to uniquely identify this module
-GUID = '9089d637-2601-420f-ae7c-6769fae0f67e'
+GUID = '1a71acc8-86ef-4e61-a8e4-a6d9d46013a9'
 
 # Author of this module
 Author = 'Jake Bolton <jake.bolton.314@gmail.com>'
@@ -30,7 +30,7 @@ CompanyName = 'Unknown'
 Copyright = '2023'
 
 # Description of the functionality provided by this module
-Description = 'misc shared utilitys'
+Description = 'misc utility functions'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -69,9 +69,7 @@ Description = 'misc shared utilitys'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @(
-    'Test-IsBlank'
-)
+FunctionsToExport = 'Test-IsBlank'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
@@ -80,7 +78,7 @@ CmdletsToExport = '*'
 VariablesToExport = '*'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = 'AliasA', 'AliasB'
+AliasesToExport = '*'
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
