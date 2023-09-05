@@ -122,7 +122,7 @@ $query = $agiltypackload.SelectNodes('//a')
 $query | fl * -force
 $what = $query | One
 
-$NextType = 'HtmlAgilityPack.HtmlNode'
+
 
 function Render.Dom.Attributes {
      $lone.Attributes
@@ -166,6 +166,17 @@ function Render.Dom.Attributes {
     }
 }
 # Render.Dom.Attributes__
+$NextType = 'HtmlAgilityPack.HtmlDocument'
+update-typedata -typename $NextType -membername 'TextShort' -membertype ScriptProperty -value {
+    Shorten -Inp $this.Text -maxLength 200
+        | Dotils.Write-DimText # toggles gray text in tables
+} -Force
+update-typedata -typename $NextType -membername 'ParsedTextShort' -membertype ScriptProperty -value {
+    Shorten -Inp $this.ParsedText -maxLength 200
+        | Dotils.Write-DimText # toggles gray text in tables
+} -Force
+
+$NextType = 'HtmlAgilityPack.HtmlNode'
 
 update-typedata -typename $NextType -membername 'OuterHtmlShort' -membertype ScriptProperty -value {
     Shorten -Inp $this.OuterHtml -maxLength 150
@@ -199,8 +210,8 @@ update-typedata -typename $NextType -membername 'AttrSummarySingleLine' -membert
     # optionally: Shorten()
     $this | Dotils.Render.Dom.Attributes -Separator ' '
     # | Shorten -maxLen 15 # optionally truncate it too
-
 } -Force
+
 update-typedata -typename $NextType -membername 'HasSummary' -membertype ScriptProperty -value {
     'Closed: {0}, ChildAttrs: {1}, ChildNodes: {2}, HasClosingAttr: {3}' -f @(
         $this.Closed ?? '␀' | Render.Bool
@@ -265,6 +276,6 @@ $what | fime -MemberType Property | sort Name | ft Name, PropertyType, * -AutoSi
 $agiltypackload.SelectNodes('//a') | select -exclude 'OuterHtml' ,'InnerHtml', 'InnerText' | fl * -force
 hr
 $query
-| select Id,Depth, HasSummary, AttrSummaryLong, ChildNodes, *short*, XPath, *node*, *child* -ea 0
-| select -ExcludeProperty 'InnerXmlShort', 'OuterXmlShort'
+| select Id,Depth, HasSummary, AttrSummaryLong, ChildNodes, *short*, XPath, *node*, *child* -ea 'ignore'
+| select -ExcludeProperty 'InnerXmlShort', 'OuterXmlShort' -ea 'ignore'
 
