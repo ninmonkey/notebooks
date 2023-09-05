@@ -34,17 +34,7 @@ function ShortenStr {
     }
 }
 
-
-    # update-typedata -typename 'HtmlAgilityPack.HtmlNode' -membername 'OuterHtmlShort' -membertype ScriptProperty -value {
-    #     $reFirst = '^(.{1,50}).*' # silly regex, grab the first 300 chars
-    #     $this.OuterHtml -replace $reFirst, '$1'
-    # } -Force
-
-# OuterHtml
-# InnerHtml
-# InnerText
-
-
+. {
     # Original demo
     $queryParam = 'PSParseHTML blog evotec'
     $language = 'sv'
@@ -57,8 +47,9 @@ function ShortenStr {
     $iwrload ??= (Invoke-WebRequest -Uri $urlbuilder).Content | ConvertFrom-Html -Engine AgilityPack
     $iwrload.SelectNodes('//a').Count
     $iwrload.SelectNodes('//a') | Select-Object InnerText | Format-List
+    'saved to $agilityPackLoad and $iwrLoad' | write-host -back 'red'
+}
 
-'saved to $agilityPackLoad and $iwrLoad' | write-host -back 'red'
 
 function Render.Bool {
     <#
@@ -148,7 +139,33 @@ function Render.Dom.Attributes {
             ( $_.Value ?? '') | Join-String -DoubleQuote -op "${fg:#94c5e4}" -os $PSStyle.Reset
         )
     }
+
+
 }
+
+function Render.Dom.Attributes {
+    [CmdletBinding()]
+    param (
+        [Parameter(ValueFromPipeline)]
+        $InputObject
+    )
+    $sep = ' ' # { '', ', ', ", " }
+    $InputObject.Attributes
+        # custom priorities
+        | Sort-Object -Descending {@(
+            $_.Value.Length -lt 15
+            $_.Name -match 'class|id|name'
+            $_.Name -match 'href|src|url'
+            $_.Name
+        )}
+        | Join-String -sep $Sep {
+        '{0}: {1}' -f @(
+            $_.Name | Join-String -op "${fg:#aad3a8}" -os $PSStyle.Reset
+            ( $_.Value ?? '') | Join-String -DoubleQuote -op "${fg:#94c5e4}" -os $PSStyle.Reset
+        )
+    }
+}
+# Render.Dom.Attributes__
 
 update-typedata -typename $NextType -membername 'OuterHtmlShort' -membertype ScriptProperty -value {
     Shorten -Inp $this.OuterHtml -maxLength 150
@@ -158,10 +175,31 @@ update-typedata -typename $NextType -membername 'InnerHtmlShort' -membertype Scr
     Shorten -Inp $this.InnerHtml -maxLength 150
     | Dotils.Write-DimText # toggles gray text in tables
 } -Force
+update-typedata -typename $NextType -membername 'InnerHtmlColumn' -membertype ScriptProperty -value {
+    Shorten -Inp $this.InnerHtml -maxLength 300
+    | Dotils.Write-DimText # toggles gray text in tables
+} -Force
 update-typedata -typename $NextType -membername 'InnerTextShort' -membertype ScriptProperty -value {
     Shorten -Inp $this.InnerText -maxLength 150
     | Dotils.Write-DimText # toggles gray text in tables
     # | bat -l html  --color always -p | Out-String
+} -Force
+update-typedata -typename $NextType -membername 'AttrSummaryLong' -membertype ScriptProperty -value {
+    $this | Dotils.Render.Dom.Attributes -Separator "`n"
+    # | Shorten -maxLen 15 # optionally truncate it too
+} -Force
+update-typedata -typename $NextType -membername 'AttrSummaryColumn' -membertype ScriptProperty -value {
+    $render = $this | Dotils.Render.Dom.Attributes -Separator "`n"
+    $render -split '\r?\n' | %{
+        Shorten -Inp $_ -MaxLength 60
+    } | Join-String -sep "`n"
+    # | Shorten -maxLen 15 # optionally truncate it too
+} -Force
+update-typedata -typename $NextType -membername 'AttrSummarySingleLine' -membertype ScriptProperty -value {
+    # optionally: Shorten()
+    $this | Dotils.Render.Dom.Attributes -Separator ' '
+    # | Shorten -maxLen 15 # optionally truncate it too
+
 } -Force
 update-typedata -typename $NextType -membername 'HasSummary' -membertype ScriptProperty -value {
     'Closed: {0}, ChildAttrs: {1}, ChildNodes: {2}, HasClosingAttr: {3}' -f @(
@@ -171,22 +209,13 @@ update-typedata -typename $NextType -membername 'HasSummary' -membertype ScriptP
         $this.HasClosingAttributes ?? '␀' | Render.Bool
     )
     | Dotils.Write-DimText
-    # | Render.Bool
-
-    # 'Closed: {0}, ChildAttrs: {1}, ChildNodes: {2}, HasClosingAttr: {3}' -f @(
-    #     $this.Closed ?? '␀'
-    #     $this.HasChildAttributes ?? '␀'
-    #     $this.HasChildNodes ?? '␀'
-    #     $this.HasClosingAttributes ?? '␀'
-    # )
-    # | Dotils.Write-DimText
-    # | bat -l html  --color always -p | Out-String
 } -Force
 
 Update-TypeData -typeName $NextType -DefaultDisplayPropertySet @(
     'Id'
     'Depth'
     'HasSummary'
+    'AttrSummarySingleLine'
     'Attributes'
     'ChildNodes'
     'InnerHtmlShort'
@@ -195,6 +224,7 @@ Update-TypeData -typeName $NextType -DefaultDisplayPropertySet @(
     'OwnerDocument'
     'ParentNode'
     'XPath'
+    'AttrSummaryLong'
 
     # 'Attributes' # -is [HtmlAgilityPack.HtmlAttributeCollection]
     # 'ChildNodes' # -is [HtmlAgilityPack.HtmlNodeCollection]
@@ -228,30 +258,13 @@ Update-TypeData -typeName $NextType -DefaultDisplayPropertySet @(
     # 'XPath' # -is [System.String]
 ) -Force
 
+# Example output
 # other properties
-$what| fime -MemberType Property | sort Name | ft Name, PropertyType, * -AutoSize
+$what | fime -MemberType Property | sort Name | ft Name, PropertyType, * -AutoSize
 
 $agiltypackload.SelectNodes('//a') | select -exclude 'OuterHtml' ,'InnerHtml', 'InnerText' | fl * -force
-
-
-# update-typedata -typename 'HtmlAgilityPack.HtmlNode' -membername 'OuterHtmlShort' -membertype ScriptProperty -value {
-#     [string]$text = $this.OuterHtml
-#     $len = $text.length
-#     $maxValid = [Math]::Clamp( <# value #> 80, <# min #> 0, <# max #> $len )
-#     $text.Substring( 0, $maxValid )
-# } -Force
-
-# HtmlAgilityPack.HtmlNode
-# System.Xml.XmlDocument
-
-# update-typedata -typename 'HtmlAgilityPack.HtmlNode' -membername 'OuterHtmlShort' -membertype ScriptProperty -value {
-#    [string]$text = $this.OuterHtml
-#    $len = $text.length
-#    $maxValid = [Math]::Clamp( <# value #> 80, <# min #> 0, <# max #> $len )
-#    $text.Substring( 0, $maxValid )
-#  } -Force
-
-# hr
-# $agiltypackload.SelectNodes('//a') | Select '*Html*'|fl
-
+hr
+$query
+| select Id,Depth, HasSummary, AttrSummaryLong, ChildNodes, *short*, XPath, *node*, *child* -ea 0
+| select -ExcludeProperty 'InnerXmlShort', 'OuterXmlShort'
 
