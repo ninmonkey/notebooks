@@ -11,11 +11,13 @@ function bp4 {
     )
     if($UsingLegacy) {
         $LastPSNative = $PSNativeCommandArgumentPassing
-        $PSNativeCommandArgumentPassing | Join-string -f 'was {0}' | write-verbose -verb
+        $PSNativeCommandArgumentPassing
+            | Join-string -f 'was {0}' | write-verbose -verb
         # ....
         $PSNativeCommandArgumentPassing =
-            $UsingStyle ?? [System.Management.Automation.NativeArgumentPassingStyle]::Legacy
-        $PSNativeCommandArgumentPassing | Join-string -f 'was {0}' | write-verbose -verb
+            [System.Management.Automation.NativeArgumentPassingStyle]::Legacy
+        $PSNativeCommandArgumentPassing
+            | Join-string -f 'was {0}' | write-verbose -verb
     }
     $items = @( $input )
     $items ??= gci . -name -depth 2 -File
@@ -27,7 +29,8 @@ function bp4 {
     if($UsingLegacy) {
         $PSNativeCommandArgumentPassing = $LastPSNative
     }
-    $PSNativeCommandArgumentPassing | Join-string -f 'was {0}' | write-verbose -verb
+    $PSNativeCommandArgumentPassing
+        | Join-string -f 'was {0}' | write-verbose -verb
 }
 
 function tryExplicit {
