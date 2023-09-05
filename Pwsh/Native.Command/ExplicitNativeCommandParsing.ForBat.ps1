@@ -6,8 +6,8 @@ function bp4 {
         the filename of the command changes some automatic behavior. Like using 'git' vs 'git.exe' causes the same binary to act differently
     #>
     param(
-        [switch]$UsingLegacy,
-        [Management.Automation.NativeArgumentPassingStyle]$UsingStyle
+        [switch]$UsingLegacy
+        #, [Management.Automation.NativeArgumentPassingStyle]$UsingStyle
     )
     if($UsingLegacy) {
         $LastPSNative = $PSNativeCommandArgumentPassing
@@ -17,8 +17,10 @@ function bp4 {
             $UsingStyle ?? [System.Management.Automation.NativeArgumentPassingStyle]::Legacy
         $PSNativeCommandArgumentPassing | Join-string -f 'was {0}' | write-verbose -verb
     }
+    $items = @( $input )
+    $items ??= gci . -name -depth 2 -File
 
-    $Input
+    $items
         | Where-Object { $null -ne $_ } # Where-IsNotBlank
         | fzf.exe -m --preview 'bat --style=snip,header,numbers --line-range=:200 "{}"'
 
