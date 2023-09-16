@@ -1,0 +1,135 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!markdown
+
+Final Output: 
+![screenshot](./img/Comparing-FunctionParameters-and-PreferenceVariables.png)
+
+Code below is from [ninmonkey/notebooks under Pwsh/Parameters](https://github.com/ninmonkey/notebooks/tree/main/Pwsh/Parameters)
+
+#!pwsh
+
+using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
+
+Set-Alias 'Json' -value 'ConvertTo-Json' -PassThru
+
+# This is the main function. Helpers functions are at the bottom.
+
+function TryParams {
+    <#
+    .synopsis
+        excessive logging to compare preferences in multiple scopes
+    #>
+    [CmdletBinding(
+        SupportsShouldProcess
+    )]
+    param()
+    begin {
+        [hashtable]$commonParams = @{
+            Debug   = $DebugPreference   -ne 'SilentlyContinue'
+            Verbose = $VerbosePreference -ne 'SilentlyContinue'
+            WhatIf  = $WhatIfPreference
+            Confirm = $ConfirmPreference -eq 'High'
+        }
+
+        $PSBoundParameters
+            | Format-Table.Render
+            | Prefix 'PSBoundParams'
+            | Write-Debug
+
+
+        Get-Variable -Scope 1 '*Preference*'
+            | Format-Table.Render
+            | Prefix 'Preferences scope 1'
+            | Write-Debug
+
+        Get-Variable -Scope 0 '*Preference*'
+            | Format-Table.Render
+            | Prefix 'Preferences scope 0'
+            | Write-Debug
+        # hr -fg orange
+    }
+    process {
+        # hr -fg orange
+        $commonParams
+            | Format-Table.Render
+            | Write-Debug
+        $commonParams
+            | Json -Depth 1
+            | Write-Debug
+    }
+    end {
+
+    }
+}
+
+function Prefix {
+    # Sugar to prefix text with a label
+    param(
+        [Parameter(Mandatory, Position=0)][string]$Prefix,
+        [Parameter(ValueFromPipeline)]$InputObject
+    )
+    process {
+        $InputObject | Join-String -op "${Prefix}`n"
+    }
+}
+function Format-Table.Render {
+    <#
+    .SYNOPSIS
+        sugar for cases you want to render a table to another output stream
+    .NOTES
+        Sometimes you want to use format in other streams like verbose, debug, information, etc
+
+        # You end up with output like this
+        gci . | format-table -auto | write-verbose -Verbose
+
+                VERBOSE: Microsoft.PowerShell.Commands.Internal.Format.FormatStartData
+                VERBOSE: Microsoft.PowerShell.Commands.Internal.Format.GroupStartData
+                VERBOSE: Microsoft.PowerShell.Commands.Internal.Format.FormatEntryData
+                VERBOSE: Microsoft.PowerShell.Commands.Internal.Format.FormatEntryData
+
+        # verses
+        gci . | format-table -auto | out-string | write-verbose -Verbose
+
+        gci . | format-table -auto | out-string | write-verbose -Verbose
+
+            VERBOSE:
+                Directory: H:\data\2023\pwsh\PsModules.dev\GitLogger
+
+            Mode        LastWriteTime Length Name
+            ----        ------------- ------ ----
+            d----  3/28/2023  9:18 PM        .github
+            d----  5/17/2023 11:12 PM        .jekyll-cache
+            d----   6/5/2023  9:07 AM        .vscode
+            d----   7/8/2023 11:32 AM        Assets
+
+
+    .EXAMPLE
+        Get-Variable -Scope 0 '*Preference*'
+            | Format-Table.Render | Prefix 'PreferenceVars scope0'
+            | Write-Verbose -Verbose
+    .EXAMPLE
+    #>
+    [Alias('Out.Render')]
+    param(
+        [switch]$Auto
+    )
+    $input | ft -auto:$Auto | out-string | Join-String -sep "`n"
+}
+
+# (re)set defaults, cleanup from previous runs
+$DebugPreference =
+    'SilentlyContinue' # -is a: [Management.Automation.ActionPreference]
+
+# Run 1
+TryParams -Debug -Verbose -WhatIf
+
+# Run 2: Comparing preferences from the current scope
+$DebugPreference = 'Ignore'
+TryParams -Debug -Verbose
+
+# Reset
+$DebugPreference = 'SilentlyContinue'
