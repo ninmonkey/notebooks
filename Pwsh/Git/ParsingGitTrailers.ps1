@@ -1,4 +1,5 @@
 using namespace System.Collections.Generic
+# Set-Alias 'Write-Host' -Value Write-Host
 
 $sampleCommit = @'
 subject
@@ -10,10 +11,21 @@ resolved: crisis 314
 Signed-off-by: Bob <bob@example.com>
 '@
 
+function H1 {
+    # Color console output using header colors
+    param( [string]$Text )
+    "`n### $Text `n`n"
+        | Microsoft.PowerShell.Utility\Write-Host
+}
+
 function Parse-CommitTrailer {
     <#
     .NOTES
-        trailers can use duplicate key names, see: <https://git-scm.com/docs/git-interpret-trailers>
+        - subcommand usage: https://git-scm.com/docs/git-interpret-trailers
+        - can works on 'git-format-patch' patches too: https://git-scm.com/docs/git-format-patch
+        - trailers can use duplicate key names, see: <https://git-scm.com/docs/git-interpret-trailers>
+
+        --parse is an alias for: --only-trailers --only-input --unfold.
     #>
     [CmdletBinding()]
     param( $CommitMessage )
@@ -53,24 +65,60 @@ function Parse-CommitTrailer {
     }
 }
 
-'original'
-    | Microsoft.PowerShell.Utility\Write-Host -fore blue
+h1 'original'
+
 
 $sampleCommit
 
-'parsed'
-    | Microsoft.PowerShell.Utility\Write-Host -fore blue
-
+h1 'parsed'
 ( $Parsed = Parse-CommitTrailer $sampleCommit )  | ConvertTo-Json
 $Parsed.KeyCollection | Format-Table -AutoSize
 $Parsed | Format-List
 
-'render shared as collapsed'
+h1 'render shared as collapsed'
 $Parsed.ShortKeys
-#     | Microsoft.PowerShell.Utility\Write-Host -fore blue
+#
 
 # $Items = $parsed.KeyCollection
 # $items | Group-Object Key | %{
 #     $_.Group | % Value | Join-string -f "`n    {0}" -op $_.Name
 # }
 
+function AddTrailer {
+    # file or conents
+    # Gc  .\msg.txt -raw
+    param(
+        $CommitMessage
+        # [hashtable]$NewTrailers # not right, new trailers can use duplicate keys
+    )
+    [List[Object]]$AddTrailerArgs = @(
+        'interpret-trailers'
+    )
+    $AddTrailerArgs.AddRange(@(
+        '--trailer'
+        'author: Jen <jen@bar.com>'
+        '--trailer'
+        'author: Tom <tom@bar.com>'
+        '--trailer'
+        'reviewed-by: Dan <dan@bar.com>'
+    ))
+
+
+    $CommitMessage
+        # | git interpret-trailers --trailer 'location: local' --trailer 'author: Jen <jen@bar.com>'
+        # | git interpret-trailers --trailer 'location: local' --trailer 'author: Jen <jen@bar.com>'
+}
+
+h1 'Append trailers to message'
+
+AddTrailer -CommitMessage $sampleCommit
+
+$roundTrip = Parse-CommitTrailer -CommitMessage ( AddTrailer -CommitMessage $sampleCommit )
+
+h1 'RoundTrip.RawMessage'
+
+$roundTrip.RawMessage
+
+h1 'RoundTrip.ShortKeys'
+
+$roundTrip.ShortKeys
