@@ -1,5 +1,33 @@
+using namespace System.Collections.Generic
 
 $script:CountersList ??= @{}
+$binBat ??= Get-Command 'bat' -CommandType Application -TotalCount 1 -ea 'stop'
+
+if( -not (gcm 'hr' -ea 'ignore')){
+    function Hr {
+        $w = $host.ui.RawUI.WindowSize.Width
+        return '-' * $w -join ''
+    }
+}
+if( -not (gcm 'Json.Colorize' -ea 'ignore')) {
+    function Json.Colorize {
+        <#
+        .NOTES
+            original:
+                '{"ParamState":{"IsPresent":true}}' | bat -l json --force-colorization --style plain | echo
+        #>
+        param()
+
+        [List[Object]]$BatArgs = @(
+            # will use an Inline render, colors, without any headers
+            '--language', 'json',
+            '--force-colorization',
+            '--style', 'plain'
+        )
+
+        return $Input | & $binBat @BatArgs
+    }
+}
 
 function TestCoal {
     <#
@@ -63,59 +91,60 @@ function TestCoalSwitch {
 
     return [pscustomobject]$meta
 }
+if( -not (gcm 'Json.Colorize' -ea 'ignore')) {
+    function AddLabel {
+        <#
+        .SYNOPSIS
+            add properties, or, names to results
+        .EXAMPLE
+            gci . | select Name, Length
+                | AddLabel -Name 'User' -Value 'Bob'
+        .EXAMPLE
+            gci . | select Name, Length
+                | AddLabel -Name 'test' -AsCounter -ResetCounter
+        .EXAMPLE
+            gci . | select Name, Length
+                | AddLabel -Name 'test' -AsCounter
+        #>
+        param(
+            [Parameter(Position=0)]
+            [Alias('Text')]
+            [ValidateNotNull()]
+            [string]$Value,
 
-function AddLabel {
-    <#
-    .SYNOPSIS
-        add properties, or, names to results
-    .EXAMPLE
-        gci . | select Name, Length
-            | AddLabel -Name 'User' -Value 'Bob'
-    .EXAMPLE
-        gci . | select Name, Length
-            | AddLabel -Name 'test' -AsCounter -ResetCounter
-    .EXAMPLE
-        gci . | select Name, Length
-            | AddLabel -Name 'test' -AsCounter
-    #>
-    param(
-        [Parameter(Position=0)]
-        [Alias('Text')]
-        [ValidateNotNull()]
-        [string]$Value,
+            [Alias('Key')]
+            [ValidateNotNull()]
+            [string]$Name = 'Name',
 
-        [Alias('Key')]
-        [ValidateNotNull()]
-        [string]$Name = 'Name',
+            [Parameter(ValueFromPipeline)]
+            [object]$InputObject,
 
-        [Parameter(ValueFromPipeline)]
-        [object]$InputObject,
-
-        [switch]$AsCounter,
-        [switch]$ResetCounter
-    )
-    begin {
-        if($AsCounter) {
-            $script:CountersList[ $Name ] ??= 0
-            if($ResetCounter) {
-                $script:CountersList[ $Name ] = 0
+            [switch]$AsCounter,
+            [switch]$ResetCounter
+        )
+        begin {
+            if($AsCounter) {
+                $script:CountersList[ $Name ] ??= 0
+                if($ResetCounter) {
+                    $script:CountersList[ $Name ] = 0
+                }
             }
         }
-    }
-    process {
-        $members = [ordered]@{}
-        if( -not $AsCounter ) {
-            $members[ $Name ] = $Value
-        } else {
-            # $script:CountersList[ $Name ] ??= 0
-            $members[ $Name ] = $script:CountersList[ $Name ]++
-        }
-        # $members = @{
-        #     $LabelName = $Label
-        # }
+        process {
+            $members = [ordered]@{}
+            if( -not $AsCounter ) {
+                $members[ $Name ] = $Value
+            } else {
+                # $script:CountersList[ $Name ] ??= 0
+                $members[ $Name ] = $script:CountersList[ $Name ]++
+            }
+            # $members = @{
+            #     $LabelName = $Label
+            # }
 
-        $InputObject
-            | Add-Member -Pass -Force -TypeName 'SillyLabel' -NotePropertyMembers $members # sorry
+            $InputObject
+                | Add-Member -Pass -Force -TypeName 'SillyLabel' -NotePropertyMembers $members # sorry
+        }
     }
 }
 # [List[Object]]$results = @()
@@ -170,7 +199,7 @@ $Results2 += # forgive me
         | AddLabel -Name 'TestName' -Value 'Switch.Alias'
         | AddLabel -Name 'Desc' -Value 'Param as Switch, using alias'
 
-function Format-RenderBool {
+function Format-RenderBool.Inline {
     <#
     .SYNOPSIS
         hack, do not use for anything. mutates object, summarizes bools as symbols
@@ -191,19 +220,6 @@ function Format-RenderBool {
             $CurObj.PSObject.Properties | %{
                 $CurProp = $_
                 $Val = $CurProp.Value
-                # if( $Val -is 'string')  {
-                #     $newVal = 'stuff'
-                #     # $newVal =
-                #     #     $val -replace 'true|ok|\b1\b|yes', {
-                #     #             @(
-                #     #                 $c.Red
-                #     #                 $_
-                #     #                 "${fg:reset}"
-                #     #             ) -join ''
-                #     #         }
-                #     # $newVal = $val -replace 'true', 'y'
-
-                # }
                 if($Val -is 'bool') {
                     $NewVal = switch ( $Val ) {
                         { $_ -eq $true -or $_ -match 'true|ok|\b1\b|yes' } {
@@ -240,6 +256,10 @@ function Format-RenderBool {
                     #     $newVal
                     # ) -join ''
                 }
+                if($CurProp.Name -eq 'PSBound') {
+                    $curProp.Value =
+                        $val | Json.Colorize
+                }
             }
             $curObj
         }
@@ -247,13 +267,13 @@ function Format-RenderBool {
 }
 
 $results
-    | Format-RenderBool
+    | Format-RenderBool.Inline
     | ft -auto
 
 hr -fg 'blue'
 
 $results2
-    | Format-RenderBool
+    | Format-RenderBool.Inline
     | ft -auto
 
 
