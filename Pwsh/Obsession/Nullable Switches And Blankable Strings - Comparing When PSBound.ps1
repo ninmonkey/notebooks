@@ -45,7 +45,7 @@ function TestCoal {
         PSTypeName = 'Silly.ParamSwitch.CompareResult'
         TrueNull =
             $Null -eq $ParamText
-$
+
         # TrueEmptyString =
         Len = ( $ParamText )?.Length ?? 'null'
         EmptyStr =
