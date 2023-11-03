@@ -2,6 +2,11 @@
 $script:CountersList ??= @{}
 
 function TestCoal {
+    <#
+    .synopsis
+        Can you treat [switch] as a nullable bool, or not? Compare related case of empty string
+    #>
+
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
@@ -28,6 +33,11 @@ function TestCoal {
     return [pscustomobject]$meta
 }
 function TestCoalSwitch {
+    <#
+    .synopsis
+        Can you treat [switch] as a nullable bool, or not? Compare related case of empty string
+    #>
+
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
@@ -119,9 +129,9 @@ hr -fg Magenta
         TestCoal -ParamText 'foo'
         TestCoal -ParamText $Null
     )
-        | AddLabel -name 'Order' -AsCounter -ResetCounter
-        | AddLabel -Name 'TestName' -Value 'StringParam'
-        | AddLabel -Name 'Desc' -Value 'Comparing whether PSBound diverges on params as alias, first full name'
+        | AddLabel -name 'TestOrder' -AsCounter -ResetCounter
+        | AddLabel -Name 'TestName' -Value 'String.FullName'
+        | AddLabel -Name 'Desc' -Value 'Param As String, using full name'
 
 $Results += # forgive me
     @(
@@ -129,9 +139,9 @@ $Results += # forgive me
         TestCoal -Pt 'foo'
         TestCoal -Pt $Null
     )
-        | AddLabel -name 'Order' -AsCounter
-        | AddLabel -Name 'TestName' -Value 'StringParamAlias'
-        | AddLabel -Name 'Desc' -Value 'Comparing whether PSBound diverges on params as alias, using param alias'
+        | AddLabel -name 'TestOrder' -AsCounter
+        | AddLabel -Name 'TestName' -Value 'String.Alias'
+        | AddLabel -Name 'Desc' -Value 'Param As String, using alias'
 
 $results | ft -auto
 hr -fg Orange
@@ -144,9 +154,9 @@ $Results2 +=
         TestCoalSwitch -ParamState:$false
         TestCoalSwitch -ParamState:$null
     )
-        | AddLabel -name 'Order' -AsCounter -ResetCounter
-        | AddLabel -Name 'TestName' -Value 'SwitchParam'
-        | AddLabel -Name 'Desc' -Value 'Comparing whether PSBound diverges on params as alias, first full name'
+        | AddLabel -name 'TestOrder' -AsCounter -ResetCounter
+        | AddLabel -Name 'TestName' -Value 'Switch.FullName'
+        | AddLabel -Name 'Desc' -Value 'Param As Switch, using fullname'
 
 $Results2 += # forgive me
     @(
@@ -156,9 +166,9 @@ $Results2 += # forgive me
         TestCoalSwitch -St:$false
         TestCoalSwitch -St:$null
     )
-        | AddLabel -name 'Order' -AsCounter -ResetCounter
-        | AddLabel -Name 'TestName' -Value 'SwitchParamAlias'
-        | AddLabel -Name 'Desc' -Value 'Comparing whether PSBound diverges on params as alias, first full name'
+        | AddLabel -name 'TestOrder' -AsCounter -ResetCounter
+        | AddLabel -Name 'TestName' -Value 'Switch.Alias'
+        | AddLabel -Name 'Desc' -Value 'Param as Switch, using alias'
 
 function Format-RenderBool {
     <#
@@ -236,15 +246,19 @@ function Format-RenderBool {
     }
 }
 
+$results
+    | Format-RenderBool
+    | ft -auto
 
-$results | ft -auto
-$results2 | ft -auto
 hr -fg 'blue'
+
 $results2
     | Format-RenderBool
     | ft -auto
 
-return
+
+'see $Results, and $Results2' | write-host -fore 'magenta'
+# return
 
 
 
@@ -263,13 +277,12 @@ return
 
 
 
+# $results2 = @(
+#     TestCoal
+#     TestCoal -ParamText 'foo'
+# )
+#     | AddLabel -name 'Order' -AsCounter
+#     | AddLabel -Name 'TestName' -Value 'StringAsParam'
+#     | AddLabel -Name 'Desc' -Value 'Comparing whether PSBound diverges on params as alias'
 
-$results2 = @(
-    TestCoal
-    TestCoal -ParamText 'foo'
-)
-    | AddLabel -name 'Order' -AsCounter
-    | AddLabel -Name 'TestName' -Value 'StringAsParam'
-    | AddLabel -Name 'Desc' -Value 'Comparing whether PSBound diverges on params as alias'
-
-$results | ft -auto
+# $results | ft -auto
