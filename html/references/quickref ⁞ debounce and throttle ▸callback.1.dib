@@ -1,0 +1,123 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!html
+
+        <style>
+        #mainContent {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        #console {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+
+        }
+        .logLine {
+            border: 2px solid #9e9e9e1f
+        }
+    </style>
+    <div>total invokes: <span id="totalInvokeCountLabel">0</span></div>
+    <select id="selectFunc">
+        <option value="basic">basic</option>
+        <option value="debounce">debounce</option>
+        <option value="throttle">throttle</option>
+    </select>
+            <input type="text" id="inputName" value="inputValue" />
+            <input type="button" id="btnReset" value="Clear" />
+      <div id="mainContent">
+        <div id="apiConsole"></div>
+        <div id="console"></div>
+
+    </div>
+    <script type="text/javascript">
+        let totalInvokeCount = 0
+        function throttle(cb, delay = 1000) {
+            let shouldWait = false
+            return(...args) => {
+                if (shouldWait) return
+                cb(...args)
+                shouldWait = true
+                setTimeout(() => {
+                    shouldWait = false
+                }, delay)
+            }
+        }
+        function debounce(cb, delay = 1000) {
+            let timeout
+                return (...args) => {
+                    clearTimeout(timeout)
+                    timeout = setTimeout(() => {
+                        cb(...args)
+                    }, delay)
+                }
+        }
+
+        function byId(id) {
+            return document.getElementById(id)
+        }
+        function writeLog( param ) {
+            const elem = document.createElement('div')
+            elem.setAttribute('class', 'logLine')
+            elem.innerHTML = `${ param }`
+            byId('console')?.appendChild(elem)
+        }
+        function writeElem( name, param ) {
+            const elem = document.createElement(name)
+            elem.setAttribute('class', 'logLine')
+            elem.innerHTML = `${ param }`
+            byId(name)?.appendChild(elem)
+        }
+        function invokeApi( param ) {
+            totalInvokeCount++
+            byId('totalInvokeCountLabel').innerHTML = totalInvokeCount
+            writeElem('apiConsole', 'Api 🌎' )
+        }
+        const invokeApi_debounce = debounce( (param) => {
+            invokeApi( param )
+        }, 300)
+        const invokeApi_throttle = throttle( (param) => {
+            invokeApi( param )
+        }, 300)
+
+        let consoleLog = byId('consoleLog');
+        let input = byId('inputName');
+        let selectFunc = byId('selectFunc')
+        byId('btnReset').addEventListener("click", function(event) {
+            byId('console').replaceChildren()
+            byId('apiConsole').replaceChildren()
+            totalInvokeCount = 0
+        })
+
+        selectFunc.addEventListener("change", function(event) {
+            const data = event.target.value
+            writeElem( 'consoleLog', data  )
+            // console.log(event)
+            // console.log(data)
+        } )
+        input.addEventListener("keypress", function(event) {
+            const payload = event.target.value
+            // writeLog( payload )
+            writeElem( 'console', payload )
+            // invokeApi( payload)
+            const func = byId('selectFunc')?.value
+            switch(func){
+                case 'basic':
+                    invokeApi( payload)
+                    break;
+                case 'debounce':
+                    invokeApi_debounce( payload )
+                    break;
+                case 'throttle':
+                    invokeApi_throttle( payload )
+                    break;
+                default:
+                    invokeApi( payload)
+            }
+        })
+
+
+</script>

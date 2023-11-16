@@ -1,0 +1,483 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!value
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container"><h1>page2</h1></a>
+<div class="r4 share">
+    <div class='d1'>―</div>
+    <div class='d2'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6'>―</div>
+    <div class='d7'>―</div>
+    <div class='d8'>―</div>
+    <div class='d9'>―</div>
+</div>
+<div class="r5 share">
+    <div class='d1'>―</div>
+    <div class='d2 selected'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6 selected'>―</div>
+    <div class='d7 selected'>―</div>
+    <div class='d8 selected'>―</div>
+    <div class='d9'>―</div>
+</div>
+<h2>r5mod</h2>
+<div class="r5 share r5mod">
+    <div class='d1'>―</div>
+    <div class='d2 selected'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6 selected'>―</div>
+    <div class='d7 selected'>―</div>
+    <div class='d8 selected'>―</div>
+    <div class='d9'>―</div>
+</div>
+<h2>r6mod</h2>
+<div class="r5 share r6mod">
+    <div class='d1'>―</div>
+    <div class='d2 selected'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6 selected'>―</div>
+    <div class='d7 selected'>―</div>
+    <div class='d8 selected'>―</div>
+    <div class='d9'>―</div>
+</div>
+
+#!markdown
+
+todo: figure out how to re-use some code literal, using one of these
+- raw values, multiline input
+- shared values in html
+- or shared values using javascript
+
+#!html
+
+<!-- https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Typical_use_cases_of_flexbox#card_layout_pushing_footer_down -->
+<style>
+    :root {
+        --color1: #99bd99;
+        --color2: #bd9999;
+        --border1: #999999af;
+        --bg1: #4c4c4c;
+        --high1: #539952;
+        --high2: #f38282;
+        --high3: #f4d428;
+        --high4: #2b79d7;
+    }
+    div.share {
+        background-color: var(--bg1);
+        border: 3px solid var(--color2);
+        border: 3px solid var(--border1);
+        padding: .7rem;
+        display: flex;
+        gap: 1.5rem;
+    }
+    div.share div {
+        background-color: #3e3e3e;
+        border: 3px solid #181818;    
+        padding: .3rem;
+    }
+    div.share div:nth-child(odd) {
+        border-right: 2px solid var(--high1);    
+    }
+    div.share div:nth-child(even) {
+        border-left: 2px solid var(--high2);    
+    }
+    /* first 3 */
+    div.r4 div:nth-child(-n + 3) {
+        background-color: var(--color2);    
+    }
+    /* every 3rd */
+    div.r4 div:nth-child(3n) {
+        border-top: 2px solid var(--high3);    
+        border-left: 2px solid var(--high3);    
+    }
+    div.r4 div:nth-child(3n) {
+        border-top: 2px solid var(--high3);    
+        border-left: 2px solid var(--high3);    
+    }
+    /*
+    :nth-child(-n + 3 of li.important) */
+
+    /*
+    2nd and 4th div that's a chilld of div.r5
+    */
+    div.r5 div:nth-child(2), div.r5 div:nth-child(4) {
+        background-color: var(--high4);
+        
+    }
+    div.r4 div:nth-child(2n + 2) {
+        background-color: var(--high4);
+        
+    }
+
+    div.r5 div,
+    div.r5:nth-child(2 of div.selected) {
+        background-color: var(--high4);    
+    }
+
+div.r5 {
+    max-width: 80%;
+    margin: auto;
+}
+div.r5 div:nth-child(2) {
+    min-width: 8rem;    
+}
+div.r5 div:nth-child(3) {
+    min-height: 4rem;
+    flex-grow: 1;
+}
+div.r5 div:nth-child(4) {
+    flex-wrap: wrap;    
+}
+div.r5 div:nth-child(5) {
+    max-height: 2rem;      
+}
+div.r5 div:nth-child(5) {
+    color: red;
+    flex-grow: 1;
+    margin: auto;
+}
+div.r5 div:nth-child(7) {
+    color: red;
+    flex-grow: 2;
+    margin: auto;
+}
+div.r5mod {
+    align-items: stretch; /* default? */
+    align-items: center;
+    align-items: end;
+}
+div.r6mod {
+    align-items: center;
+}
+</style>
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container"><h1>page2</h1></a>
+<div class="r4 share">
+    <div class='d1'>―</div>
+    <div class='d2'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6'>―</div>
+    <div class='d7'>―</div>
+    <div class='d8'>―</div>
+    <div class='d9'>―</div>
+</div>
+<div class="r5 share">
+    <div class='d1'>―</div>
+    <div class='d2 selected'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6 selected'>―</div>
+    <div class='d7 selected'>―</div>
+    <div class='d8 selected'>―</div>
+    <div class='d9'>―</div>
+</div>
+<h2>r5mod</h2>
+<div class="r5 share r5mod">
+    <div class='d1'>―</div>
+    <div class='d2 selected'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6 selected'>―</div>
+    <div class='d7 selected'>―</div>
+    <div class='d8 selected'>―</div>
+    <div class='d9'>―</div>
+</div>
+<h2>r6mod</h2>
+<div class="r5 share r6mod">
+    <div class='d1'>―</div>
+    <div class='d2 selected'>―</div>
+    <div class='d3'>―</div>
+    <div class='d4'>―</div>
+    <div class='d5'>―</div>
+    <div class='d6 selected'>―</div>
+    <div class='d7 selected'>―</div>
+    <div class='d8 selected'>―</div>
+    <div class='d9'>―</div>
+</div>
+
+#!markdown
+
+:nth-child(-n + 3 of li.important) {
+}
+li.important:nth-child(-n + 3) {
+}
+
+#!markdown
+
+## `CSS` methods
+
+- [nth-child root](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child)
+
+#!html
+
+<style>
+:root {
+    --color1: #99bd99;
+    --color2: #bd9999;
+    --border1: #999999af;
+    --border2: #99999966;
+    --bg1: #4c4c4c;
+}
+.r8, .r9 {
+
+}
+.r8, .r9 {
+    background-color: #3e3e3e;
+    border: 3px solid #181818;
+    
+    width: 300px;
+        background-color: var(--bg1);
+    border: 3px solid var(--color2);
+    border: 3px solid var(--border2);    
+}
+
+
+.r8, .r8 .d1 {
+    width: min-content;
+    border: 2px solid var(--color1);
+}
+.r8 .d2 {
+    width: max-content;
+}
+.r8 {
+    display: flex;
+    
+}
+.r9 {
+    display: grid;
+    gap: 2rem;
+    width: 300px;
+}
+.r9 .d1 {
+    width: min-content;
+}
+.r9 .d2 {
+    width: max-content;
+}
+.r9 .d3 {
+    width: auto;
+}
+.r8 div, .r9 div {
+    border: 3px solid var(--border1);       
+    padding: .3rem;
+}
+.r8, .r9 {
+    border: 3px solid var(--border2);       
+    padding: .3rem;
+    margin: 5px;
+}
+div.root1 {
+    border: 2px solid var(--color1);
+    display: flex;        
+}
+.root2 {
+    border: 2px solid var(--color1);
+    /*
+    display: flex;        
+    display: grid;
+    margin-top: 20px;
+    width: max-content;
+    margin: auto;
+    */
+
+    display: grid;
+  grid-template-columns: min-content min-content 1fr;
+}
+/*  sample: <https://developer.mozilla.org/en-US/docs/Web/CSS/min-content>
+        width: min-content;
+        inline-size: min-content;
+        height: min-content;
+        block-size: min-content;
+        used in grid tracks
+        grid-template-columns: 200px 1fr min-content;
+*/
+</style>
+<h1>page4 template</h1>
+display: flex
+<div class='root1'>
+    <div>display: flex</div>
+    <div class="r8">
+        <div class='d1'><b>min-content</b>. Item with more text in it.</div>
+        <div class='d2'><b>max-content</b>. Item with more text in it.</div>
+        <div class='d3'><b>auto</b>. Item with more text in it.</div>    
+    </div>
+    <div>display: grid</div>
+    <div class="r9">
+        <div class='d1'><b>min-content</b>. Item with more text in it.</div>
+        <div class='d2'><b>max-content</b>. Item with more text in it.</div>
+        <div class='d3'><b>auto</b>. Item with more text in it.</div>    
+    </div>
+    <div class="r10">
+        <div class='d1'><b>min-content</b>. Item with more text in it.</div>
+        <div class='d2'><b>max-content</b>. Item with more text in it.</div>
+        <div class='d3'><b>auto</b>. Item with more text in it.</div>    
+    </div>
+</div>
+<style>
+
+</style>
+<div class='root2'>
+    <div class="r11">
+        <div class='d1'><b>min-content</b>. Item with more text in it.</div>
+        <div class='d2'><b>max-content</b>. Item with more text in it.</div>
+        <div class='d3'><b>auto</b>. Item with more text in it.</div>    
+    </div>
+</div>
+
+#!html
+
+<style>
+:root {
+    --color1: #99bd99;
+    --color2: #bd9999;
+    --border1: #999999af;
+    --border2: #99999966;
+    --bg1: #4c4c4c;
+}
+.r8, .r9 {
+
+}
+.r8, .r9 {
+    background-color: #3e3e3e;
+    border: 3px solid #181818;
+    
+    width: 300px;
+        background-color: var(--bg1);
+    border: 3px solid var(--color2);
+    border: 3px solid var(--border2);    
+}
+
+
+.r8, .r8 .d1 {
+    width: min-content;
+    border: 2px solid var(--color1);
+}
+.r8 .d2 {
+    width: max-content;
+}
+.r8 {
+    display: flex;
+    
+}
+.r9 {
+    display: grid;
+    gap: 2rem;
+    width: 300px;
+}
+.r9 .d1 {
+    width: min-content;
+}
+.r9 .d2 {
+    width: max-content;
+}
+.r9 .d3 {
+    width: auto;
+}
+.r8 div, .r9 div {
+    border: 3px solid var(--border1);       
+    padding: .3rem;
+}
+.r8, .r9 {
+    border: 3px solid var(--border2);       
+    padding: .3rem;
+    margin: 5px;
+}
+div.root1 {
+    border: 2px solid var(--color1);
+    
+    display: flex;        
+}
+</style>
+<h1>page3 template</h1>
+<div class='root1'>
+    <div class="r8">
+        <div class='d1'><b>min-content</b>. Item with more text in it.</div>
+        <div class='d2'><b>max-content</b>. Item with more text in it.</div>
+        <div class='d3'><b>auto</b>. Item with more text in it.</div>    
+    </div>
+    <div class="r9">
+        <div class='d1'><b>min-content</b>. Item with more text in it.</div>
+        <div class='d2'><b>max-content</b>. Item with more text in it.</div>
+        <div class='d3'><b>auto</b>. Item with more text in it.</div>    
+    </div>
+</div>
+
+#!html
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container"><h1>page2</h1></a>
+<div class="r4 share">
+    <div class='d1'>foo bar stuff</div>
+    <div class='d2'>foo bar stuff</div>
+    <div class='d3'>foo bar stuff</div>
+    <div class='d4'>foo bar stuff</div>
+    <div class='d5'>foo bar stuff</div>
+    <div class='d6'>foo bar stuff</div>
+    <div class='d7'>foo bar stuff</div>
+    <div class='d8'>foo bar stuff</div>
+    <div class='d9'>foo bar stuff</div>
+</div>
+<div class="r5 share">
+    <div class='d1'>foo bar stuff</div>
+    <div class='d2 selected'>foo bar stuff</div>
+    <div class='d3'>foo bar stuff</div>
+    <div class='d4'>foo bar stuff</div>
+    <div class='d5'>foo bar stuff</div>
+    <div class='d6 selected'>foo bar stuff</div>
+    <div class='d7 selected'>foo bar stuff</div>
+    <div class='d8 selected'>foo bar stuff</div>
+    <div class='d9'>foo bar stuff</div>
+</div>
+<h2>r5mod</h2>
+<div class="r5 share r5mod">
+    <div class='d1'>foo bar stuff</div>
+    <div class='d2 selected'>foo bar stuff</div>
+    <div class='d3'>foo bar stuff</div>
+    <div class='d4'>foo bar stuff</div>
+    <div class='d5'>foo bar stuff</div>
+    <div class='d6 selected'>foo bar stuff</div>
+    <div class='d7 selected'>foo bar stuff</div>
+    <div class='d8 selected'>foo bar stuff</div>
+    <div class='d9'>foo bar stuff</div>
+</div>
+<h2>r6mod</h2>
+<div class="r5 share r6mod">
+    <div class='d1'>foo bar stuff</div>
+    <div class='d2 selected'>foo bar stuff</div>
+    <div class='d3'>foo bar stuff</div>
+    <div class='d4'>foo bar stuff</div>
+    <div class='d5'>foo bar stuff</div>
+    <div class='d6 selected'>foo bar stuff</div>
+    <div class='d7 selected'>foo bar stuff</div>
+    <div class='d8 selected'>foo bar stuff</div>
+    <div class='d9'>foo bar stuff</div>
+</div>
+
+#!html
+
+<style>
+ul.base li { 
+    background-color: #99bd99;
+    width: 4em;
+}
+</style>
+<ul class='base'>
+    <li>a</li>
+    <li>b</li>
+    <li>c</li>
+    <li>d</li>
+    <li>e</li>
+</ul>

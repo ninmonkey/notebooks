@@ -1,0 +1,60 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+cl = function ( params ) { 
+    // sugar to make notebooks a little bit readable
+    let lines = ''
+    for( const [k,v] of Object.entries( params ) ) { 
+        lines += `${ k } = ${ v }\n` 
+    }
+    console.log( lines ) 
+}
+
+console.log(Intl.supportedValuesOf('calendar'));
+console.log(Intl.supportedValuesOf('collation'));
+console.log(Intl.supportedValuesOf('currency'));
+console.log(Intl.supportedValuesOf('numberingSystem'));
+console.log(Intl.supportedValuesOf('timeZone'));
+console.log(Intl.supportedValuesOf('unit'));
+// Expected output: Array ['key'] (for each key)
+
+if(false) { 
+    try {
+        Intl.supportedValuesOf('someInvalidKey');
+    } catch (err) {
+        console.log(err.toString());
+        // Expected output: RangeError: invalid key: "someInvalidKey"
+    }
+}
+
+#!javascript
+
+console.log(Intl.supportedValuesOf('calendar'));
+console.log(Intl.supportedValuesOf('collation'));
+console.log(Intl.supportedValuesOf('currency'));
+console.log(Intl.supportedValuesOf('numberingSystem'));
+console.log(Intl.supportedValuesOf('timeZone'));
+console.log(Intl.supportedValuesOf('unit'));
+
+#!markdown
+
+- [relative time format](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat#examples)
+- And more: [display names](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#language_display_names)
+
+```js
+Array.from( 
+    Intl.supportedValuesOf('unit') ).
+        join(', ')
+```
+
+acre, bit, byte, celsius, centimeter, day, degree, fahrenheit, fluid-ounce, foot, gallon, gigabit, gigabyte, gram, hectare, hour, inch, kilobit, kilobyte, kilogram, kilometer, liter, megabit, megabyte, meter, microsecond, mile, mile-scandinavian, milliliter, millimeter, millisecond, minute, month, nanosecond, ounce, percent, petabyte, pound, second, stone, terabit, terabyte, week, yard, year
+```js
+Array.from( 
+    Intl.supportedValuesOf('calendar') ).
+        join(', ')
+```
+
+ buddhist, chinese, coptic, dangi, ethioaa, ethiopic, gregory, hebrew, indian, islamic, islamic-civil, islamic-rgsa, islamic-tbla, islamic-umalqura, iso8601, japanese, persian, roc

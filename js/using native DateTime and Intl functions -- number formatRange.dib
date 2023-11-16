@@ -1,0 +1,102 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+cl = function ( params ) { 
+    // sugar to make notebooks a little bit readable
+    let lines = ''
+    for( const [k,v] of Object.entries( params ) ) { 
+        lines += `${ k } = ${ v }\n` 
+    }
+    console.log( lines ) 
+}
+rendJson = function ( object, options ) { 
+    options = { ...options }
+     if( ! typeof object == 'string' ) { 
+        jsonStr = JSON.stringify( object )
+     } else { 
+        jsonStr = object
+     }
+    // naive formatting. Don't forget, the built in has some with the right args
+    return jsonStr.
+        replace( /,/gi, `,\n` ).
+        replace( /\n"/gi, `\n\t"` )
+}
+quoteIt = function( items ) { 
+    return Array.from( items ).map( (e) => { return `"${ e }"` } )
+}
+
+const nf = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+});
+
+console.log(nf.formatRange(3, 5)); // "$3 – $5"
+
+// Note: the "approximately equals" symbol is added if
+// startRange and endRange round to the same values.
+console.log(nf.formatRange(2.9, 3.1)); // "~$3"
+
+const nf2 = new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+});
+
+console.log(nf2.formatRange(3, 5)); // "3-5 €"
+console.log(nf2.formatRange(2.9, 3.1)); // "~3 €"
+
+console.log( JSON.stringify( nf.formatToParts(2354.52) ) ) 
+cl( {
+    // nf.formatToParts(2354.52).reduce( (acc, cur) => { return acc + cur.value })
+
+    nf: nf.formatToParts(2354.52).
+        map((e) => { return `${ e.type } => "${ e.value }"` }).
+        join(', '),
+    nf2: nf.formatToParts(2354.52).
+        map((e) => { return e.value }).
+        join(', '),
+
+    nf3: quoteIt( 
+        nf.formatToParts(2354.52).        
+        map((e) => { return e.value }) ).
+        join(', '),
+
+    nf4: JSON.stringify (
+        nf.formatRangeToParts(10, 300) ),
+        
+    nf5: quoteIt( 
+        nf.formatToParts(2354.52).        
+        map((e) => { return e.value }) ).
+        join(', '),
+    
+    lasty: 
+        JSON.stringify( nf.formatRangeToParts(10, 300)).replace( /,/gi, `,\n` ).replace( /\n"/gi, `\n\t"` )
+})
+//.reduce( (acc, cur) => { return acc + cur.value })
+
+#!markdown
+
+- [enumerating found NumberFormat.resolvedOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/resolvedOptions)
+- [format range](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/formatRange)
+- [DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat)
+- [Intl.DateTimeFormat.Parts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/formatToParts)
+- [relative time format](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat#examples)
+- And more: [display names](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#language_display_names)
+
+```ts
+const date = new Date(Date.UTC(2012, 11, 20, 3, 0, 0, 200));
+
+// request a weekday along with a long date
+let options = {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+};
+console.log(new Intl.DateTimeFormat("de-DE", options).format(date));
+// "Donnerstag, 20. Dezember 2012"
+```

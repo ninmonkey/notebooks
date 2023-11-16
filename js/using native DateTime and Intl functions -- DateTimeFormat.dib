@@ -1,0 +1,63 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+cl = function ( params ) {
+    // sugar to make notebooks a little bit readable
+    let lines = ''
+    for( const [k,v] of Object.entries( params ) ) {
+        lines += `${ k } = ${ v }\n`
+    }
+    console.log( lines )
+}
+
+const opts = { year: "numeric", month: "numeric", day: "numeric" }
+const df = new Intl.DateTimeFormat("zh-u-ca-chinese", opts)
+// cl( Array.from( df.formatToParts(Date.UTC(2012, 11, 17, 3, 0, 42)) ).join(', '))
+
+console.log(
+    df.formatToParts(Date.UTC(2012, 11, 17, 3, 0, 42) ))
+
+
+const opts2 = { month: "numeric", day: "numeric", year: "numeric" }
+const df2 = new Intl.DateTimeFormat("en-u-ca-chinese", opts2)
+const date = Date.UTC(2012, 11, 17, 3)
+console.log(
+    df2.formatToParts(date) )
+
+console.log(
+    Object.values( df2.formatToParts(date) ).
+        map( (e) => e.value ).
+        reduce( (a, b) => a + b )
+    )
+
+
+
+
+            console.log( Object.values(
+         df2.formatToParts(date) ).
+             map( (e) => e.value ).
+          reduce( (a, b) => a + b) )
+
+#!markdown
+
+- [DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat)
+- [Intl.DateTimeFormat.Parts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/formatToParts)
+- [relative time format](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat#examples)
+- And more: [display names](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#language_display_names)
+
+```ts
+Array.from( 
+    Intl.supportedValuesOf('unit') ).
+        join(', ')
+```
+```json
+[
+  { type: "relatedYear", value: "2012" },
+  { type: "literal", value: "年" },
+  { type: "month", value: "十一月" },
+  { type: "day", value: "4" },
+]
+```

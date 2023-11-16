@@ -1,0 +1,76 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+cl = function ( params ) { 
+    // sugar to make notebooks a little bit readable
+    let lines = ''
+    for( const [k,v] of Object.entries( params ) ) { 
+        lines += `${ k } = ${ v }\n` 
+    }
+    console.log( lines ) 
+}
+cl({ name: 'bob', region: 32 })
+const now = new Date()
+cults = {
+    US: new Intl.DateTimeFormat('en-us'),
+    BR: Intl.DateTimeFormat('pt-BR', {dateStyle: 'full', timeStyle: 'short'} ),
+}
+
+console.log( cults )
+
+cl({
+    now: now,
+    inline: Intl.DateTimeFormat('pt-BR', {dateStyle: 'full', timeStyle: 'short'}),
+    cultUS: cults.US.format( now ),
+    cultBR: cults.BR.format( now ),
+})
+
+#!javascript
+
+const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+console.log( rtf.formatToParts(-1, "day") )
+    // [{ type: "literal", value: "yesterday"}]
+
+console.log( rtf.formatToParts(100, "day") )
+    // [
+    //   { type: "literal", value: "in " },
+    //   { type: "integer", value: "100", unit: "day" },
+    //   { type: "literal", value: " days" }
+    // ]
+
+#!csharp
+
+const relFormat = new Intl.RelativeTimeFormat('en', { style: 'short' } )
+const now = new Date()
+
+cl({
+    now: now,
+    rel1: relFormat.format( 3, 'quarter' ),
+    q1: relFormat.format( -1, 'day' ),
+    dayYesterday: relFormat.format( -1, 'day' ),
+    q2: relFormat.format( 17, 'minutes' ),
+    q3: relFormat.format( 17.31 / 4, 'minute' ),
+    q4: relFormat.format( 17.31 / 4, 'seconds' ),
+    tomorrow: relFormat.format( 1, 'day' ),
+})
+
+const relFormat = new Intl.RelativeTimeFormat('en', { style: 'short' } )
+console.log(rtf2.format(2, 'day'));
+// Expected output: "pasado mañana"
+
+// Create a relative time formatter in your locale
+// with default values explicitly passed in.
+const rtf = new Intl.RelativeTimeFormat("en", {
+  localeMatcher: "best fit", // other values: "lookup"
+  numeric: "always", // other values: "auto"
+  style: "long", // other values: "short" or "narrow"
+});
+
+// Format relative time using negative value (-1).
+rtf.format(-1, "day"); // "1 day ago"
+
+// Format relative time using positive value (1).
+rtf.format(1, "day"); // "in 1 day"
