@@ -1,0 +1,91 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!markdown
+
+[Dotnet enums have their own format strings](https://learn.microsoft.com/en-us/dotnet/standard/base-types/enumeration-format-strings)
+
+## Output
+
+```
+            Value Fstr Render            Implicit          Type                Group Test
+            ----- ---- ------            --------          ----                ----- ----
+        Wednesday D    3                 Wednesday         [DayOfWeek]             0    4
+        Wednesday d    3                 Wednesday         [DayOfWeek]             0    5
+Hidden, Directory D    18                Hidden, Directory [IO.FileAttributes]     1    4
+Hidden, Directory d    18                Hidden, Directory [IO.FileAttributes]     1    5
+        Wednesday f    Wednesday         Wednesday         [DayOfWeek]             0    2
+        Wednesday F    Wednesday         Wednesday         [DayOfWeek]             0    3
+Hidden, Directory f    Hidden, Directory Hidden, Directory [IO.FileAttributes]     1    2
+Hidden, Directory F    Hidden, Directory Hidden, Directory [IO.FileAttributes]     1    3
+        Wednesday g    Wednesday         Wednesday         [DayOfWeek]             0    0
+        Wednesday G    Wednesday         Wednesday         [DayOfWeek]             0    1
+Hidden, Directory g    Hidden, Directory Hidden, Directory [IO.FileAttributes]     1    0
+Hidden, Directory G    Hidden, Directory Hidden, Directory [IO.FileAttributes]     1    1
+        Wednesday x    00000003          Wednesday         [DayOfWeek]             0    6
+        Wednesday X    00000003          Wednesday         [DayOfWeek]             0    7
+Hidden, Directory x    00000012          Hidden, Directory [IO.FileAttributes]     1    6
+Hidden, Directory X    00000012          Hidden, Directory [IO.FileAttributes]     1    7
+```
+
+#!pwsh
+
+$GroupId = 0
+$Sample = @( 
+    @{  Label = 'DayOfWeek'
+        Value = ([DayOfWeek]3) 
+    }
+    @{  Label = 'FlagsAttribute'
+        Value = ( [IO.FileAttributes]'Hidden, Directory' )
+    }
+    @{  
+        Label = 'HexFlag'
+        Value = ( [IO.FileAttributes]2048 )
+    }
+) | ForEach-Object { 
+    $_.GroupId = $GroupId++
+    [pscustomobject]$_
+}
+
+[string[]]$FstrList = 'g', 'G', 'f', 'F', 'D', 'd', 'x', 'X' 
+
+
+$results = $Sample | ForEach-Object { 
+    $Obj = $_ 
+    $Item = $Obj.Value
+    $TestId = 0
+    foreach($Fstr in $FstrList) { 
+        [pscustomobject]@{
+            Fstr = $fStr
+            Render = $Item.ToString($fstr)
+            Implicit = $Item.ToString() 
+            # Value = $Item
+            Type = $Item | Ninmonkey.Console\Format-ShortTypeName
+            Group = $Obj.GroupId
+            Test = ( $TestId++ )
+            # Label = $Obj.Label
+            Json = $Item | Json
+            JsonAsString = $Item | Json -EnumsAsStrings
+        }
+    }
+}
+    | sort-Object FStr, Label, Render -unique
+
+$results 
+    | sort-Object Label
+    |ft -auto -group Label
+hr
+ 
+ 
+$results 
+    | ft -auto
+
+#!pwsh
+
+$who = find-type -Base enum | Get-Random -Count 1
+$names = $who | fime -MemberType Field | ? Name -NotMatch 'value__' | Get-Random -count 3 | % Name
+
+$names | %{ 
+    $who::$_ -f '{0:g}'
+} | Join-String -sep ', ' -op 'render random fields: '

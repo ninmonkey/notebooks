@@ -1,0 +1,25 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!pwsh
+
+# I think this runs on PS5, grabbing the raw text at first
+
+[string]$text = (iwr -Uri 'https://learn.microsoft.com/en-us/powershell/scripting/bread/toc.json?view=powershell-7.3').Content
+# and parse it:
+$Obj = $text | ConvertFrom-Json
+function Json.Keys {
+   param()
+   process {
+       $_.PSObject.Properties.Name | Sort -Unique }
+}
+
+$Obj | Json.Keys
+
+$Obj.metadata.manager
+
+#!markdown
+
+- Live version in your browser as a web app: https://jqplay.org/#
+- [jq docs / tutorial](https://jqlang.github.io/jq/tutorial)
