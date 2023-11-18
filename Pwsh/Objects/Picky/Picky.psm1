@@ -19,7 +19,60 @@ function pk.Assert.Truthy {
         [Alias('TestOnly', 'AsError')]
         [switch]$AsBool
     )
+    throw  'nyi'
+}
 
+function pk.Assert.IsTypeInfo {
+    param(
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [Parameter(Mandatory)]
+        [object]$InputObject,
+
+        # return a bool instead of throwing
+        [Alias('TestOnly', 'AsError')]
+        [switch]$AsBool
+    )
+    $test = $InputObject -is 'type'
+    if($AsBool) {
+        return $test
+    }
+    if(-not $test) {
+        throw [System.ArgumentException]::new(
+        <# paramName: #> 'InputObject',
+        <# message: #> 'Was not a typeInfo')
+    }
+}
+function pk.Assert.IsArray {
+    param(
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [Parameter(Mandatory)]
+        [object]$InputObject,
+
+        # return a bool instead of throwing
+        [Alias('TestOnly', 'AsError')]
+        [switch]$AsBool
+    )
+    $Tinfo = $InputObject.GetType()
+}
+function pk.Assert.NotEmpty.List {
+    param(
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [Parameter(Mandatory)]
+        [object]$InputObject,
+
+        # return a bool instead of throwing
+        [Alias('TestOnly', 'AsError')]
+        [switch]$AsBool
+    )
+    if( $MyInvocation.InvocationName -in @('pk.Test.NotTrueNull')) {
+        $Asbool = $true
+    }
 
 }
 function pk.Assert.NotTrueNull {
@@ -41,7 +94,6 @@ function pk.Assert.NotTrueNull {
     )
     if( $MyInvocation.InvocationName -in @('pk.Test.NotTrueNull')) {
         $Asbool = $true
-
     }
     $isNull = $Null -eq $InputObject
     if( $AsBool ) {
