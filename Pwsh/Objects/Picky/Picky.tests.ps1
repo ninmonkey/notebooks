@@ -15,6 +15,57 @@ AfterAll {
         | write-host -back 'darkyellow'
 }
 
+Describe 'Assert.Truthy' {
+    it '<In> Test.Truthy <ShouldThrow> and IsTrue <IsTrue>' -foreach  @(
+        @{
+            In = @{} # empty is true
+            ShouldThrow = $false
+            IsTrue = $true
+        }
+        @{
+            In = [ordered]@{} # empty is true
+            ShouldThrow = $false
+            IsTrue = $true
+        }
+        @{
+            In = @() # empty is false
+            ShouldThrow = $false
+            IsTrue = $false
+        }
+        @{
+            In = [Collections.Generic.List[object]]::new() # empty is false
+            ShouldThrow = $false
+            IsTrue = $false
+        }
+        @{
+            In = $null
+            ShouldThrow = $false
+            IsTrue = $false
+        }
+        @{
+            In = ''
+            ShouldThrow = $false
+            IsTrue = $False
+        }
+        @{
+            In = ' '
+            ShouldThrow = $false
+            IsTrue = $true
+        }
+
+    ) {
+        if($ShouldThrow) {
+            { pk.Assert.Truthy -InputObject $In }
+                | Should -Throw
+
+        } else {
+            { pk.Assert.NotTrueNull -InputObject $In }
+                | Should -Not -Throw
+
+        }
+
+    }
+}
 Describe 'Assert.NotTrueNull' {
     it '<In> throws <ShouldThrow>' -foreach  @(
         @{

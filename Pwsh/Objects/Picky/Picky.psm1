@@ -26,7 +26,11 @@ function pk.Assert.Truthy {
 
         [switch]$IsNot
     )
-    if($MyInvocation.MyCommand.Name -match 'test|\bis\b'){
+    # if($MyInvocation.MyCommand.Name -match '\btest\b|\bis\b'){
+    if(
+        ( $MyInvocation.MyCommand.Name -match '\btest\b|\bis\b' ) -and
+        ( $MyInvocation.MyCommand.Name -notmatch 'assert' )
+    ){
         $AsBool = $True
     }
     $isTruthy = [bool]$InputObject
