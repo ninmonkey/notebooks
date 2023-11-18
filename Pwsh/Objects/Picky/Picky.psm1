@@ -8,6 +8,11 @@ filter presets to drop keys
 
 
 function pk.Assert.Truthy {
+    [Alias(
+        'pk.Test.Truthy',
+        'pk.Assert.Truthy',
+        'pk.Is.Truthy'
+    )]
     param(
         [AllowEmptyCollection()]
         [AllowEmptyString()]
@@ -17,9 +22,25 @@ function pk.Assert.Truthy {
 
         # return a bool instead of throwing
         [Alias('TestOnly', 'AsError')]
-        [switch]$AsBool
+        [switch]$AsBool,
+
+        [switch]$IsNot
     )
-    throw  'nyi'
+    if($MyInvocation.MyCommand.Name -match 'test|\bis\b'){
+        $AsBool = $True
+    }
+    $isTruthy = [bool]$InputObject
+    $IsNotTruthy = -not [bool]$InputObject
+
+    if($AsBool) {
+        if( $IsNot ) { return -not $IsTruthy }
+        else { return $isTruthy}
+    }
+    if( -not $isTruthy ) {
+        [System.ArgumentException]::new(
+        <# paramName: #> 'InputObject',
+        <# message: #> 'Was not truthy')
+    }
 }
 
 function pk.Assert.IsTypeInfo {
