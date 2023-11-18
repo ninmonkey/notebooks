@@ -1,8 +1,32 @@
+@'
+filter presets to drop keys
+- [ ]   [System.Management.Automation.PSCmdlet]::CommonParameters
+- [ ] [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
+- [ ] drop blank keys/props
+- [ ] drop whitespace keys/props
+'@
 
+
+function pk.Assert.Truthy {
+    param(
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [Parameter(Mandatory)]
+        [object]$InputObject,
+
+        # return a bool instead of throwing
+        [Alias('TestOnly', 'AsError')]
+        [switch]$AsBool
+    )
+
+
+}
 function pk.Assert.NotTrueNull {
     <#
     .EXAMPLE
     #>
+    [Alias('pk.Test.NotTrueNull')]
     param(
         # anything
         [AllowEmptyCollection()]
@@ -15,7 +39,11 @@ function pk.Assert.NotTrueNull {
         [Alias('TestOnly', 'AsError')]
         [switch]$AsBool
     )
-     $isNull = $Null -eq $InputObject
+    if( $MyInvocation.InvocationName -in @('pk.Test.NotTrueNull')) {
+        $Asbool = $true
+
+    }
+    $isNull = $Null -eq $InputObject
     if( $AsBool ) {
         return $IsNull
     }
@@ -26,7 +54,6 @@ function pk.Assert.NotTrueNull {
         <# paramName: #> 'InputObject',
         <# message: #> 'Was Null')
     }
-
 }
 function PickKeys {
 # this function will create a new object with specific keys from the input object

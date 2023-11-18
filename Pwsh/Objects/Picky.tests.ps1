@@ -41,4 +41,37 @@ Describe 'Assert.NotTrueNull' {
         }
 
     }
+    it '<In> Alias is Bool and not throws <ShouldThrow>' -foreach  @(
+        @{
+            In = @{}
+            ShouldThrow = $false
+            Expected = $false
+        }
+        @{
+            In = $null
+            ShouldThrow = $false
+            Expected = $true
+        }
+        @{
+            In = ''
+            ShouldThrow = $false
+            Expected = $false
+        }
+    ) {
+        if($ShouldThrow) {
+            { pk.Test.NotTrueNull -InputObject $In }
+                | Should -Throw
+        } else {
+            { pk.Test.NotTrueNull -InputObject $In }
+                | Should -Not -Throw
+        }
+        $result = pk.Test.NotTrueNull -InputObject $In
+        $result
+            | Should -BeOfType ([bool])
+        $result
+            | Should -BeExactly $Expected
+
+
+
+    }
 }
