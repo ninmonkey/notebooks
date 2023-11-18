@@ -1,7 +1,10 @@
 
 function pk.Assert.NotTrueNull {
+    <#
+    .EXAMPLE
+    #>
     param(
-        # [AllowNull()]
+        # anything
         [AllowEmptyCollection()]
         [AllowEmptyString()]
         [AllowNull()]
@@ -11,7 +14,7 @@ function pk.Assert.NotTrueNull {
         # return a bool instead of throwing
         [Alias('TestOnly', 'AsError')]
         [switch]$AsBool
-     )
+    )
      $isNull = $Null -eq $InputObject
     if( $AsBool ) {
         return $IsNull
