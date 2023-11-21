@@ -1,3 +1,5 @@
+using namespace System
+
 @'
 filter presets to drop keys
 - [ ]   [System.Management.Automation.PSCmdlet]::CommonParameters
@@ -33,6 +35,8 @@ function pk.Assert.Truthy {
     ){
         $AsBool = $True
     }
+
+
     $isTruthy = [bool]$InputObject
     $IsNotTruthy = -not [bool]$InputObject
 
@@ -41,7 +45,7 @@ function pk.Assert.Truthy {
         else { return $isTruthy}
     }
     if( -not $isTruthy ) {
-        [System.ArgumentException]::new(
+        [ArgumentException]::new(
         <# paramName: #> 'InputObject',
         <# message: #> 'Was not truthy')
     }
@@ -64,7 +68,7 @@ function pk.Assert.IsTypeInfo {
         return $test
     }
     if(-not $test) {
-        throw [System.ArgumentException]::new(
+        throw [ArgumentException]::new(
         <# paramName: #> 'InputObject',
         <# message: #> 'Was not a typeInfo')
     }

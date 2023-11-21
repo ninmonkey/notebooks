@@ -54,15 +54,26 @@ Describe 'Assert.Truthy' {
         }
 
     ) {
-        if($ShouldThrow) {
+        if( $ShouldThrow ) {
             { pk.Assert.Truthy -InputObject $In }
                 | Should -Throw
-
         } else {
-            { pk.Assert.NotTrueNull -InputObject $In }
+            { pk.Assert.Truthy -InputObject $In }
                 | Should -Not -Throw
-
         }
+
+        $result = pk.Assert.Truthy -InputObject $In
+        $result | Should -BeOfType ([bool])
+        $result | Should -BeExactly $IsTrue
+        # if($ShouldThrow) {
+        #     { pk.Assert.Truthy -InputObject $In }
+        #         | Should -Throw
+
+        # } else {
+        #     { pk.Assert.NotTrueNull -InputObject $In }
+        #         | Should -Not -Throw
+
+        # }
 
     }
 }
