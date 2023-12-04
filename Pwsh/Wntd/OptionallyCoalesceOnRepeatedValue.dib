@@ -1,0 +1,125 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!markdown
+
+![screenshot](./img/OptionallyCoalesceOnRepeatedValue.png)
+
+#!pwsh
+
+function ␠ { [CmdletBinding()]
+   param(
+    #  [ValidateNotNullOrWhiteSpace()]
+     ${␠}, ${␒}
+   )
+   $PSBoundParameters | Json -Compress | New-Text -fg 'gray30' -bg 'gray15'
+      | Write-Information
+   ${␒}--
+   if ( <# ${␒} -gt 15 -or #> (${␒} ?? 0) -le 0) { return }
+   ␠ ${␠} ${␒}
+   [string]${␠} * ${␒} ?? '␀' -split '' -join ''
+      | Join-String -sep ' ' -DoubleQuote {
+          $_.EnumerateRunes() | % tostring | Join-String -f '{0:x}' }
+
+}
+
+␠ '👨‍👩‍👧‍👦' 14 -infa Continue | Join-String -op $PSStyle.Foreground.Red
+
+#!pwsh
+
+function ␠ { [CmdletBinding()]
+   param(
+    #  [ValidateNotNullOrWhiteSpace()]
+     ${␠}, ${␒}
+   )
+   $PSBoundParameters | Json -Compress | New-Text -fg 'gray30' -bg 'gray15'
+      | Write-Information
+   ${␒}--
+   if ( <# ${␒} -gt 15 -or #> (${␒} ?? 0) -le 0) { return }
+   ␠ ${␠} ${␒}
+   [string]${␠} * ${␒} ?? '␀' -split '' -join ''
+      | Join-String -sep ' ' {
+          $_.EnumerateRunes().Value | Join-String -f '{0:x}' }
+
+}
+
+␠ '👨‍👩‍👧‍👦' 14 -infa Continue | Join-String -op $PSStyle.Foreground.Red
+
+#!pwsh
+
+function ␠ {
+   param(
+    #  [ValidateNotNullOrWhiteSpace()]
+     ${␠}, ${␒}
+   )
+   $PSBoundParameters | Json -Compress | New-Text -fg 'gray30' -bg 'gray15' | INfa
+   ${␒}--
+   if ( <# ${␒} -gt 15 -or #> (${␒} ?? 0) -le 0) { return }
+   (␠ ${␠} ${␒})
+   [string]${␠} * ${␒} ?? '␀' -split '' -join ''
+      | Join-String -sep ' ' {
+          $_.EnumerateRunes().Value | Join-String -f '{0:x}' }
+
+}
+
+␠ 😺 14
+
+#!pwsh
+
+function ␠ {
+   param(
+    #  [ValidateNotNullOrWhiteSpace()]
+     ${␠}, ${␒}
+   )
+   $PSBoundParameters | Json | write-host -fg 'gray80' -bg 'gray40'
+   ${␒}--
+   if (${␒} -gt 5 -or (${␒} ?? 0) -le 0) { return }
+   (␠ ${␠} ${␒})
+   [string]${␠} * ${␒} # ?? '␀' -split '' -join '.'
+
+}
+
+␠ 😺 5
+
+#!pwsh
+
+# 3
+function ␠ {
+   param(
+    #  /[ValidateNotNullOrWhiteSpace()]
+     ${␠}, ${␒}
+   )
+   $PSBoundParameters | Json | write-host -fg 'gray80' -bg 'gray40'
+   [string]${␠} * ${␒} # ?? '␀' -split '' -join '.'
+
+}
+
+␠ 😺 3
+
+#!pwsh
+
+function ␠ {
+   param(
+    #  [ValidateNotNullOrWhiteSpace()]${␠}, ${␒}
+        ${␠}, ${␒}
+   )
+   [string]${␠} * [int]${␒} # ?? '␀' -split '' -join '.'
+
+}
+
+␠ 😺 3
+
+#!pwsh
+
+# iter[1]
+#  [ValidateNotNullOrWhiteSpace()]${␠}, ${␒}
+function ␠ {
+   param(
+     [ValidateNotNull()]${␠}, ${␒}
+   )
+   ${␠} * 4 ?? '␀' -split '' -join '.'
+
+}
+
+␠ 9
