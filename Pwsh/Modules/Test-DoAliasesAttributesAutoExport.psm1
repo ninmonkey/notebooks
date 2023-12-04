@@ -1,7 +1,11 @@
-﻿'Testing: Do aliases auto-export if the command they are attributes to, are? Nope.' | write-host
+﻿'Testing: Do aliases auto-export if the command they are attributes to, are?' | write-host
+
+function Alice.GetCommand {
+    gcm -m Test-Do
+}
 
 function InternalFunc {
-    [alias('Ini.Func')]
+    [alias('Ini.Func', 'Alice.InKnee')]
     param()
     $MyInvocation.MyCommand.Name
 }
