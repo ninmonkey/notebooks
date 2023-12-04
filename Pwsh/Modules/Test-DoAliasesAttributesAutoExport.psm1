@@ -1,7 +1,10 @@
 ﻿'Testing: Do aliases auto-export if the command they are attributes to, are?' | write-host
 
 function Alice.GetCommand {
-    gcm -m Test-Do
+    gcm Alice.*
+    hr
+    gcm -m 'Test-DoAliasesAttributesAutoExport'
+    hr
 }
 
 function InternalFunc {
