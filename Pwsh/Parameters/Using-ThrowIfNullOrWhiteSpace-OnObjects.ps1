@@ -7,18 +7,23 @@
         [Parameter()]
             [ArgumentCompletions(
                 '([CultureInfo]::InvariantCulture)', 'en-us', 'de-de' )]
-            [CultureInfo]$Culture = [CultureInfo]::InvariantCulture
+                # $Culture = [CultureInfo]::InvariantCulture
+                $Culture
+                # [CultureInfo]$Culture = [CultureInfo]::InvariantCulture
     )
-    $PSBoundParameters | ConvertTo-Json -Depth 1 -Compress | Write-debug
-    $null -eq $Culture | Join-String -f 'Cult == $Null: {0}' | write-verbose -verb
-    if( [String]::IsNullOrWhiteSpace( $Culture )) {
-        throw "MandatoryCultureWasBlank!"
-    }
+    $Culture ??= [CultureInfo]::InvariantCulture
+    if( [String]::IsNullOrWhiteSpace( $Culture )) { throw "MandatoryCultureWasBlank!" }
     [ArgumentException]::ThrowIfNullOrWhiteSpace( $Culture, 'Culture' )
+
+    # $PSBoundParameters | ConvertTo-Json -Depth 1 -Compress | Write-debug
+    # $null -eq $Culture | Join-String -f 'Cult == $Null: {0}' | write-verbose -verb
 }
+
+FormatDate (Get-Date) -Culture (Get-Culture 'en-us')
 return
+FormatDate (Get-Date) -Culture ([CultureInfo]::InvariantCulture)
+Get-Date | FormatDate -Culture ([CultureInfo]::InvariantCulture)
 
 
 # FormatDate (Get-Date)
 # (get-date).ToString( [cultureinfo]::InvariantCulture )
-# Get-Date | FormatDate -Culture ([CultureInfo]::InvariantCulture)
