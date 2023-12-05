@@ -1,4 +1,5 @@
 ﻿function FormatDate {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory, ValueFromPipeline)]
             [datetime]$Dt,
@@ -6,9 +7,9 @@
         [Parameter()]
             [ArgumentCompletions(
                 '([CultureInfo]::InvariantCulture)', 'en-us', 'de-de' )]
-            [CultureInfo]$Culture = ([CultureInfo]::InvariantCulture)
+            [CultureInfo]$Culture = [CultureInfo]::InvariantCulture
     )
-
+    $PSBoundParameters | ConvertTo-Json -Depth 1 -Compress | Write-debug
     $null -eq $Culture | Join-String -f 'Cult == $Null: ' | write-verbose -verb
     if( [String]::IsNullOrWhiteSpace( $Culture )) {
         throw "MandatoryCultureWasBlank!"
