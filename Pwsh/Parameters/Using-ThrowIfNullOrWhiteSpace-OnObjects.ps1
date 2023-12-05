@@ -1,0 +1,23 @@
+﻿function FormatDate {
+    param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+            [datetime]$Dt,
+
+        [Parameter()]
+            [ArgumentCompletions(
+                '([CultureInfo]::InvariantCulture)', 'en-us', 'de-de' )]
+            [CultureInfo]$Culture = ([CultureInfo]::InvariantCulture)
+    )
+
+    $null -eq $Culture | Join-String -f 'Cult == $Null: ' | write-verbose -verb
+    if( [String]::IsNullOrWhiteSpace( $Culture )) {
+        throw "MandatoryCultureWasBlank!"
+    }
+    [ArgumentException]::ThrowIfNullOrWhiteSpace( $Culture, 'Culture' )
+}
+return
+
+
+# FormatDate (Get-Date)
+# (get-date).ToString( [cultureinfo]::InvariantCulture )
+# Get-Date | FormatDate -Culture ([CultureInfo]::InvariantCulture)
