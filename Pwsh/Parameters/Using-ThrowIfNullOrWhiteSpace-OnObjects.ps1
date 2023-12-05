@@ -10,7 +10,7 @@
             [CultureInfo]$Culture = [CultureInfo]::InvariantCulture
     )
     $PSBoundParameters | ConvertTo-Json -Depth 1 -Compress | Write-debug
-    $null -eq $Culture | Join-String -f 'Cult == $Null: ' | write-verbose -verb
+    $null -eq $Culture | Join-String -f 'Cult == $Null: {0}' | write-verbose -verb
     if( [String]::IsNullOrWhiteSpace( $Culture )) {
         throw "MandatoryCultureWasBlank!"
     }
