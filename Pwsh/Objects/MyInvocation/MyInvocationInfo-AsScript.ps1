@@ -2,6 +2,14 @@
 using namespace System.Management.Automation
 using namespace System.Management
 
+'Future testing could test for
+- [ ] in a basic function
+- [ ] in a basic function nested 2 layers deep
+- [ ] in a script block
+- [ ] in a script block nested 2 layers deep
+- [ ] in a script block nested in a basic function
+- [ ] then repeat all of the above in a module''s scope: <file:///./MyInvocationInfo-AsModule.psm1>
+'
 $Config = @{
     SuperVerboseSummaryRender = $True
 }
@@ -12,7 +20,7 @@ $meta = [ordered]@{
     MyI          = $MyInvocation
     MyI_Cmd      = $MyInvocation.MyCommand # [ScriptInfo]
     MyI_Cmd_Path = $MyInvocation.MyCommand.Source
-    MyI_Cmd_Src  = $MyInvocation.MyCommand.Source
+
 
     # $MyInvocation.MyCommand.Name
     # $MyInvocation
