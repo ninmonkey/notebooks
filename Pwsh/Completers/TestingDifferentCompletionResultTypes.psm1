@@ -81,10 +81,14 @@ function New-CompletionTemplate {
     )
 
     [List[CompletionResult]]$Completions = @()
+    return @(
+        Td.New.CR -ResultType ParameterName -ListItemText 'Name' -CompletionText '-Name' -Tooltip ''
+        Td.New.CR -ResultType ParameterValue -ListItemText 'Bob' -CompletionText 'Bob' -Tooltip ''
+    )
     # Td.New.CR -ListItemText 'Example' -CompletionText '' -ResultType 'ParameterValue' -Tooltip ''
     switch($TemplateName) {
         '1' {
-            $Completions.AddRange(@(
+            $Completions.AddRange( [CompletionResult[]]@(
                 Td.New.CR -ResultType ParameterName -ListItemText 'Name' -CompletionText '-Name' -Tooltip ''
                 Td.New.CR -ResultType ParameterValue -ListItemText 'Bob' -CompletionText 'Bob' -Tooltip ''
                 Td.New.CR -ResultType ParameterName -ListItemText 'Id' -CompletionText '-Id' -Tooltip ''
@@ -97,7 +101,7 @@ function New-CompletionTemplate {
             ))
         }
         '2' {
-            $Completions.AddRange(@(
+            $Completions.AddRange( [CompletionResult[]]@(
                 Td.New.CR -ResultType ParameterName -ListItemText 'Name' -CompletionText '-Name' -Tooltip ''
                 Td.New.CR -ResultType ParameterValue -ListItemText 'Bob' -CompletionText 'Bob' -Tooltip ''
                 Td.New.CR -ResultType ParameterName -ListItemText 'Id' -CompletionText '-Id' -Tooltip ''
@@ -169,3 +173,9 @@ Export-ModuleMember -Function @(
 ) -Alias @(
     'Td.*'
 ) -Variable @('Td_*')
+
+'The functions are tied to different completers, try running
+
+    > Td.Try1 name<tab>
+    > Td.Try2 <menuComplete>
+' | write-host -fg 'darkorange' -bg 'gray15'
