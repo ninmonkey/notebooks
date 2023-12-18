@@ -49,3 +49,10 @@ $ctx.Response.close()
 
 Log Listener Close
 $listen.Close()
+
+<#
+for async,
+    $task = $httpListener.GetContextAsync()
+    while (-not $task.AsyncWaitHandle.WaitOne(200)) { }
+    $context = $task.GetAwaiter().GetResult()
+#>
