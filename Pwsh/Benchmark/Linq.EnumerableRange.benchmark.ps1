@@ -1,8 +1,14 @@
 ﻿@'
 Outputs:
 
-# grouped
+# sort: Time
 
+Technique                              Time             RelativeSpeed GroupName Throughput
+---------                              ----             ------------- --------- ----------
+Nums = [EnumerableRange]::(0, 4mb )    00:00:00.0124675          1.00               160.42
+[EnumerableRange]::(0, 4mb ) | %{ $_ } 00:00:00.0846974          6.79                23.61
+Nums = 0..4mb                          00:00:00.9147725         73.37                 2.19
+Nums = 0..4mb | %{ $_ }                00:00:32.7884668       2629.92                 0.06
 
 '@
 h1 (Join-String -f 'File: {0}' -in $PSCommandPath)
