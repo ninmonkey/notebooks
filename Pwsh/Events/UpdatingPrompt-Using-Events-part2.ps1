@@ -1,4 +1,9 @@
-﻿'event prompttest, context here and earlier: <https://discord.com/channels/180528040881815552/447476117629304853/1177138420615745637>'
+﻿using namespace System.Diagnostics
+using namespace System.Timers
+using namespace System.Collections.Generic
+
+
+'event prompttest, context here and earlier: <https://discord.com/channels/180528040881815552/447476117629304853/1177138420615745637>'
 | write-verbose -Verbose
 $eventId = 'UpdatePrompt'
 
@@ -9,17 +14,19 @@ catch {
     $_ | Join-String -op 'UnregisterEvent: ' | Write-warning
 }
 
-$timer = New-Object Timers.Timer -Property @{
+[Stopwatch]$W = @{}
+[Timer]$Timer = @{
     Interval = 1000
-    Enabled = $true
+    Enabled = $True
     AutoReset = $true
 }
+
 $timerArgs = @{
     InputObject = $timer
-    EventName = 'Elapsed'
+    EventName = 'Prompt.TimerCallback'
     SourceIdentifier = $eventId
     Action = {
-        param($e)
+        param( $e)
         $date = [DateTime]::Now.ToString("MM/dd/yyyy HH:mm:ss")
         $function:prompt = { "$date> " }.GetNewClosure()
         $Date | Dotils.Write-DimText | Infa
