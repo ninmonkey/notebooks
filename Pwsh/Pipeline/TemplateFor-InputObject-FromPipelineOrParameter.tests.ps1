@@ -12,6 +12,15 @@ Describe 'ParameterBindingDoesNotThrow' {
     it 'x | CollectList' {
         { 'a'..'e' | CollectList } | Should -Not -Throw
     }
+    it 'CollectList -Inp x -Name Arg' {
+        { CollectList -Inp ('a'..'e')  -Label 'Arg' } | Should -Not -Throw
+    }
+    it 'CollectList -Inp x Arg' {
+        { CollectList -Inp ('a'..'e') 'Arg' } | Should -Not -Throw
+    }
+    it 'CollectList -Inp x' {
+        { CollectList -Inp ('a'..'e') } | Should -Not -Throw
+    }
 
     # it 'stuff' -ForEach @(
     #     # $gci = Gci . |select -first 2| CollectList
