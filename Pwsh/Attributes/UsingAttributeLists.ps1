@@ -6,16 +6,12 @@ using namespace System.Management.Automation
 
 err -Clear
 Get-Module Picky -all | Remove-Module
-$modPath = 'H:\data\2023\pwsh\PsModules\Picky\Picky\Picky.psm1'
 # import-module Picky -force -PassThru
-import-module $ModPath -force -PassThru
+goto $PSScriptRoot
+$modPath = 'H:\data\2023\pwsh\PsModules\Picky\Picky\Picky.psm1'
+import-module $ModPath -force -PassThru -Verbose
 
 @'
-# see more
-
-- [Creating Custom Attributes](https://powershell.one/powershell-internals/attributes/custom-attributes#a-better-autolearn-attribute)
-- [Retrieving Information Stored in Attributes](https://learn.microsoft.com/en-us/dotnet/standard/attributes/retrieving-information-stored-in-attributes)
-
 ## Summary:
 
 - for mandatory parameters:
@@ -28,6 +24,13 @@ import-module $ModPath -force -PassThru
 
 - for optional named parameters:
   - implemented as properties not in a c-tor
+
+## see more
+
+- [Creating Custom Attributes](https://powershell.one/powershell-internals/attributes/custom-attributes#a-better-autolearn-attribute)
+- [Retrieving Information Stored in Attributes](https://learn.microsoft.com/en-us/dotnet/standard/attributes/retrieving-information-stored-in-attributes)
+- [Accessing Custom Attributes](https://learn.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/accessing-custom-attributes)
+- [How to: Get type and member information by using reflection](https://learn.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/get-type-member-information)
 
 '@ | Write-Host -fore 'green'
 class AuthorAttribute : Attribute {
@@ -48,19 +51,19 @@ function DoWork {
 
 
 DoWork
-h1 '.ResolveParameter(Text)'
-(gcm DoWork).ResolveParameter('Text')
+h1 '.ResolveParameter(Te)'
+(gcm 'DoWork').ResolveParameter('Te')
 
 h1 '.ResolveParameter(Text).Attributes'
-(gcm DoWork).ResolveParameter('Text').Attributes
+(gcm 'DoWork').ResolveParameter('Text').Attributes
 
 h1 '.ScriptBlock.Attributes'
-[List[Attribute]]$Attrs = (gcm DoWork).ScriptBlock.Attributes
+[List[Attribute]]$Attrs = (gcm 'DoWork').ScriptBlock.Attributes
 $authorAttr = $Attrs[0]
-
-
-(gcm DoWork) | Function.GetInfo Attributes
+$authorAttr
 
 $target = gcm 'DoWork'
-# Picky\Function.GetInfo $target
-# Function.GetInfo -Fn $Target -Out Attributes
+
+# other routes
+# gcm 'Dowork' | Function.GetInfo Attributes
+# gcm 'Dowork' | Function.GetInfo ScriptBlock | ScriptBlock.GetInfo Attributes
