@@ -13,6 +13,7 @@ New-Item 'function:\TrueEmptyAsFunction' -Value {} #-ea 'continue'
 
 $Sample = @{}
 $Sample.TrueEmpty = {}
+$Sample.TrueEmptyWithPadding = { }
 # $Sample.TrueEmptyCtor = [ScriptBlock]::new()
 # $Sample.NewEmptyLiteral = [ScriptBlock]::new()
 $Sample.EmptyString = { [string]::StringEmpty }
