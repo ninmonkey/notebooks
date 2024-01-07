@@ -39,7 +39,8 @@ function New-Regex.SplitBySegmentSize {
         [string]$Delimiter = ':',
 
         [ArgumentCompletions('Original', 'MultiLine1', 'MultiLine2')]
-        [string]$RegexName = 'Original' # MultiLine2
+        [string]$RegexName = 'Original'
+        # [string]$RegexName = 'Original' # MultiLine2
 
     )
     # was: '(?<=\G..)(?!$)',':'
@@ -59,6 +60,17 @@ function New-Regex.SplitBySegmentSize {
 '@
     $regex.MultiLine2 = @'
 (?x)
+    # previous version moved delim to the start of match,
+    # this preserves the original end of
+(?:
+  (?<=\G{0})
+  |^
+)
+(?!$)
+'@
+    $regex.MultiLine3 = @'
+(?x)
+(?mi)
     # previous version moved delim to the start of match,
     # this preserves the original end of
 (?:
@@ -210,14 +222,25 @@ function FancyName {
         [ArgumentCompletions(
             2, 3, 4, 10, 16
         )]
-        [int]$Len
+        [int]$Len,
+
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object[]]$InputObject
     )
-    $Input
+    begin {
+        [List[Object]]$Items = @()
+    }
+    process {
+        $Items.AddRange(@( $InputObject ))
+    }
+    end {
+        $Items
         | % $PropertyName
         | Sort-Object -Unique
         | Join-String -sep $Separator -p {
             $_ | FancySegment -SegmentLength $Len '•'
         }
+    }
 }
 
 hr
