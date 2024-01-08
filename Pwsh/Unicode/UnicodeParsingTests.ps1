@@ -10,6 +10,56 @@ $Uni = @{
 
 ' '.EnumerateRunes()|ft
 
+
+[regex]::Match( $what, '^..')
+[regex]::Match( $what, '^...')
+
+# Groups Success Name Captures Index Length Value ValueSpan Hex
+# ------ ------- ---- -------- ----- ------ ----- --------- ---
+# {0}    True    0    {0}      0     1      a               61 fffd
+# {0}    True    0    {0}      0     1      a🐒             61 1f412
+
+
+$what = 'a🐒c'
+$list = $what.ToCharArray()
+[Text.Encoding]::Unicode.GetBytes( $what ) | Join-string -sep ' ' -f ' {0:x}'
+
+$what = 'a🐒c'
+[Text.Encoding]::Unicode.GetBytes( $what ) | Join-string -sep ' ' -f '{0:x2}'
+'61 00 3d d8 12 dc 63 00'
+
+$list[1].ToInt64($Null) | % tostring 'x'
+'d83d'
+
+$list[0].ToInt64($Null) | % tostring 'x'
+'61'
+
+$what -match '\ud83d'
+'True'
+
+$what.EnumerateRunes()
+[regex]::match( $what, '\ud83d.')       | ft # '[2] = 🐒'
+[regex]::match( $what, '\ud83d\udc12')  | ft # '[2] = 🐒'
+
+
+function CodepointAs16RegexLiteral {
+    <#
+    .EXAMPLE
+        > '🐒' -match ( CodepointAs16RegexLiteral '🐒')
+        > 'a🐒b' -match (CodepointAs16RegexLiteral 'a🐒b')
+            # out: true
+    #>
+    [OutputType('String')]
+    param(
+        [ArgumentCompletions('🐒')]
+        [string]$Text = '🐒')
+
+    return ([Text.Encoding]::GetEncoding('utf-16le').GetBytes( $Text )
+        | Join-string -f '{0:x2}' ) -replace
+            '(?<=\G.{4})(?!$)', ':' -split ':' | Join-String -f '\u{0}' { $_ -replace '(..)(..)', '$2$1' }
+}
+
+
 function j.Hex {
     <#
     .SYNOPSIS
@@ -68,46 +118,6 @@ function j.Hex {
 }
 
 
-$what = 'a🐒c'
-$list = $what.ToCharArray()
-[Text.Encoding]::Unicode.GetBytes( $what ) | Join-string -sep ' ' -f ' {0:x}'
-
-$what = 'a🐒c'
-[Text.Encoding]::Unicode.GetBytes( $what ) | Join-string -sep ' ' -f '{0:x2}'
-'61 00 3d d8 12 dc 63 00'
-
-$list[1].ToInt64($Null) | % tostring 'x'
-'d83d'
-
-$list[0].ToInt64($Null) | % tostring 'x'
-'61'
-
-$what -match '\ud83d'
-'True'
-
-$what.EnumerateRunes()
-[regex]::match( $what, '\ud83d.')       | ft # '[2] = 🐒'
-[regex]::match( $what, '\ud83d\udc12')  | ft # '[2] = 🐒'
-
-
-function CodepointAs16RegexLiteral {
-    <#
-    .EXAMPLE
-        in: 🐒
-
-        > '🐒' -match ( CodepointAs16RegexLiteral '🐒')
-
-        # out: true
-    #>
-    [OutputType('String')]
-    param(
-        [ArgumentCompletions('🐒')]
-        [string]$Text = '🐒')
-    if( @($Text.EnumerateRunes().Value).count -gt 1 ) { throw "expected one codepoint for now"}
-    return ([Text.Encoding]::GetEncoding('utf-16le').GetBytes( $Text )
-        | Join-string -f '{0:x2}' ) -replace
-            '(?<=\G.{4})(?!$)', ':' -split ':' | Join-String -f '\u{0}' { $_ -replace '(..)(..)', '$2$1' }
-}
 
 # CodepointAs16Literal
 
@@ -117,6 +127,15 @@ function CodepointAs16RegexLiteral {
 # ) -Force -ea 'silentlycontinue'
 
 # 🐱‍👤
+
+ Write-FormatView -TypeName ([System.Text.RegularExpressions.Match]) -Property @(
+       'Groups', 'Success', 'Name', 'Captures', 'Index', 'Length', 'Value', "ValueSpan", 'Hex' #,  'Ctrl'
+    ) -VirtualProperty @{
+        'Hex' = { ($_.Value)?.EnumerateRunes().value | j.Hex }
+        'Ctrl' = {
+            $_.Value | Fcc
+        }
+    } -AutoSize | Out-FormatData | Push-FormatData
  Write-FormatView -TypeName ([Text.Rune]) -Property @(
         'Render'
         'Hex'
