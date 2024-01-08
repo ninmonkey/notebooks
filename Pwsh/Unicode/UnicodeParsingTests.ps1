@@ -21,6 +21,19 @@ $Uni = @{
 
 
 $what = 'a🐒c'
+$oneRune = [Text.Rune]0x1f412 # monkey
+
+[Text.Rune]::GetUnicodeCategory( $oneRune )
+    # OtherSymbol
+'🐒'.ToCharArray() | %{ [char]::GetUnicodeCategory( $_ ) } | Join-string -sep ', '
+    # Surrogate, Surrogate
+
+
+<#
+note:
+ Rune.GetUnicodeCategory doesn't always return the same result as Char.GetUnicodeCategory. It does return the same value as CharUnicodeInfo.GetUnicodeCategory. For more information, see the Remarks on Char.GetUnicodeCategory.
+#>
+
 $list = $what.ToCharArray()
 [Text.Encoding]::Unicode.GetBytes( $what ) | Join-string -sep ' ' -f ' {0:x}'
 
