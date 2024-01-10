@@ -1,16 +1,27 @@
 ﻿<#
 this script outputs:
-Name                                     Value
-----                                     -----
-4294967296 | Join-String -f '{0:x}'      100000000
-'{0:x}' -f $o                            0000000100000000
-'{0:x}' -f $o.value__                    100000000
-$o.ToString('x')                         0000000100000000
-$o.value__.ToString('x')                 100000000
-Join-String -f '{0:x}'                   0000000100000000
-Join-String -f '{0:x}' -Property value__ 100000000
-[enum]::Format( [e], $o.value__, 'x' )   0000000100000000
-[enum]::Format( [e], $o, 'x' )           0000000100000000
+
+0x300000000
+300000000
+0000000300000000
+0000000100000000
+0000000100000000
+0000000100000000
+0000000100000000
+
+Name                                                Value
+----                                                -----
+4294967296 | Join-String -f '{0:x}'                 100000000
+'{0:x}' -f $o                                       0000000100000000
+'{0:x}' -f $o.value__                               100000000
+$o.ToString('x')                                    0000000100000000
+$o.value__.ToString('x')                            100000000
+Join-String -f '{0:x}'                              0000000100000000
+Join-String -f '{0:x}' -Property value__            100000000
+[enum]::Format( [e], $o.value__, 'x' )              0000000100000000
+[enum]::Format( [e], $o, 'x' )                      0000000100000000
+[enum]::Format( [e], ([e]4294967296).value__, 'x' ) 0000000100000000
+[enum]::Format( [e], ([e]4294967296), 'x' )         0000000100000000
 
 
 F1 F2    Str1 Str2             ToStr_None ToStr_F1         '{0:x}' -f enum  '{0:x}' -f enum.value__
@@ -64,6 +75,23 @@ enum e : ulong
 [e]'A, B' | Join-String -f '{0:x}' { $_ }
 $o = [e]'A'
 
+$lo = 4294967296l
+# all for of these variations all format with the custom zero-prefixed numbers
+[enum]::Format( [e], ([e]$lo).value__, 'x' )
+[enum]::Format( [e], ([e]$lo), 'x' )
+[enum]::Format( [e], $o.value__, 'x' )
+[enum]::Format( [e], $o, 'x' )
+
+<# it appears to be calling something roughly like
+
+
+$someLong = 4294967296l
+$someLong.ToString('x')
+    vs
+$o.ToString('x')
+
+#>
+
 [ordered]@{
     "4294967296 | Join-String -f '{0:x}'" =
         4294967296 | Join-String -f '{0:x}'
@@ -91,6 +119,12 @@ $o = [e]'A'
 
     "[enum]::Format( [e], `$o, 'x' )" =
         [enum]::Format( [e], $o, 'x' )
+
+    "[enum]::Format( [e], ([e]$lo).value__, 'x' )" =
+        [enum]::Format( [e], ([e]$lo).value__, 'x' )
+    "[enum]::Format( [e], ([e]$lo), 'x' )" =
+        [enum]::Format( [e], ([e]$lo), 'x' )
+
 
 } |
 ft -AutoSize
