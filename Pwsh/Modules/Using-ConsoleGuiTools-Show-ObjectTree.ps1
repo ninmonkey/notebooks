@@ -1,30 +1,33 @@
 ﻿using namespace System.Collections.Generic
 
 class Node {
-    [string]$Name = 'node'
+    [string]$Title = 'node'
     [List[Object]]$Children = @()
 }
 
 $tree = @(
     [Node]@{
-        Name = 'Root'
+        Title = 'Root'
         Children = @(
             [Node]@{
-                Name = 'style'
+                Title = 'style'
                 Children = [Node]@{
-                    Name = 'SomeFont'
+                    Title = 'SomeFont'
                 }
             }
             [Node]@{
-                Name = 'body'
+                Title = 'body'
                 Children = @(
                     [Node]@{
-                        Name = 'flex-item'
+                        Title = 'flex-item'
                     }
                 )
             }
         )
     }
 )
+
+# json used
+$tree | json -Depth 99 -Compress
 
 $tree | Show-ObjectTree
