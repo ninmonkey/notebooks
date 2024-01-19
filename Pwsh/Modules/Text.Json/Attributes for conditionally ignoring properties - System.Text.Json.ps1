@@ -33,9 +33,9 @@ As a base case, automatically serialize all properties (if able to)
 '@
 
 class Forecast {
-    [datetime]$Date
-    [int]$Degrees
-    [string]$Summary
+    [datetime] $Date
+    [int] $Degrees
+    [string] $Summary
 }
 
 [Forecast]$CastObj = @{
@@ -74,16 +74,20 @@ class SimpleProcess {
 
     [Datetime]$When
 
-    # a property that normally errors out:
+    # a property that normally errors out (with default serialization)
     [System.Text.Json.Serialization.JsonIgnoreAttribute()]
     [Diagnostics.ProcessModuleCollection]$Modules
-    # $Modules = 0..10
+
+    # and a property to only ignore when null
+    [object]$MaybeData
 
     SimpleProcess ( ) {
-        $This.When =  Get-Date
+        $This.When      = Get-Date
+        $this.MaybeData = $Null
     }
     SimpleProcess ( [object]$Other ) {
         $this.When        = Get-Date
+        $this.MaybeData   = $Null
         $This.CommandLine = ($Other)?.CommandLine ?? ''
         $This.Modules     = ($Other)?.Modules
         # $this.Modules     =  ($Other)?.Modules
@@ -92,6 +96,8 @@ class SimpleProcess {
     }
 }
 
+[SimpleProcess]@(ps | s -first 1 )
+return
 [List[Object]]$Records = @(
     # class coerce from an object
     [SimpleProcess](get-process pwsh | s -First 1)
