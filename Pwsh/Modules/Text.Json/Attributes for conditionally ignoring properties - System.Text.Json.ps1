@@ -60,19 +60,19 @@ Tons of properties will throw. I'm using '.modules' for the example
 
 This class defines a couple of properties that will auto-assign by name
 if you keep a parameter-less c-tor.
-'@
+'@ | Out-Null
 
+# [Text.Json.Serialization.JsonIgnoreCondition]
+# [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+# [Serialization.JsonIgnoreCondition([Serialization.JsonIgnoreCondition]::Always )]
+# [Serialization.JsonIgnoreAttribute]
+# [Serialization.JsonIgnore(Condition = 'always')]$Modules
 
 class SimpleProcess {
     [string]$Name
     [string]$CommandLine
 
     [Datetime]$When
-    # [Text.Json.Serialization.JsonIgnoreCondition]
-    # [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    # [Serialization.JsonIgnoreCondition([Serialization.JsonIgnoreCondition]::Always )]
-    # [Serialization.JsonIgnoreAttribute]
-    # [Serialization.JsonIgnore(Condition = 'always')]$Modules
 
     # a property that normally errors out:
     [System.Text.Json.Serialization.JsonIgnoreAttribute()]
@@ -131,7 +131,7 @@ Line |
      | Exception calling "Serialize" with "2" argument(s): "Serialization and deserialization
      | of 'System.IntPtr' instances is not supported. Path: $.Modules.BaseAddress."
 #>
-'@
+'@ | Out-Null
 
 # string jsonString = JsonSerializer.Serialize<WeatherForecast>(weatherForecast);
 
