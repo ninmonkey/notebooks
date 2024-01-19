@@ -2,8 +2,15 @@
 using namespace System.IO
 using namespace System.Collections.Generic
 
-goto $PSScriptRoot
-return
+
+<#
+
+Is this an example of what you *should* do? No.
+Is this overly complex for no reason? Yes.
+At least the Linq part
+
+#>
+
 class TinyProc {
     [string]$Name
     [datetime]$When
@@ -12,37 +19,34 @@ class TinyProc {
         $this.When = Get-date
     }
     TinyProc ( [object]$Other ) {
-        [Linq.Enumerable]::Intersect( $This.PSobject.Properties.Name, $Other.PSObject.Properties.Name )
-        $selected = [Linq.Enumerable]::Intersect( $This.PSobject.Properties.Name, $Other.PSObject.Properties.Name )
+        $WantedProps = [Linq.Enumerable]::Intersect(
+            [string[]]$This.PSObject.Properties.Name,
+            [string[]]$Other.PSObject.Properties.Name )
 
-        [List[Object]]$Props = $this.PSObject.Properties.Name
-        [string[]]$intersect = $Other.PSObject.Properties.Name -in $Props
-        $intersect -join ', ' | write-host -fore 'red'
+        $This.When = Get-Date
 
-
-        $this.Psobject.Properties | json | write-host -fg 'orange'
-        @( $Other )[0].psobject.properties.Name
+        foreach($PropName in $WantedProps) {
+            $This.$PropName = $Other.$PropName
+        }
     }
 }
 
+$Ps = get-process pwsh | Select -first 1
+$testCoerce = [TinyProc]$Ps
 
-[Linq.Enumerable]::Intersect(
-    <# first: #> $first,
-    <# second: #> $second)
+$records = @(
+    [TinyProc]@{}
+    [TinyProc]::new()
+    [TinyProc]$Ps
+)
+$records
 
-$comparer = [Func[object,bool]]{}
-[Linq.Enumerable]::Intersect(
-    <# first: #> $files1,
-    <# second: #> $files2,
-    <# comparer: #> $comparer)
+<#
+variations you could also use:
+#>
 
+@( get-process) -as [TinyProc[]]
+    | Out-Null
 
-return
-$ps = Get-Process pwsh | Select -first 1
-
-return
-try { [TinyProc]$Ps } catch { '😿' }
-
-[TinyProc]@{}
-[TinyProc]::new()
-[TinyProc]$Ps
+[TinyProc[]]@(get-process)
+    | Out-Null
