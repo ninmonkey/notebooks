@@ -12,16 +12,16 @@ At least the Linq part
 #>
 
 class TinyProc {
-    [string]$Name
-    [datetime]$When
+    [string]   $Name
+    [datetime] $When
 
     TinyProc () {
         $this.When = Get-date
     }
     TinyProc ( [object]$Other ) {
         $WantedProps = [Linq.Enumerable]::Intersect(
-            [string[]]$This.PSObject.Properties.Name,
-            [string[]]$Other.PSObject.Properties.Name )
+            [string[]] $This.PSObject.Properties.Name,
+            [string[]] $Other.PSObject.Properties.Name )
 
         $This.When = Get-Date
 
@@ -35,9 +35,9 @@ $Ps = get-process pwsh | Select -first 1
 $testCoerce = [TinyProc]$Ps
 
 $records = @(
-    [TinyProc]@{}
+    [TinyProc] @{}
     [TinyProc]::new()
-    [TinyProc]$Ps
+    [TinyProc] $Ps
 )
 $records
 
@@ -48,5 +48,5 @@ variations you could also use:
 @( get-process) -as [TinyProc[]]
     | Out-Null
 
-[TinyProc[]]@(get-process)
+[TinyProc[]] @(get-process)
     | Out-Null

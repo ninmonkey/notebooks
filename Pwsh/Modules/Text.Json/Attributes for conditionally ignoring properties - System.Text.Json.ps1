@@ -1,5 +1,6 @@
-﻿using namespace System.Text.Json
-using namespace System.Collections.Generic
+﻿using namespace System.Collections.Generic
+using namespace System.Text
+using namespace System.Text.Json
 using namespace System.Text.Json.Serialization
 $assembly = Add-type -AssemblyName System.Text.Json -PassThru -ea 'stop'
 goto $PSScriptRoot
@@ -75,10 +76,16 @@ class SimpleProcess {
     [Datetime]$When
 
     # a property that normally errors out (with default serialization)
-    [System.Text.Json.Serialization.JsonIgnoreAttribute()]
+    # or: [System.Text.Json.Serialization.JsonIgnoreAttribute()]
+    [Serialization.JsonIgnoreAttribute()]
     [Diagnostics.ProcessModuleCollection]$Modules
 
     # and a property to only ignore when null
+
+    # [Serialization.JsonIgnoreCondition(
+    #    'always'
+    # )]
+    [JsonIgnoreAttribute( Condition = [JsonIgnoreCondition]::WhenWritingNull) ]
     [object]$MaybeData
 
     SimpleProcess ( ) {
@@ -96,21 +103,28 @@ class SimpleProcess {
     }
 }
 
-[SimpleProcess]@(ps | s -first 1 )
+$pslist = [SimpleProcess[]] @( ps  | s -first 2)
+$psList[0].MaybeData = @{ Name = 'Jen' ; Species = 'cat' }
+
+h1 'should only serialize .MaybeData for one result'
+AutoJson $pslist| jq
 return
-[List[Object]]$Records = @(
+
+[SimpleProcess] @(ps | s -first 1 )
+# return
+[List[Object]] $Records = @(
     # class coerce from an object
-    [SimpleProcess](get-process pwsh | s -First 1)
+    [SimpleProcess] (get-process pwsh | s -First 1)
 
     # explicit ctor
     [SimpleProcess]::new()
 
     # automatic if parameterless c-tor:
-    [SimpleProcess]@{}
+    [SimpleProcess] @{}
 
     # a similar variation
     $One = Get-Process 'pwsh' | Select -first 1
-    [SimpleProcess]$One
+    [SimpleProcess] $One
 )
 
 $records | ft -auto
@@ -119,10 +133,7 @@ $records | ft -auto
 AutoJson $Records
 @'
 [{"Name":null,"CommandLine":"pwsh.exe -nol","When":"2024-01-19T15:13:20.8026851-06:00"},{"Name":null,"CommandLine":null,"When":"2024-01-19T15:13:21.0254829-06:00"},{"Name":null,"CommandLine":"","When":"2024-01-19T15:13:21.0266413-06:00"},{"Name":null,"CommandLine":"pwsh.exe -nol","When":"2024-01-19T15:13:21.0397003-06:00"}]
-'@
 
-
-@'
 If you didn't ignore that property, you'd get an error
 
 Error will occur if 'modules' isn't excluded
