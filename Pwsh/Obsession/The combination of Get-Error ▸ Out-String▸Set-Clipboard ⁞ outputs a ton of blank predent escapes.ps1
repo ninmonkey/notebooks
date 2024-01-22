@@ -39,8 +39,7 @@ $outStr_lines | Set-Clipboard
 [string[]]$roundTClippy_lines = Get-Clipboard
 
 
-(($serr | Get-Error | out-string) -split '\r?\n').where({$_}, 'first', 6) | Join-String -sep (Hrr) -p { $_ | fcc }
-| ShowEmojiRepeats
+(($serr | Get-Error | out-string) -split '\r?\n').where({$_}, 'first', 6) | Join-String -sep (Hrr) -p { $_ | HShowEscape } | ShowEmojiRepeats
 
 
 $outStr_lines| HShowEscape
@@ -57,13 +56,4 @@ $outStr_lines| HShowEscape
 
 (($serr | Get-Error | out-string) -split '\r?\n').where({$_}, 'first', 6) | Join-String -sep (Hrr) -p { $_ | HShowEscape } | ShowEmojiRepeats
 
-
-return
-
- 'ssdf'.EnumerateRunes().value | Join-string -f '{x}' -sep ' '
-(($serr | Get-Error | out-string) -split '\r?\n').where({$_}, 'first', 6) | Join-String -sep (Hrr) -p { $_ | fcc }
-
-
-return
-
-(($serr | Get-Error | out-string) -split '\r?\n').where({$_}, 'first', 6) | Join-String -sep (Hrr) -p { $_ | fcc }
+# (($serr | Get-Error | out-string) -split '\r?\n').where({$_}, 'first', 6) | Join-String -sep (Hr 1) -p { $_ | fcc }
