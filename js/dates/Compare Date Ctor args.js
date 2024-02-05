@@ -1,18 +1,48 @@
 // file:///H:\data\2023\pwsh\notebooks\js\dates\Compare%20Date%20Ctor%20args.js
 // about: comparing Date() Ctors, showing unexpected values
 // some of the code is weird, because it's meant for an interactive "Qoukka.js" notebook
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
+/*
+
+JavaScript specification only specifies one format to be universally supported: the date time string format, a simplification of the ISO 8601 calendar date extended format. The format is as follows:
+
+YYYY-MM-DDTHH:mm:ss.sssZ
+
+
+*/
 
 // test 1: as integers
 const now = new Date()
 let d0 = new Date(2020, 1, 1) // feb  1 2020
 let _ = d0;
-d0;
-d0 = new Date(2020, 0, 1) // jan  1 2020
-d0;
-d0 = new Date(2020, 0, 0) // dec 31 2019
-d0;
-d0 = new Date(2020, 1, 0) // jan 31 2020
-d0;
+
+_ = now.toDateString()
+_
+_ = now.toISOString()
+_
+_ = now.toJSON()
+_
+_ = now.toLocaleDateString()
+_
+_ = now.toLocaleString()
+_
+_ = now.toLocaleTimeString()
+_
+_ = now.toString()
+_
+_ = now.toTimeString()
+_
+_ = now.toUTCString()
+_
+
+
+_
+_ = now.toString()
+_
+_ = now.toString()
+_
+
 
 let cultName = 'en-us'
 let cult = new Intl.DateTimeFormat( cultName )
