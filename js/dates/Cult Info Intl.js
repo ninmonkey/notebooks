@@ -5,6 +5,20 @@
 let cultInfo = Intl.DateTimeFormat('en-US')
 let _ = cultInfo
 
+const inventory = [
+  { name: "asparagus", type: "vegetables", quantity: 5 },
+  { name: "bananas", type: "fruit", quantity: 0 },
+  { name: "goat", type: "meat", quantity: 23 },
+  { name: "cherries", type: "fruit", quantity: 5 },
+  { name: "fish", type: "meat", quantity: 22 },
+];
+
+
+const result = Object.groupBy(inventory, ({ type }) => type);
+_ = result;
+_
+_ = result.meat
+_
 
 // test 1: as integers
 const now = new Date();
@@ -67,6 +81,14 @@ _
 _ = ObjectFromParts( parts )
 _;
 
+cultInfo;
+let asParts = cultInfo.formatToParts( now )
+asParts;
+
+_  = ObjectFromParts( asParts )
+_
+
+
 const arr = [{
   key: "11",
   value: "1100"
@@ -96,3 +118,23 @@ arr;
 // }
 hash = {}
 
+
+function Object_FromIntlParts() {
+    const cultInfo = Intl.DateTimeFormat('en-US')
+    const now = new Date()
+    const parts = cultInfo.formatToParts( now )
+
+    function ObjectFromParts ( objectList ) {
+        return Array.from( objectList ).reduce( (accum, part) => {
+            return {
+                ...accum,
+                [part.type]: part.value
+            }
+        }, {})
+    }
+
+    return ObjectFromParts( parts )
+}
+// { month: '2', literal: '/', day: '5', year: '2024' }
+_ = Object_FromIntlParts()
+_
