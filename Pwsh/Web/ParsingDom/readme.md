@@ -1,11 +1,11 @@
 - [GetBingWallpaperImages.ps1](./GetBingWallpaperImages.ps1)
 
-## How to use
+## Examples
 
 ```ps1
-> GetWallpaperUrl 'https://bing.gifposter.com/archive/202401.html'
+GetWallpaperUrl 'https://bing.gifposter.com/archive/202401.html'
 
-> GetWallpaperImage 'https://bing.gifposter.com/wallpaper-2753-SleepingFox.html'
+GetWallpaperImage 'https://bing.gifposter.com/wallpaper-2753-SleepingFox.html'
 ```
 Chain them
 ```ps1
