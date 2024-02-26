@@ -1,4 +1,5 @@
-﻿$src = @'
+﻿# About:  tab expansion version
+$src = @'
 Import-Module DbaTools -passthru
 $splatExport = @{
     # comment
