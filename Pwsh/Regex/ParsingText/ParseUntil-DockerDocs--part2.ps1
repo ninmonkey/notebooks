@@ -53,3 +53,18 @@ $render = $selected.ForEach({
     }
 })
 $render #| CountOf
+
+<#
+outputs:
+
+SubCommand Description
+---------- -----------
+attach     Attach local standard input, output, and error streams to a running container
+commit     Create a new image from a container's changes
+cp         Copy files/folders between a container and the local filesystem
+create     Create a new container
+diff       Inspect changes to files or directories on a container's filesystem
+events     Get real time events from the server
+export     Export a container's filesystem as a tar archi
+           ....
+#>
