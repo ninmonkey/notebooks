@@ -33,6 +33,38 @@ function Test.IncrementCurrent {
     $state = $script:DbgInfo
     $state.CurNum++
 }
+
+Function mergeHash {
+    <#
+    .description
+        Copy and append BaseHash with new values from UpdateHash
+    #>
+    [cmdletbinding()]
+    [outputType('System.Collections.Hashtable')]
+    param(
+        # base hashtable
+        [AllowNull()]
+        [Parameter(Mandatory)][hashtable] $BaseHash = @{},
+
+        # New values to append and/or overwrite
+        [AllowNull()]
+        [Parameter(Mandatory)][hashtable] $OtherHash = @{},
+        # normal is to not modify left, return a new hashtable
+        [Parameter()][switch]$MutateBase
+    )
+    $compareType = [StringComparer]::FromComparison('CurrentCultureIgnoreCase')
+    if (! $MutateBase) {
+        $TargetHash = [hashtable]::new( $BaseHash, $newCompareType )
+    } else {
+        Write-Debug 'Mutate enabled'
+        $TargetHash = $BaseHash
+    }
+    $OtherHash.GetEnumerator() | ForEach-Object {
+        $TargetHash[ $_.Key ] = $_.Value
+    }
+    return $TargetHash
+}
+
 Test.ResetState
 function Test.Work {
     param( $SleepSecs = 0.3 )
@@ -46,7 +78,7 @@ function DoProg {
         $SecsDuration = 0.1, [hashtable]$Options = @{}
     )
     begin {
-        $Config = nin.MergeHash -OtherHash $Options -BaseHash @{
+        $Config = MergeHash -OtherHash $Options -BaseHash @{
             ActivityId                = 9099
             CompleteBeforeEnd         = $false
             IncrementMax              = 7
