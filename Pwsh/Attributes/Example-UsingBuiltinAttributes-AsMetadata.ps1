@@ -41,17 +41,18 @@ function dbg.ShowError {
     hr
     h1 'manual'
 
-    $global:error | %{ $_.Exception.ToString() }
+    $global:error | %{ ($_.Exception)?.ToString() }
          | Join-String -sep (hr 1)
+    h1 'rest'
     hr 1
-    $global:error | %{ $_.Exception.ToString() }
+    $global:error | %{ ($_.Exception)?.ToString() }
         | Dotils.Write-DimText
         | Join-String -sep (hr 1)
 
 
 }
 
-$global:error.clear()
+# $global:error.clear()
 gcm 'label' | InspectOther
 'label'  | InspectOther
 'bad-command' | InspectOther
