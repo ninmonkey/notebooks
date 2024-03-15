@@ -11,9 +11,11 @@ $tree = @(
         Children = @(
             [Node]@{
                 Title = 'style'
-                Children = [Node]@{
-                    Title = 'SomeFont'
-                }
+                Children = @(
+                    [Node]@{
+                        Title = 'SomeFont'
+                    }
+                )
             }
             [Node]@{
                 Title = 'body'

@@ -36,16 +36,26 @@ class SimpleProcess {
     [Serialization.JsonIgnoreAttribute()]
     [Diagnostics.ProcessModuleCollection] $Modules
 
+    # some property that can be blank
+    [string]$MainWindowTitle
+
     SimpleProcess ( ) {
     }
     SimpleProcess ( [object]$Other ) {
         $This.Name        = ($Other)?.Name ?? ''
         $This.CommandLine = ($Other)?.CommandLine ?? ''
+        $this.MainWindowTitle = ($Other)?.MainWindowTitle ?? ''
         $This.Modules     = ($Other)?.Modules
     }
 }
 
-$pslist = [SimpleProcess[]] @( Get-Process  | Select-First -first 3)
+$pslist = [SimpleProcess[]] @(
+    Get-Process
+        | Select-First -first 3
+    Get-Process
+        | ?{ $_.MainWindowTitle.length -gt 0 }
+        | select -first 1
+)
 h1 'should only serialize .MaybeData for one result'
 AutoJson $pslist| jq
 

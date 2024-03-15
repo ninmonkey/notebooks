@@ -8,7 +8,6 @@ filter presets to drop keys
 - [ ] drop whitespace keys/props
 '@
 
-
 function pk.Assert.Truthy {
     [Alias(
         'pk.Test.Truthy',
@@ -36,12 +35,11 @@ function pk.Assert.Truthy {
         $AsBool = $True
     }
 
-
     $isTruthy = [bool]$InputObject
     $IsNotTruthy = -not [bool]$InputObject
 
     if($AsBool) {
-        if( $IsNot ) { return -not $IsTruthy }
+        if( $IsNot ) { return -not $isTruthy }
         else { return $isTruthy}
     }
     if( -not $isTruthy ) {
@@ -50,6 +48,7 @@ function pk.Assert.Truthy {
         <# message: #> 'Was not truthy')
     }
 }
+
 
 function pk.Assert.IsTypeInfo {
     param(

@@ -24,7 +24,6 @@ class TinyProc {
             [string[]] $Other.PSObject.Properties.Name )
 
         $This.When = Get-Date
-
         foreach($PropName in $WantedProps) {
             $This.$PropName = $Other.$PropName
         }
@@ -50,3 +49,6 @@ variations you could also use:
 
 [TinyProc[]] @(get-process)
     | Out-Null
+
+$obj  = [TinyProc[]] @(get-process)
+[JsonSerializer]::Serialize( <# value: #> $Obj, $Obj.GetType() )

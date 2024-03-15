@@ -1,0 +1,14 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "name": "Sketches",
+            "path": "../../../../../../2024/pwsh/sketch/2024-01-18-WeatherSerializeJson"
+        }
+    ],
+    "settings": {
+        "powershell.cwd": "Text.Json"
+    }
+}

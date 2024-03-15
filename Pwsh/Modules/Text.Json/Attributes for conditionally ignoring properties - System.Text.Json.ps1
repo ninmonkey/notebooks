@@ -40,7 +40,7 @@ class Forecast {
 }
 
 [Forecast]$CastObj = @{
-   Degrees = 134
+   Degrees = 134    
    Date    = Get-Date
    Summary = 'sunny'
 }
