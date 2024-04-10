@@ -13,21 +13,20 @@ function Goto-ItemLocation {
     # [CmdletBinding()]
     [Alias('mg', 'miniGoto')]
     param(
-        [ValidateNotNullOrEmpty()]
-        [Alias('Path', 'InObj', 'Obj')]
-        [Parameter( Position = 0, ParameterSetName = 'FromObject', ValueFromPipeline)]
-        # [Parameter( ParameterSetName = 'FromObject', position = 0)]
-        # [Parameter( ParameterSetName = 'FromObject', Position = 0 )]
-        [object] $InputObject,
-
         # catch properties named Path, PsPath, etc
-        [ValidateNotNullOrEmpty()]
-        [Alias('FullName', 'PSPath', 'InStr', 'Str')]
+        [ValidateNotNull()]
+        [Alias('FullName', 'PSPath', 'Path', 'InStr', 'Str')]
         # [Parameter( ParameterSetName = 'FromString', ValueFromPipelineByPropertyName, ValueFromRemainingArguments)]
         # [Parameter( Position = 0, ParameterSetName = 'FromString' )]
         [Parameter( Position = 0, ParameterSetName = 'FromString', ValueFromPipelineByPropertyName)]
-        # [Parameter( ParameterSetName = 'FromString', Position = 0 )]
-        [string] $LiteralPath
+        [string] $LiteralPath,
+
+        [ValidateNotNull()]
+        [Alias('InObj', 'Obj')]
+        # [Parameter( ParameterSetName = 'FromObject', Position = 0 )]
+        [Parameter( Position = 0, ParameterSetName = 'FromObject', ValueFromPipeline)]
+        [object] $InputObject
+
 
         # files, items, maybe even functions
     )
@@ -70,18 +69,22 @@ function Goto-ItemLocation {
             PushLoc $Item
             return
         }
+        $Target.GetType() | Join-String -op 'Was a: ' |  write-host -fg 'blue'
+
+        wait-debugger
         'Unhandled Type: "{0}", value: {1}' -f @(
             $Target.GetType()
             $Target
         ) | write-error
 
-        $Target.GetType() | Join-String -op 'Was a: ' |  write-host -fg 'blue'
     }
 }
 # test a few variations, verbose output
 $PSDefaultParameterValues['Goto-ItemLocation:Verbose'] = $true
 $PSDefaultParameterValues['Goto-ItemLocation:Debug'] = $true
 mg (gi . )
+
+return
 
 mg $PSScriptRoot
 mg $PSCommandPath
