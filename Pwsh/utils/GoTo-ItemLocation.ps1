@@ -1,5 +1,6 @@
 ﻿import-module pansies
 set-location $PSScriptRoot
+$error.Clear()
 
 function Goto-ItemLocation {
     <#
@@ -8,15 +9,27 @@ function Goto-ItemLocation {
     .EXAMPLE
         see the bottom of this file for tests
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'FromString')]
+    # [CmdletBinding()]
     [Alias('mg', 'miniGoto')]
     param(
-        # files, items, maybe even functions
         [ValidateNotNullOrEmpty()]
-        [Alias('FullName', 'PSPath', 'Path', 'InObj', 'Obj')]
-        [Parameter( ValueFromPipeline, ValueFromPipelineByPropertyName)]
-        [object]
-        $InputObject
+        [Alias('Path', 'InObj', 'Obj')]
+        [Parameter( Position = 0, ParameterSetName = 'FromObject', ValueFromPipeline)]
+        # [Parameter( ParameterSetName = 'FromObject', position = 0)]
+        # [Parameter( ParameterSetName = 'FromObject', Position = 0 )]
+        [object] $InputObject,
+
+        # catch properties named Path, PsPath, etc
+        [ValidateNotNullOrEmpty()]
+        [Alias('FullName', 'PSPath', 'InStr', 'Str')]
+        # [Parameter( ParameterSetName = 'FromString', ValueFromPipelineByPropertyName, ValueFromRemainingArguments)]
+        # [Parameter( Position = 0, ParameterSetName = 'FromString' )]
+        [Parameter( Position = 0, ParameterSetName = 'FromString', ValueFromPipelineByPropertyName)]
+        # [Parameter( ParameterSetName = 'FromString', Position = 0 )]
+        [string] $LiteralPath
+
+        # files, items, maybe even functions
     )
     begin {
         function PushLoc {
@@ -35,11 +48,17 @@ function Goto-ItemLocation {
         }
     }
     process {
-        if($null -eq $InputObject) {
+        if( -not $PSBoundParameters.ContainsKey('LiteralPath') -and
+            -not $PSBoundParameters.ContainsKey('InputObject') ) {
+            throw 'Mandatory InputObject or Path is missing'
+        }
+        if($null -eq $InputObject -and $Null -eq $LiteralPath ) {
             throw 'ShouldNeverReach: InputObject is null '
         }
-        $InputObject.GetType().Name | Join-string -op ' => Proc: ' | Write-Debug
-        if( $Item = Get-Item $InputObject -ea 'ignore' ) {
+        $Target = [string]::IsNullOrEmpty( $LiteralPath ) ? $InputObject : $LiteralPath
+
+        $Target.GetType().Name | Join-string -op ' => Proc: ' | Write-Debug
+        if( $Item = Get-Item $Target -ea 'ignore' ) {
             $Item
                 | Join-String -op '  Is: Item, Value: ' -sep ' ::: '
                 | Write-verbose
@@ -52,18 +71,18 @@ function Goto-ItemLocation {
             return
         }
         'Unhandled Type: "{0}", value: {1}' -f @(
-            $InputObject.GetType()
-            $InputObject
+            $Target.GetType()
+            $Target
         ) | write-error
 
-        $InputObject.GetType() | Join-String -op 'Was a: ' |  write-host -fg 'blue'
+        $Target.GetType() | Join-String -op 'Was a: ' |  write-host -fg 'blue'
     }
 }
 # test a few variations, verbose output
 $PSDefaultParameterValues['Goto-ItemLocation:Verbose'] = $true
 $PSDefaultParameterValues['Goto-ItemLocation:Debug'] = $true
 mg (gi . )
-mg .
+
 mg $PSScriptRoot
 mg $PSCommandPath
 mg ..
@@ -71,9 +90,12 @@ gi .. | mg
 '.' | mg
 '..' | mg
 
+
 # not yet working:
 # the property Path isn't being passed as a name, it's the full object
 (Get-process pwsh | select -First 1) | mg -ea 'break'
+
+pushd $PSScriptRoot
 
 $PSDefaultParameterValues['Goto-ItemLocation:Verbose'] = $false
 $PSDefaultParameterValues['Goto-ItemLocation:Debug'] = $false
