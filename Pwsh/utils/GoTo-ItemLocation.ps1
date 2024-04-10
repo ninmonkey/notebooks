@@ -9,22 +9,25 @@ function Goto-ItemLocation {
     .EXAMPLE
         see the bottom of this file for tests
     #>
-    [CmdletBinding(DefaultParameterSetName = 'FromString')]
-    # [CmdletBinding()]
+    # [CmdletBinding(DefaultParameterSetName = 'FromString')]
+    [CmdletBinding()]
     [Alias('mg', 'miniGoto')]
     param(
+        # [Parameter( ParameterSetName = 'FromString', ValueFromPipelineByPropertyName, ValueFromRemainingArguments)]
+        # [Parameter( Position = 0, ParameterSetName = 'FromString' )]
+
+
+
         # catch properties named Path, PsPath, etc
         [ValidateNotNull()]
         [Alias('FullName', 'PSPath', 'Path', 'InStr', 'Str')]
-        # [Parameter( ParameterSetName = 'FromString', ValueFromPipelineByPropertyName, ValueFromRemainingArguments)]
-        # [Parameter( Position = 0, ParameterSetName = 'FromString' )]
-        [Parameter( Position = 0, ParameterSetName = 'FromString', ValueFromPipelineByPropertyName)]
-        [string] $LiteralPath,
+        # [Parameter( Position = 0, ParameterSetName = 'FromString', ValueFromPipelineByPropertyName)]
+        [Parameter( Position = 0, ValueFromPipelineByPropertyName)]
+        [object] $LiteralPath,
 
         [ValidateNotNull()]
         [Alias('InObj', 'Obj')]
-        # [Parameter( ParameterSetName = 'FromObject', Position = 0 )]
-        [Parameter( Position = 0, ParameterSetName = 'FromObject', ValueFromPipeline)]
+        [Parameter( Position = 0, ValueFromPipeline)]
         [object] $InputObject
 
 
@@ -47,16 +50,41 @@ function Goto-ItemLocation {
         }
     }
     process {
+        $StrNull = "`u{2400}"
+
+
         if( -not $PSBoundParameters.ContainsKey('LiteralPath') -and
             -not $PSBoundParameters.ContainsKey('InputObject') ) {
             throw 'Mandatory InputObject or Path is missing'
         }
+
+        $LiteralPath | Join-string -op '  LitPath: ' | write-host -fg 'orange'
+        $InputObject | Join-string -op '  InObjec: ' | write-host -fg 'orange'
         if($null -eq $InputObject -and $Null -eq $LiteralPath ) {
-            throw 'ShouldNeverReach: InputObject is null '
+            # throw 'ShouldNeverReach: InputObject is null '
+            # 'moved below to show debug message'
         }
         $Target = [string]::IsNullOrEmpty( $LiteralPath ) ? $InputObject : $LiteralPath
 
         $Target.GetType().Name | Join-string -op ' => Proc: ' | Write-Debug
+
+        "`n`n ## Iter ## `n`n" | write-host -fg 'magenta'
+        [ordered]@{
+            BoundParam_LiteralPath = $PSBoundParameters.ContainsKey('LiteralPath')
+            BoundParam_InputObject = $PSBoundParameters.ContainsKey('InputObject')
+            ParamSet = $PSCmdlet.ParameterSetName
+            LitPath_Type = ($LiteralPath)?.GetType().Name ?? $StrNull
+            LitPath = $LiteralPath ?? $StrNull
+            InObj_Type = ($InputObject)?.GetType().Name ?? $StrNull
+            InObj = $InputObject ?? $StrNull
+            Item = (Get-Item $Target -ea ignore) ?? $StrNull
+        } | ft -auto | out-string | write-host -fg 'blue'
+
+         if($null -eq $InputObject -and $Null -eq $LiteralPath ) {
+            throw 'ShouldNeverReach: InputObject is null '
+        }
+
+
         if( $Item = Get-Item $Target -ea 'ignore' ) {
             $Item
                 | Join-String -op '  Is: Item, Value: ' -sep ' ::: '
@@ -84,6 +112,12 @@ $PSDefaultParameterValues['Goto-ItemLocation:Verbose'] = $true
 $PSDefaultParameterValues['Goto-ItemLocation:Debug'] = $true
 mg (gi . )
 
+$SomeObj = [pscustomobject]@{
+    Path = gi 'g:\'
+    PSPath = gi 'c:\'
+    InStr = 'h:\'
+}
+$SomeObj | mg -verbose -debug
 return
 
 mg $PSScriptRoot
