@@ -40,15 +40,29 @@ $info = [ordered]@{
     'b' * 240 -join '' ) )
 
 ( Test-Path $scaryPathFolder ) ? '' : ( mkdir $scaryPathFolder )
+( $scaryLog = Join-String -f '{0}\SomeFile.log' -in $scaryPathFolder )#
+Get-Date | Set-Content -path $scaryLog
 
-$info.ScaryPath = $ScaryPathFolder
-$info.ScaryPath_Length = $ScaryPathFolder.length
+$info.ScaryPath            = $ScaryPathFolder
+$info.ScaryPath_Length     = $ScaryPathFolder.length
 $info.ScaryPath_SegLengths = $scaryPathFolder -split '\\'
     | Join-String -p { $_.Length } -sep ', '
 
+$info.ScaryLog            = $scaryLog
+$info.ScaryLog_NameLength = (gi $scaryLog).FullName.Length
+$Info.ScaryLog_FileSize   = ( gi $ScaryLog ).Length
+# $Info | Add-Member -force -pass -ea 'ignore' -NotePropertyMembers @{
+#     ScaryPath = $ScaryPathFolder
+#     ScaryPath_Length = $ScaryPathFolder.length
+#     ScaryPath_SegLengths = $scaryPathFolder -split '\\'
+#         | Join-String -p { $_.Length } -sep ', '
+# }
 $Info
+
+(pwd) -split '\\' | Join-String -op 'SegmentLengths for Pwd: ' -sep ', ' { $_.Length }
+
 @'
-notes:
+extra notes:
 Here's a couple of details on MAX_PATH I hadn't ran across
 There's a few causes how `LongPathsEnabled` is ignored
 
