@@ -62,6 +62,26 @@ $Info
 (pwd) -split '\\' | Join-String -op 'SegmentLengths for Pwd: ' -sep ', ' { $_.Length }
 
 @'
+now can I open explorer? yes with the old names
+
+I right clicked on the folder in `everything`, to convert the path from $ScaryPath
+which outputs:
+    'G:\temp\LONGPA~1\stuff\AAAAAA~1'
+
+
+
+'@
+# My first test opens the root, because it doesn't like the path
+# explorer $ScaryPath
+
+# but this works!
+explorer 'G:\temp\LONGPA~1\stuff\AAAAAA~1'
+# ie: start -path explorer -Args 'G:\temp\LONGPA~1\stuff\AAAAAA~1'
+
+# but this works
+[Environment]::CurrentDirectory = 'G:\temp\LONGPA~1\stuff\AAAAAA~1'
+
+@'
 extra notes:
 Here's a couple of details on MAX_PATH I hadn't ran across
 There's a few causes how `LongPathsEnabled` is ignored
