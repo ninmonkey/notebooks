@@ -14,7 +14,7 @@ pushd 'g:\temp\longpathTest'
 $baseDir  = Join-Path 'g:\temp\longpathTest' $Long1
 $baseDir2 = Join-Path 'g:\temp\longpathTest' $Long2
 ( Test-Path $BaseDir ) ? '' : ( mkdir $baseDir )
-( Test-Path $BaseDir2 ) ? '' : ( mkdir $baseDir2 )
+# ( Test-Path $BaseDir2 ) ? '' : ( mkdir $baseDir2 )
 #$newPath = ( $where = Join-String -f '{0}\SomeFile.log' -in  (Join-Path (gi .) $Long1 ))
 #(Test-Path $NewPath) ? ( mkdir -Path $where
 #GEt-date | Set-content -Path $newPath -PassThru
@@ -23,7 +23,7 @@ $nextPath2 = Join-String -f '{0}\SomeFile.log' -in  (Join-Path (gi .) $Long2 )
 
 # try writing to it
 Get-Date | Set-content -path $nextPath -PassThru
-Get-Date | Set-content -path $nextPath2 -PassThru
+# Get-Date | Set-content -path $nextPath2 -PassThru
 
 $info = [ordered]@{
     BaseDir               = $BaseDir
@@ -33,16 +33,18 @@ $info = [ordered]@{
     NextPath2             = $NextPath2
     NextPath2_Length      = $NextPath2.Length
 }
-$info.NextPath_Filesize = (gi $NextPath2).Length
+# $info.NextPath_Filesize = (gi $NextPath2).Length
 
 ( $scaryPathFolder = Join-Path 'G:\temp\longpathTest\' -ChildPath 'stuff' @(
     'a' * 240 -join ''
     'b' * 240 -join '' ) )
 
+( Test-Path $scaryPathFolder ) ? '' : ( mkdir $scaryPathFolder )
+
 $info.ScaryPath = $ScaryPathFolder
 $info.ScaryPath_Length = $ScaryPathFolder.length
 $info.ScaryPath_SegLengths = $scaryPathFolder -split '\\'
-
+    | Join-String -p { $_.Length } -sep ', '
 
 $Info
 @'
