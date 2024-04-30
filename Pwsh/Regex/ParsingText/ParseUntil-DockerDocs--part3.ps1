@@ -28,6 +28,12 @@ function Text.IsEmpty {
     [string]::IsNullOrEmpty( $TextContent)
 }
 function Text.Where-IsNotEmpty {
+    <#
+    .example
+        Pwsh> Set-Alias -Name 'Pk!Empty' -value 'Picky\Picky.Text.Where-IsNotEmpty'
+        Pwsh> 'a', $null, ' ' | Pk!Empty # | Json -Compress
+        # outputs: ["a"," "]
+    #>
     [Alias(
         '?IsNot-Blank'
     )]
@@ -56,7 +62,10 @@ function Text.SkipBeforeMatch {
         [string]$BeforePattern,
 
         [Parameter(ValueFromPipeline)]
-        [string[]]$TextContent
+        [string[]]$TextContent,
+
+        # default setting ignores the line that matched. this includes it.
+        [switch]$IncludeMatch
     )
     begin {
         $ShouldSkip = $true
@@ -65,6 +74,7 @@ function Text.SkipBeforeMatch {
         foreach($Line in $TextContent) {
             if($Line -match $BeforePattern) {
                 $ShouldSkip = $false
+                if($IncludeMatch){ $Line }
                 continue
             }
             if( -not $SHouldSkip) { $Line }
@@ -72,6 +82,43 @@ function Text.SkipBeforeMatch {
     }
     end {}
 }
+# function Text.TakeLineCount {
+#     <#
+#     .SYNOPSIS
+#         ignores all text until you reach the first match, output remaining rows
+#         wait until a flag, ignoring output before ti
+#     .NOTES
+#         - future: Pass StringBuilder around?
+#         - future: Offset so you say say -2, or +3 index relative the match
+#     #>
+#     [Alias('Text.TakeLines', 'Text.TakeFirstN', 'Text.TakeFirst')]
+#     [CmdletBinding()]
+#     param(
+
+#         # filtering regex
+#         [Parameter(Mandatory, Position=0)]
+#         [string]$TakeCount,
+
+#         [Parameter(ValueFromPipeline)]
+#         [string[]]$TextContent
+#     )
+#     begin {
+#         write-warning 'broke?, see Text.SkipLinecount for inversion'
+#         $ShouldTake = $true
+#         $linesProcessed = 0
+#     }
+#     process {
+#         foreach($Line in $TextContent) {
+#             if($linesProcessed -gt $TakeCount) {
+#                 $shouldTake = $true
+#                 continue
+#             }
+#             $linesProcessed++
+#             if(-not $ShouldTake) { $Line }
+#         }
+#     }
+#     end {}
+# }
 function Text.TakeLineCount {
     <#
     .SYNOPSIS
@@ -81,11 +128,17 @@ function Text.TakeLineCount {
         - future: Pass StringBuilder around?
         - future: Offset so you say say -2, or +3 index relative the match
     #>
-    [Alias('Text.TakeLines', 'Text.TakeFirstN', 'Text.TakeFirst')]
+    [CmdletBinding()]
+    [Alias(
+        'Text.TakeN',
+        'Text.TakeLines',
+        'Text.TakeFirstN', 'Text.TakeFirst'
+    )]
     [CmdletBinding()]
     param(
 
         # filtering regex
+        [Alias('FirstN', 'N', 'Len')]
         [Parameter(Mandatory, Position=0)]
         [string]$TakeCount,
 
@@ -93,57 +146,27 @@ function Text.TakeLineCount {
         [string[]]$TextContent
     )
     begin {
-        write-warning 'broke?, see Text.SkipLinecount for inversion'
-        $ShouldTake = $true
+        $ShouldTake = $false
         $linesProcessed = 0
     }
     process {
         foreach($Line in $TextContent) {
+            $linesProcessed++
             if($linesProcessed -gt $TakeCount) {
                 $shouldTake = $true
                 continue
             }
-            $linesProcessed++
             if(-not $ShouldTake) { $Line }
         }
     }
-    end {}
-}
-function Text.SkipLineCount {
-    <#
-    .SYNOPSIS
-        ignores all text until you reach the first match, output remaining rows
-        wait until a flag, ignoring output before ti
-    .NOTES
-        - future: Pass StringBuilder around?
-        - future: Offset so you say say -2, or +3 index relative the match
-    #>
-    [Alias('Text.SkipLines', 'Text.SkipFirstN', 'Text.SkipFirst')]
-    [CmdletBinding()]
-    param(
-
-        # filtering regex
-        [Parameter(Mandatory, Position=0)]
-        [string]$SkipCount,
-
-        [Parameter(ValueFromPipeline)]
-        [string[]]$TextContent
-    )
-    begin {
-        $ShouldSkip = $false
-        $linesProcessed = 0
-    }
-    process {
-        foreach($Line in $TextContent) {
-            if($linesProcessed -gt $SkipCount) {
-                $shouldSkip = $true
-                continue
-            }
-            $linesProcessed++
-            if(-not $ShouldSKip) { $Line }
+    end {
+        if($TakeCount -gt $LinesProcessed) {
+            'TakeCount is greater than the number of lines in the input: FirstN: {0}, Parsed: {1}' -f @(
+                $TakeCount, $LinesProcessed
+            )
+            | write-verbose
         }
     }
-    end {}
 }
 function Text.SkipAfterMatch {
     <#
@@ -164,7 +187,9 @@ function Text.SkipAfterMatch {
         [string]$AfterPattern,
 
         [Parameter(ValueFromPipeline)]
-        [string[]]$TextContent
+        [string[]]$TextContent,
+        # default setting ignores the line that matched. this includes it.
+        [switch]$IncludeMatch
     )
     begin {
         $ShouldSkip = $false
@@ -174,9 +199,10 @@ function Text.SkipAfterMatch {
             if(Text.IsEmpty $Line) { continue }
             if($Line -match $AfterPattern) {
                 $ShouldSkip = $true
+                if($IncludeMatch) { $Line }
                 continue
             }
-            if( -not $SHouldSkip) { $Line }
+            if( -not $ShouldSkip) { $Line }
         }
     }
     end {}
@@ -225,7 +251,8 @@ $render = $selected.ForEach({
 $render #| CountOf
 
 hr
-$lines |Text.SkipBeforeMatch '^Commands:'
+
+$lines | Pk.SkipBeforeMatch '^Commands:' -IncludeMatch | CountOf
 <#
 outputs:
 
