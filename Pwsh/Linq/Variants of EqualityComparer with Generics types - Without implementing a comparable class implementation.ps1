@@ -47,6 +47,19 @@ $linky1 = [Linq.Enumerable]::Intersect(
 @($linky3).count | join-string -op 'linky3 count: '
 @($linky4).count | join-string -op 'linky4 count: '
 
+## using a HashSet with [EqualityComparer<T>] generic
+[IO.Fileinfo[]]$files = @(
+    [IO.FileInfo]::new('c:\foo\bar.ps1'),
+    [IO.FileInfo]::new('c:\foo\bar.ps1'),
+    [IO.FileInfo]::new('c:\foo\Bar.ps1')
+)
+$distinct = [hashSet[IO.FileInfo]]::new(
+    $files,
+    [EqualityComparer[IO.FileSystemInfo]]::Create(
+        <# equals #>      { param($x, $y) $x.FullName -eq $y.FullName },
+        <# gethashCode #> { param($x) [StringComparer]::InvariantCulture.GetHashCode( $x.FullName ) }) )
+
+$distinct.fullname # returns 2 items
 <#
 Extra
 a custom [IEquality] comparer, without writing a class

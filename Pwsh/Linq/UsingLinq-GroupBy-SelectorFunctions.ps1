@@ -76,7 +76,11 @@ Parent Items
 
 #>
 
-
+function NewGroup {
+    param( [string[]]$names )
+    return [Enumerable]::GroupBy( $names,
+        [Func[object,string]]{param($n) return $n})
+}
 
 $names = Get-Process | % Name
 $groupedNames =

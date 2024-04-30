@@ -21,6 +21,11 @@ $meta = [ordered]@{
     MyI_Cmd      = $MyInvocation.MyCommand # [ScriptInfo]
     MyI_Cmd_Path = $MyInvocation.MyCommand.Source
 
+    Abbr_Path = $MyInvocation.MyCommand.Source # is this always equal to _.ScriptBlock.File ?
+    Abbr_Name = $MyInvocation.MyCommand.Name
+    Abbr_SbFile= $MyInvocation.MyCommand.ScriptBlock.File
+
+    
 
     # $MyInvocation.MyCommand.Name
     # $MyInvocation
@@ -37,3 +42,9 @@ if($Config.SuperVerboseSummaryRender) {
         else { $_.Value | iot2 -NotSkipMost | ft -auto }
     }
 }
+
+# $Meta.Abbr_All = @{
+    $Meta.Abbr_Path, $meta.Abbr_Name, $meta.Abbr_SbFile | Join.ul
+# render abbr only
+$meta.Keys | ?{ $_ -match 'abbr' }
+    | %{ $Meta[ $_ ] | join-string -f "${_} => {0}" }
