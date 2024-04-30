@@ -47,11 +47,15 @@ $linky1 = [Linq.Enumerable]::Intersect(
 @($linky3).count | join-string -op 'linky3 count: '
 @($linky4).count | join-string -op 'linky4 count: '
 
-# Extra
-# a custom [IEquality] comparer, without writing a class
-# this example for fun randomly adds duplicates
-# from: [discord thread](https://discord.com/channels/180528040881815552/447476117629304853/1198037155264594001)
-$comparerRandomFolder =
+<#
+Extra
+a custom [IEquality] comparer, without writing a class
+this example for fun randomly adds duplicates
+
+    [discord thread](https://discord.com/channels/180528040881815552/447476117629304853/1198037155264594001),
+    [discord thread2](https://discord.com/channels/180528040881815552/447475598911340559/1177305079376793730)
+#>
+$comparerRandomFolder = # from santisq
     [EqualityComparer[IO.DirectoryInfo]]::Create(
         <# equals: #>
         [Func[IO.DirectoryInfo, IO.DirectoryInfo, bool]] {
@@ -60,6 +64,8 @@ $comparerRandomFolder =
         [Func[IO.DirectoryInfo, int]] {
             $args[0].FullName.GetHashCode() })
 
-$hashFolders = [HashSet[IO.DirectoryInfo]]::new($comparerRandomFolder)
+$hashFolders =
+    [HashSet[IO.DirectoryInfo]]::new(
+        $comparerRandomFolder )
 
 0..10 | ForEach-Object { $hashFolders.Add((Get-Item .)) } | Join-string -sep ', ' -op 'RandComparison adds: '
