@@ -1,4 +1,29 @@
 ﻿function MiniCountOf {
+    <#
+    .EXAMPLE
+        🐒> 'a'..'z' | MiniCountOf -OutNull
+        # out:
+            26 Items, First: System.Char
+
+    .EXAMPLE
+        🐒> 0..10 | MiniCountOf | Join-String -sep ', '
+
+        # out:
+            11 Items, First: System.Int32
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+    .EXAMPLE
+        🐒>
+        'a'..'f'
+            | Add-Content -path 'append.txt' -PassThru
+            | MiniCountOf
+            | Join-String -sep ', ' -op 'Adding records: '
+            | Write-Host -bg 'gray15' -fg 'gray70'
+
+        # out:
+            6 Items, First: System.Object[]
+            Adding records: a, b, c, d, e, f
+    #>
     [CmdletBinding()]
     param(
         # Show type names of collection and items
