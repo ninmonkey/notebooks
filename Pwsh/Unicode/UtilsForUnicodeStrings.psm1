@@ -26,8 +26,6 @@ function ShowHex {
     param()
 
     $input | join-string -f ' {0,4:x}' -sep ''
-    # $Input | join-string -f ' {0,-4:x}'
-
     # or for the ToString('x') equivalent:
     # $Input | join-string -f '{0:x}'
 }
