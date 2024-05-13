@@ -123,30 +123,31 @@ function Write.Color {
 }
 
 # 📌 example starts here
-function WriteVioletColor.Pansies {
+function WriteViolet.Pansies {
     # New-Text is from Pansies
     # Pansies is nice in that it converts several formats, including names to a RgbColor
     # the value is an object, so you can filter or modify it later.
     # compared to writing ansi colors inline, like Write.Fg
     param(
         [Parameter(ValueFromPipeline)][string[]] $Content
+        # [object]$Separator
     )
     process {
-        $Content | New-Text -fg 'violet'
+        $Content | New-Text -fg 'violet' #-Separator $Separator
     }
 }
-function WriteVioletColor {
-    # or purely Pwsh
-    param(
-        [Parameter(ValueFromPipeline)][string[]] $Content
-    )
-    begin {
-        $Violet = Write.Fg '#c882f1' # $PSStyle.Foreground.FromRgb('#c882f1')
-    }
-    process {
-        $Content | Join-String -f "$Violet"
-    }
-}
+# function WriteVioletColor {
+#     # or purely Pwsh
+#     param(
+#         [Parameter(ValueFromPipeline)][string[]] $Content
+#     )
+#     begin {
+#         $Violet = $PSStyle.Foreground.FromRgb('#c882f1')
+#     }
+#     process {
+#         $Content | Join-String -f "$Violet"
+#     }
+# }
 function Write.Color.usingPansies {
     <#
     .SYNOPSIS
@@ -179,27 +180,22 @@ function Write.Color.usingPansies {
 }
 
 
-# Write.Fg '#c882f1' | Format-ShowEscapeChar
 Write.Fg '#c882f1' | Format-ShowControlChar
+# Write.Fg '#c882f1' | Format-ShowEscapeChar
 
 0..0x30 -as [Text.Rune[]]
     | Format-ShowControlChar
     | Join-string -sep ' '
 
-'a'..'d'
-    | WriteVioletColor | Join-String -sep ', '
 
 'a'..'d' | Write.Color -Fg '#c882f1' | Join-String -sep ', '
 
-WriteVioletColor -Content (0..3)
-    | Join-String -sep ', '
-
 'foo', 'hi world'
-    | Join-String -op (Write.Fg -Hex '#c882f1') -sep ', '
+    | Join-String -op (Write.Bg -Hex '#303030') -sep ', '
 
 'foo', 'bar'
     | Write.Color -Fg '#c882f1' -ColorBg '#3882f1'
-    | Join-String -sep ', '
+    | Join-String -sep ', ' # -os $PSStyle.Reset -op $PSStyle.Reset
 
 'Write.Color can return a collection of strings : '
 
@@ -217,3 +213,10 @@ WriteVioletColor -Content (0..3)
     - BeforeContent line1 After clear- BeforeContent line2 After clear
 
 #>
+
+# Pansies will give you the gradient between two colors
+$grads = Get-Gradient '#ce88aa' '#1e88aa' -Width 10
+$grads | ForEach-Object {
+    $_ | New-Text -fg $_
+} | Join-String -sep ' ' -op 'Pansies generates gradients: '
+# outputs color range: #CE88AA #C286B1 #B386B8 #A387BD #9088BF #7C88C0 #6689BE #5089B9 #3889B3 #1E88AA
