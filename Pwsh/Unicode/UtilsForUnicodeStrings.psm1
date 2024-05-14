@@ -1,4 +1,6 @@
-﻿function UnicodeLength {
+# Text.Rune and other features used require Pwsh7+
+ 
+ function UnicodeLength {
     <#
     .SYNOPSIS
      this gives the "length" of a string in terms of codepoints (aka runes)
@@ -28,6 +30,14 @@ function ShowHex {
     $input | join-string -f ' {0,4:x}' -sep ''
     # or for the ToString('x') equivalent:
     # $Input | join-string -f '{0:x}'
+}
+
+filter ShowUni {
+   # sugar. nothing to see here...
+   ($_ ?? '').EnumerateRunes()
+       | Join-string -f "`n- {0}" -p {
+           $_.Value.ToString('x'), $_
+       }
 }
 
 $script:Enc8  = [Text.Encoding]::GetEncoding('utf-8')
