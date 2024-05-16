@@ -1,4 +1,5 @@
-﻿
+﻿function hr { '-' * 30 -join '' }
+
 $single = [regex]::Matches('a9', '9')
 
 $few = [regex]::Matches('sda324r32 d23 ew', '(?<Token>.+)')
@@ -7,7 +8,7 @@ $few.Groups | Ft
 
 $single[0].Groups                        | Ft ; hr ;
 $single[0].Captures.groups               | Ft
-                                           hr -fg magenta
+                                           hr
 $few[0].Groups                           | Ft ; hr ;
 $few[0].Captures.groups                  | Ft
 
