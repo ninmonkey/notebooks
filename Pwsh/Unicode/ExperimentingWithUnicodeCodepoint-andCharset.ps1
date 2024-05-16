@@ -11,7 +11,7 @@ $enc_winX.GetEncoding()|Ft
 
 
 
-$Rune = 'ë'
+$Rune = 'ë  '
 # return an object of before and after encoding the character for ervery encoding
 
 
@@ -19,11 +19,9 @@ $Rune = 'ë'
 # $curEnc -is [Encoding]
 $query = $enc_winX.ForEach({
     $curEnc = $_.GetEncoding()
-
-
     $Bytes  = $curEnc.GetBytes( $Rune )
 
-    $info = [ordered]@{
+    $info   = [ordered]@{
         Enc_Codepage = $_.CodePage
         Enc_Name     = $_.Name
         Enc_Display  = $_.DisplayName
@@ -32,16 +30,11 @@ $query = $enc_winX.ForEach({
             | Join-String -f '{0:x}' -sep ' '
 
         Before      = $Rune
+        Enc_TypeName = $curEnc.GetType().FullName
     }
 
-
-
-    #     Enc_        = $encCur.CodePage
-    #     Enc_Type    = $encCur.GetType().fullname
-
-
-
-    # }
+    [pscustomobject]$info
 })
 
-$query | Ft -auto
+$query
+| Ft -auto
