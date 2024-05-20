@@ -2,6 +2,7 @@
 
 # Tuple variations
 ## optionally see the discord thread for context: <https://discord.com/channels/180528040881815552/447476117629304853/1241476332861522052>
+## and <https://discord.com/channels/180528040881815552/447476117629304853/1241927888966520862>
 
 
 ## [d] struct that autocompletes constructor params
