@@ -4,6 +4,17 @@
 ## optionally see the discord thread for context: <https://discord.com/channels/180528040881815552/447476117629304853/1241476332861522052>
 
 
+## [d] struct that autocompletes constructor params
+Add-Type '
+public record struct RecCompleter
+{
+    public string Foo { get; set; }
+    public RecCompleter() { }
+    public RecCompleter(string foo) => Foo = foo;
+}' -IgnoreWarnings
+[RecCompleter]$mp = @{ Foo = 23  }
+
+
 ## [a] Nested Tuples
 'Using [a] using ValueTuple' | Write-warning
 $tuple1 = @{
@@ -35,11 +46,6 @@ Add-Type -TypeDefinition 'public struct MyStruct5 { public string Foo; public st
    Foo = 'foo'
    Bar = 1231
 }
-[MyStruct5]$miss2 = @{
-   Foo = 'foo'
-   Bar = 1231
-}
-
 $miss | ft -AutoSize
 <#
     Foo Bar
@@ -57,7 +63,7 @@ $miss | ConvertTo-Json
 #>
 
 
-'Using [c] records' | Write-warning
+'Using [c] record struct' | Write-warning
 ## [b]
 # $struct1 = @{
 #   [MyStruct]::new('1', '2') ="first";
@@ -65,7 +71,15 @@ $miss | ConvertTo-Json
 # $struct1[[MyStruct]::new('1', '2')]
 
 ## [c]
-Add-Type 'public record MyRect(string foo, string bar);'
+Add-Type 'public record struct recStruct(string foo, string bar);'
+[recStruct]$x = @{ foo = 190; bar = '99' }
+$x | Json
+<#
+    {
+    "foo": "190",
+    "bar": "99"
+    }
+#>
 
 $record1 = @{
   [MyRect]::new('1', '2') ="first";
