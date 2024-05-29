@@ -1,4 +1,5 @@
-﻿function Start-TestConnectionLoop {
+﻿# should be mostly WinPS compatible with minor edits
+function Start-TestConnectionLoop {
     <#
     .SYNOPSIS
         repeat pinging until canceled by ctrl+c. Writes to log every iteration.
@@ -112,3 +113,53 @@
 
 > Get-Content error-history.csv
 '@
+
+
+function Export-PingLogExcel {
+    # extra function. reads both csv files, exports as an excel file
+    # simple version that builds a new file
+    param(
+        [string] $PingLogPath  = 'ping-history.csv',
+        [string] $ErrorLogPath = 'error-history.csv',
+        [string] $ExcelPath    = 'ping-history.xlsx'
+    )
+    $srcHistory      = gi -ea 'stop' $PingLogPath
+    $srcErrorHistory = gi -ea  'stop' $ErrorLogpath
+
+    remove-item $ExcelPath -ea Ignore
+
+    # this does enumerate the list twice. I thought the code might be a little easier to read
+    $stats = Import-Csv -Path $srcHistory |
+        Select-Object -expand DateTime | Measure-Object -Minimum -Maximum
+
+    $Title = 'Ping History: From {0} to {1}' -f @(
+        $Stats.Minimum, $Stats.Maximum
+    )
+
+    $Stats.Minimum, $Stats.Maximum
+    $ExportPing_splat = @{
+        Append        = $true
+        AutoSize      = $true
+        Path          = $ExcelPath
+        TableName     = 'PingTable'
+        TableStyle    = 'Light2'
+        Title         = $Title
+        WorksheetName = 'PingLog'
+    }
+    Import-Csv -Path $srcHistory | Export-Excel @ExportPing_splat
+
+    $ExportError_splat = @{
+        Append        = $true
+        AutoSize      = $true
+        Path          = $ExcelPath
+        TableName     = 'ErrorTable'
+        TableStyle    = 'Light2'
+        Title         = 'Exceptions'
+        WorksheetName = 'Errors'
+    }
+
+    Import-Csv -Path $srcErrorHistory | Export-Excel @ExportError_splat
+    'Wrote: {0}' -f $ExcelPath
+
+    Get-Item -ea 'stop' $ExcelPath | invoke-item
+}
