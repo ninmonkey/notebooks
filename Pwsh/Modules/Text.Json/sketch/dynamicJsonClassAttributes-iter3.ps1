@@ -44,13 +44,15 @@ class SomePS {
     [string] $ProcessName
     [int] $Id
 
-    # [example kind 2]: Serialize property if it's not null, but ignore it if it's null
-    [JsonIgnoreAttribute( Condition = [JsonIgnoreCondition]::WhenWritingNull) ]
-    [string] $MainWindowTitle # next: test if ignore condition works on empty strings
 
     # [example kind 1]: Property on instances to include, but, never serialize it
     [Serialization.JsonIgnoreAttribute()]
     [Diagnostics.ProcessModuleCollection] $Modules
+
+    # [example kind 2]: Serialize property if it's not null, but ignore it if it's null
+    # note: It does not work here beacuse [object][string]::empty is not null
+    [JsonIgnoreAttribute( Condition = [JsonIgnoreCondition]::WhenWritingNull) ]
+    [object] $MainWindowTitle
 
     SomePS ( [object]$Other ) {
         $WantedProps = [Linq.Enumerable]::Intersect( # because linq is fun
@@ -70,6 +72,7 @@ class SomePS {
 $hasModules = get-process | ? Modules | select -First 1
 $hasTitle   = ( ps ) | ? MainWindowTitle | select -first 1
 $noTitle    = ( ps ) | ? -not MainWindowTitle | select -first 1
+$notNullSite = (get-process | ?{ $Null -eq $_.site })
 
 # [a] works
 $hasModules -as [SomePS[]]
