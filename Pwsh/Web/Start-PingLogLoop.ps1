@@ -2,6 +2,8 @@
     <#
     .SYNOPSIS
         repeat pinging until canceled by ctrl+c. Writes to log every iteration.
+    .NOTES
+        You can use the same code to write to an excel sheet using the module ImportExcel
     .EXAMPLE
         Pwsh> Start-TestConnectionLoop -SleepSeconds 0.1 -Verbose -Targets 'somedoesnotexist.com', 9.12.3.3, 'google.com', 1.1.1.1
         Pwsh> Get-Content 'ping-history.csv'
