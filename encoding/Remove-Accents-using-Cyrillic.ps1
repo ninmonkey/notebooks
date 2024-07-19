@@ -5,6 +5,8 @@ function RemoveAccents {
     .notes
         warning: this is a simple method, but does remove non-accented characters that weren't encodable
         it's a single-byte encoding
+    .links
+        https://en.wikipedia.org/wiki/Windows-1251
     #>
     param( [string] $Text )
     $enc = [Text.Encoding]::GetEncoding('iso-8859-5')
