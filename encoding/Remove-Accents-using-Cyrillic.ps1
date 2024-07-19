@@ -1,7 +1,12 @@
 function RemoveAccents { 
     <#
     .synopsis
-      Strip accents from text using cyrillic encoding. warning: this is a simple method, but does remove non-accented characters that weren't encodable
+      Strip accents from text using cyrillic encoding
+    .notes
+        warning: this is a simple method, but does remove non-accented characters that weren't encodable
+        it's a single-byte encoding
+
+        🐒
     #>
     param( [string] $Text )
     $enc = [Text.Encoding]::GetEncoding('iso-8859-5')
@@ -9,6 +14,10 @@ function RemoveAccents {
 }
 
 RemoveAccents 'foo bår'
+    # output: foo bar 
+
+RemoveAccents 'foo 🐒 bar'
+    # output: foo ?? bar
 
 <#
 I'm not 100% this is the best cyrillic to use, there's a few 
