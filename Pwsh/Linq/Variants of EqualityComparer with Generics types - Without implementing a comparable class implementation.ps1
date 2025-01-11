@@ -3,6 +3,8 @@ using namespace System.Collections.Generic
 using namespace System.Collections
 using namespace System.Linq
 
+# 2025: Added a new summary with more methods in this thread: <https://discord.com/channels/180528040881815552/447476117629304853/1327427981995675802>
+
 $all_files  = @( gci 'c:\' -depth 0 -File )
 $some_files = @( $all_files | Get-random -count 4 )
 
